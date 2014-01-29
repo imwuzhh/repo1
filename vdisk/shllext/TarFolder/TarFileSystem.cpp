@@ -63,14 +63,14 @@ LONG CTarShellModule::GetConfigInt(VFS_CONFIG Item)
 
    case VFS_INT_SHELLROOT_SFGAO:
        return   SFGAO_FOLDER 
-			  //| SFGAO_CANCOPY 
-              //| SFGAO_CANMOVE 
-              //| SFGAO_CANRENAME 
+			  | SFGAO_CANCOPY 
+              | SFGAO_CANMOVE 
+              | SFGAO_CANRENAME 
               | SFGAO_DROPTARGET
               | SFGAO_STREAM
               | SFGAO_BROWSABLE 
               | SFGAO_HASSUBFOLDER 
-              //| SFGAO_HASPROPSHEET 
+              | SFGAO_HASPROPSHEET 
               | SFGAO_FILESYSANCESTOR
               | SFGAO_STORAGEANCESTOR;
 
@@ -159,7 +159,10 @@ CTarFileSystem::~CTarFileSystem()
 HRESULT CTarFileSystem::Init(PCIDLIST_ABSOLUTE pidlRoot)
 {
    // Get the filename of the Windows source file.
-   WCHAR wszTarFilename[MAX_PATH] = L"D:\\cifs\\lab\\tarballs\\sample.tar";//{ 0 };
+   WCHAR wszTarFilename[MAX_PATH] = L""; 
+   GetModuleFileNameW(GetModuleHandleA("TarFolder64.dll"), wszTarFilename, MAX_PATH);
+   wcsrchr(wszTarFilename, L'\\')[1] = 0;
+   wcscat(wszTarFilename, L"sample.tar");
 #if 0
    if( !::SHGetPathFromIDListW(pidlRoot, wszTarFilename) ) return E_FAIL;
 #endif

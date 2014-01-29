@@ -1,2 +1,12 @@
 EXPORTS
-	tar_createarchive
+	tar_createarchive 
+	tar_openarchive 
+	tar_closearchive 
+	tar_getfindinfo 
+	tar_getfilelist 
+	tar_renamefile 
+	tar_deletefile 
+	tar_createfolder 
+	tar_setfileattribs 
+	tar_readfile 
+	tar_writefile 

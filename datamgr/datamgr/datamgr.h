@@ -16,7 +16,8 @@
 // Beware of bugs.
 //
 
-#pragma once
+#ifndef __LIB_DATAMGR_H__
+#define __LIB_DATAMGR_H__
 
 
 #define TAR_MAXNAMELEN 100
@@ -66,6 +67,9 @@ typedef struct tagTAR_ARCHIVE
    CComAutoCriticalSection csLock;               // Thread lock
 } TAR_ARCHIVE;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 HRESULT tar_createarchive(LPCWSTR pstrFilename);
 HRESULT tar_openarchive(LPCWSTR pstrFilename, TAR_ARCHIVE** ppArchive);
@@ -78,3 +82,9 @@ HRESULT tar_createfolder(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);
 HRESULT tar_setfileattribs(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, DWORD dwAttributes);
 HRESULT tar_readfile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD& dwFileSize);
 HRESULT tar_writefile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

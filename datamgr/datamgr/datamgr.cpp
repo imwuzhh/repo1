@@ -1,9 +1,30 @@
+#pragma warning(disable:4996)
 #include <Windows.h>
 #include <ShlObj.h>
 #include <atlbase.h>
-#define HR(x) {return true;}
-#define IsBitSet(x,y) true
-#define lengthof(x) 0
+
+///////////////////////////////////////////////////////////////////////////////
+// Macros
+
+#ifndef lengthof
+   #define lengthof(x)  (sizeof(x)/sizeof(x[0]))
+#endif  // lengthof
+
+#ifndef offsetof
+  #define offsetof(type, field)  ((int)&((type*)0)->field)
+#endif  // offsetof
+
+#ifndef IsBitSet
+   #define IsBitSet(val, bit)  (((val)&(bit))!=0)
+#endif // IsBitSet
+
+
+#ifdef _DEBUG
+   #define HR(expr)  { HRESULT _hr; if(FAILED(_hr=(expr))) { _CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, NULL, #expr); _CrtDbgBreak(); return _hr; } }  
+#else
+   #define HR(expr)  { HRESULT _hr; if(FAILED(_hr=(expr))) return _hr; }
+#endif // _DEBUG
+
 
 #include "datamgr.h"
 
@@ -11,7 +32,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // TAR helper functions
 
-static DWORD tar_getoct(LPCSTR pstr, SIZE_T cchMax)
+  DWORD tar_getoct(LPCSTR pstr, SIZE_T cchMax)
 {
    DWORD dwValue = 0;
    while( --cchMax > 0 && *pstr != '\0' ) {
@@ -24,7 +45,7 @@ static DWORD tar_getoct(LPCSTR pstr, SIZE_T cchMax)
    return dwValue;
 }
 
-static void tar_putoct(LPSTR pstr, SIZE_T cchMax, DWORD dwValue)
+  void tar_putoct(LPSTR pstr, SIZE_T cchMax, DWORD dwValue)
 {
    ATLASSERT(cchMax>0);
    pstr[--cchMax] = '\0';
@@ -34,13 +55,13 @@ static void tar_putoct(LPSTR pstr, SIZE_T cchMax, DWORD dwValue)
    }
 }
 
-static DWORD tar_roundnearestblock(DWORD dwPos)
+  DWORD tar_roundnearestblock(DWORD dwPos)
 {
    if( (dwPos % TAR_BLOCKSIZE) != 0 ) dwPos += TAR_BLOCKSIZE - (dwPos % TAR_BLOCKSIZE);
    return dwPos;
 }
 
-static void tar_getfullpath(const TAR_HEADER& Header, LPSTR pstrPath, char chSep)
+  void tar_getfullpath(const TAR_HEADER& Header, LPSTR pstrPath, char chSep)
 {
    // TAR filenames can have all kinds of UNIX prefix formats
    // One goal is to clean out entries such as:
@@ -62,7 +83,7 @@ static void tar_getfullpath(const TAR_HEADER& Header, LPSTR pstrPath, char chSep
    }
 }
 
-static void tar_getfolderpath(const TAR_HEADER& Header, LPSTR pstrPath, char chSep)
+  void tar_getfolderpath(const TAR_HEADER& Header, LPSTR pstrPath, char chSep)
 {
    tar_getfullpath(Header, pstrPath, chSep);
    LPSTR pstrSep = strrchr(pstrPath, chSep);
@@ -70,7 +91,7 @@ static void tar_getfolderpath(const TAR_HEADER& Header, LPSTR pstrPath, char chS
    else pstrPath[0] = '\0';
 }
 
-static void tar_getfilename(const TAR_HEADER& Header, LPSTR pstrName)
+  void tar_getfilename(const TAR_HEADER& Header, LPSTR pstrName)
 {
    char szFullPath[TAR_MAXPATHLEN + 1] = { 0 };
    tar_getfullpath(Header, szFullPath, '/');
@@ -79,7 +100,7 @@ static void tar_getfilename(const TAR_HEADER& Header, LPSTR pstrName)
    else strcpy_s(pstrName, TAR_MAXNAMELEN, szFullPath);
 }
 
-static DWORD tar_findeof(const TAR_ARCHIVE* pArchive)
+  DWORD tar_findeof(const TAR_ARCHIVE* pArchive)
 {
    // Most TAR files are terminated with 2 empty blocks; however the size of the
    // blocks and number actually varies between implementations. We'll have to
@@ -111,7 +132,7 @@ static DWORD tar_findeof(const TAR_ARCHIVE* pArchive)
    return 0;
 }
 
-static time_t tar_getunixtime()
+  time_t tar_getunixtime()
 {
    SYSTEMTIME stTime = { 0 }; 
    ::GetSystemTime(&stTime); 
@@ -124,7 +145,7 @@ static time_t tar_getunixtime()
    return (time_t) llTime;
 }
 
-static void tar_makeheader(TAR_HEADER& Header, BOOL bIsNew, LPCSTR pstrFilename, DWORD dwFileSize, DWORD dwAttributes)
+  void tar_makeheader(TAR_HEADER& Header, BOOL bIsNew, LPCSTR pstrFilename, DWORD dwFileSize, DWORD dwAttributes)
 {
    // Create a .tar file header.
    // NOTE: We don't really support ustar in this version!
@@ -163,7 +184,7 @@ static void tar_makeheader(TAR_HEADER& Header, BOOL bIsNew, LPCSTR pstrFilename,
    tar_putoct(Header.chksum, sizeof(Header.chksum) - 1, dwChecksum);
 }
 
-static HRESULT tar_addtocache(TAR_ARCHIVE* pArchive, TAR_FILEINFO& Info)
+  HRESULT tar_addtocache(TAR_ARCHIVE* pArchive, TAR_FILEINFO& Info)
 {
    // Test folder for duplicate entries
    if( Info.Header.typeflag == '5' ) {
@@ -182,7 +203,7 @@ static HRESULT tar_addtocache(TAR_ARCHIVE* pArchive, TAR_FILEINFO& Info)
    return S_OK;
 }
 
-static TAR_FILEINFO* tar_getfileptr(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
+  TAR_FILEINFO* tar_getfileptr(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
 {
    char szFilename[TAR_MAXPATHLEN + 1];
    strcpy_s(szFilename, lengthof(szFilename), CW2A(pwstrFilename));
@@ -195,7 +216,7 @@ static TAR_FILEINFO* tar_getfileptr(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename
    return NULL;
 }
 
-static HRESULT tar_convertfileinfo(TAR_ARCHIVE* pArchive, const TAR_FILEINFO* pInfo, WIN32_FIND_DATA* pData)
+  HRESULT tar_convertfileinfo(TAR_ARCHIVE* pArchive, const TAR_FILEINFO* pInfo, WIN32_FIND_DATA* pData)
 {
    // Clear and fill out WIN32_FIND_DATA structure
    ::ZeroMemory(pData, sizeof(WIN32_FIND_DATA));

@@ -112,6 +112,7 @@ HRESULT CTarShellModule::DllUninstall()
    return S_OK;
 }
 
+
 /**
  * Called on ShellNew integration.
  * Invoked by user through Desktop ContextMenu -> New -> Tar Folder.
@@ -160,7 +161,7 @@ HRESULT CTarFileSystem::Init(PCIDLIST_ABSOLUTE pidlRoot)
 {
    // Get the filename of the Windows source file.
    WCHAR wszTarFilename[MAX_PATH] = L""; 
-   GetModuleFileNameW(GetModuleHandleA("TarFolder64.dll"), wszTarFilename, MAX_PATH);
+   GetModuleFileNameW(GetModuleHandleA("vdrive64.dll"), wszTarFilename, MAX_PATH);
    wcsrchr(wszTarFilename, L'\\')[1] = 0;
    wcscat(wszTarFilename, L"sample.tar");
 #if 0

@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="TarFolder"
+	Name="vdrive"
 	ProjectGUID="{59734B95-2C5C-4B66-9817-5EFF39B82135}"
 	RootNamespace="TarFolder"
 	Keyword="Win32Proj"
@@ -44,12 +44,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../ShFrwk"
+				AdditionalIncludeDirectories="../ShFrwk;.;../../../datamgr/datamgr"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="2"
 				WarningLevel="3"
@@ -123,12 +123,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../ShFrwk"
+				AdditionalIncludeDirectories="../ShFrwk;.;../../../datamgr/datamgr"
 				PreprocessorDefinitions="WIN32;WIN64;_DEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="2"
 				DebugInformationFormat="3"
@@ -200,10 +200,10 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../ShFrwk"
+				AdditionalIncludeDirectories="../ShFrwk;.;../../../datamgr/datamgr"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				ExceptionHandling="0"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="2"
@@ -282,10 +282,10 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../ShFrwk;."
+				AdditionalIncludeDirectories="../ShFrwk;.;../../../datamgr/datamgr"
 				PreprocessorDefinitions="WIN32;WIN64;NDEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				ExceptionHandling="0"
-				RuntimeLibrary="0"
+				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				RuntimeTypeInfo="false"
 				UsePrecompiledHeader="0"
@@ -304,6 +304,7 @@
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\$(ProjectName)64.dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="../../../datamgr/Release"
 				ModuleDefinitionFile="TarFolder.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -400,10 +401,6 @@
 			</File>
 			<File
 				RelativePath=".\TarFolder.rc"
-				>
-			</File>
-			<File
-				RelativePath=".\xtar.cpp"
 				>
 			</File>
 			<Filter
@@ -510,10 +507,6 @@
 			</File>
 			<File
 				RelativePath=".\TarFileSystem.h"
-				>
-			</File>
-			<File
-				RelativePath=".\xtar.h"
 				>
 			</File>
 			<Filter

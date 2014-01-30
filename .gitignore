@@ -5,7 +5,5 @@
 *.dll
 *.suo
 *.aps
-*/[Dd]ebug/
-*/[Rr]elease/
-*/*/[Dd]ebug/
-*/*/[Rr]elease/
+Debug
+Release

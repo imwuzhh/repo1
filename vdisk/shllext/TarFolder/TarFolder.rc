@@ -63,6 +63,7 @@ IDR_SHELL_ROOT_PROPERTIES    XML DISCARDABLE         "res/properties.xslt"
 IDI_APP                 ICON    DISCARDABLE     "res/Folder.ico"
 ID_COMMAND_EXTRACT      ICON    DISCARDABLE     "res/Extract.ico"
 
+
 /////////////////////////////////////////////////////////////////////////////
 //
 // Bitmap
@@ -137,12 +138,12 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-   IDS_NSE_PROJNAME        "TarFolder"
-   IDS_NSE_DISPLAYNAME     "Tar folder"
-   IDS_NSE_DESCRIPTION     "Tar Shell Extension"
+   IDS_NSE_PROJNAME        "vdrive"
+   IDS_NSE_DISPLAYNAME     "edoc2 virtual drive"
+   IDS_NSE_DESCRIPTION     "edoc2 virtual drive shell extension"
    IDS_NSE_FILEEXTENSION   ".tar"
-   IDS_NSE_VENDOR          "www.viksoe.dk"
-   IDS_NSE_VOLUME          "Tar Archive"
+   IDS_NSE_VENDOR          "www.edoc2.com"
+   IDS_NSE_VOLUME          "edoc2VirtualDisk"
    IDS_NSE_URLPROTOCOL     "xxx"
 END
 
@@ -183,13 +184,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "viksoe.dk"
-            VALUE "FileDescription", "TAR Folder Shell Extension"
+            VALUE "CompanyName", "edoc2.com"
+            VALUE "FileDescription", "edoc2 virtual drive shell extension"
             VALUE "FileVersion", "1.0.0.0"
-            VALUE "LegalCopyright", "Copyright (C) 2009 viksoe.dk All rights reserved."
-            VALUE "InternalName", "TarFolder.dll"
-            VALUE "OriginalFilename", "TarFolder.dll"
-            VALUE "ProductName", "TarFolder"
+            VALUE "LegalCopyright", "Copyright (C) 2014 edoc2.com All rights reserved."
+            VALUE "InternalName", "vdrive.dll"
+            VALUE "OriginalFilename", "vdrive.dll"
+            VALUE "ProductName", "vdrive"
             VALUE "ProductVersion", "1.0.0.0"
             VALUE "OLESelfRegister", ""
         END

@@ -19,7 +19,11 @@
 #pragma once
 
 #include "NseFileSystem.h"
-#include "xtar.h"
+
+// HarryWu, 2014.1.29
+// the data source implementation.
+#include <datamgr.h>
+#pragma comment(lib, "libdatamgr64.lib")
 
 
 ///////////////////////////////////////////////////////////////////////////////

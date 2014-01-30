@@ -106,6 +106,9 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    // Get actual path and retrieve a list of sub-items
    WCHAR wszPath[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszPath) );
+   // HarryWu, 2014.1.29
+   // Note!, it is NOT safe to pass c++ objects array between modules.
+   // use /MD to genereate these modules.
    CSimpleValArray<WIN32_FIND_DATA> aList;
    HR( tar_getfilelist(_GetTarArchivePtr(), wszPath, aList) );
    for( int i = 0; i < aList.GetSize(); i++ ) {

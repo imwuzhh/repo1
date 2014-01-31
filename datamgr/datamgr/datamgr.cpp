@@ -254,29 +254,11 @@
 // TAR archive manipulation
 
 /**
- * Creates an empty tar archive.
- * This method is only called by the ShellNew shell integration. 
- * It creates an empty archive. Any tar file must be terminated with two
- * empty blocks of data.
- */
-HRESULT tar_createarchive(LPCWSTR pstrFilename)
-{
-   HANDLE hFile = ::CreateFile(pstrFilename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-   if( hFile == INVALID_HANDLE_VALUE ) return AtlHresultFromLastError();
-   TAR_HEADER Empty = { 0 };
-   DWORD dwBytesWritten = 0;
-   ::WriteFile(hFile, &Empty, sizeof(Empty), &dwBytesWritten, NULL);
-   ::WriteFile(hFile, &Empty, sizeof(Empty), &dwBytesWritten, NULL);
-   ::CloseHandle(hFile);
-   return S_OK;
-}
-
-/**
  * Opens an existing .tar archive.
  * Here we basically memorize the filename of the .tar achive, and we only
  * open the file later on when it is actually needed the first time.
  */
-HRESULT tar_openarchive(LPCWSTR pwstrFilename, TAR_ARCHIVE** ppArchive)
+HRESULT DMOpen(LPCWSTR pwstrFilename, TAR_ARCHIVE** ppArchive)
 {
    TAR_ARCHIVE* pArchive = new TAR_ARCHIVE();
    if( pArchive == NULL ) return E_OUTOFMEMORY;
@@ -304,7 +286,7 @@ HRESULT tar_commit(TAR_ARCHIVE* pArchive)
 /**
  * Close the archive.
  */
-HRESULT tar_closearchive(TAR_ARCHIVE* pArchive)
+HRESULT DMClose(TAR_ARCHIVE* pArchive)
 {
    if( pArchive == NULL ) return E_INVALIDARG;
    HR( tar_commit(pArchive) );
@@ -390,7 +372,7 @@ HRESULT tar_archiveinit(TAR_ARCHIVE* pArchive)
  * Convert the archive file information to a Windows WIN32_FIND_DATA structure, which
  * contains the basic information we must know about a virtual file/folder.
  */
-HRESULT tar_getfindinfo(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DATA* pData)
+HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DATA* pData)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    HR( tar_archiveinit(pArchive) );
@@ -402,7 +384,7 @@ HRESULT tar_getfindinfo(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_
 /**
  * Return the list of children of a sub-folder.
  */
-HRESULT tar_getfilelist(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, CSimpleValArray<WIN32_FIND_DATA>& aList)
+HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, CSimpleValArray<WIN32_FIND_DATA>& aList)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    HR( tar_archiveinit(pArchive) );
@@ -422,7 +404,7 @@ HRESULT tar_getfilelist(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, CSimpleValArra
  * Rename a file or folder in the archive.
  * Notice that we do not support rename of a folder, which contains files, yet.
  */
-HRESULT tar_renamefile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPCWSTR pwstrNewName)
+HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPCWSTR pwstrNewName)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    HR( tar_archiveinit(pArchive) );
@@ -431,7 +413,7 @@ HRESULT tar_renamefile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPCWSTR pws
    // BUG: This version doesn't support renaming of folders with files in it!!
    if( pInfo->Header.typeflag == '5' ) {
       CSimpleValArray<WIN32_FIND_DATA> aList;
-      HR( tar_getfilelist(pArchive, pwstrFilename, aList) );
+      HR( DMGetChildrenList(pArchive, pwstrFilename, aList) );
       if( aList.GetSize() > 0 ) return AtlHresultFromWin32(ERROR_NOT_SUPPORTED);
       if( pInfo->bProtected ) return E_ACCESSDENIED;
    }
@@ -458,7 +440,7 @@ HRESULT tar_renamefile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPCWSTR pws
 /**
  * Delete a file or folder.
  */
-HRESULT tar_deletefile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
+HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    HR( tar_archiveinit(pArchive) );
@@ -472,12 +454,12 @@ HRESULT tar_deletefile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
    //      list will yield a stable fileptr list, even when recursive.
    if( pInfo->Header.typeflag == '5' ) {
       CSimpleValArray<WIN32_FIND_DATA> aList;
-      HR( tar_getfilelist(pArchive, pwstrFilename, aList) );
+      HR( DMGetChildrenList(pArchive, pwstrFilename, aList) );
       for( int i = aList.GetSize() - 1; i >= 0; --i ) {
          WCHAR wszFilename[MAX_PATH] = { 0 };
          wcscpy_s(wszFilename, lengthof(wszFilename), pwstrFilename);
          ::PathAppend(wszFilename, aList[i].cFileName);
-         HR( tar_deletefile(pArchive, wszFilename) );
+         HR( DMDelete(pArchive, wszFilename) );
       }
       HR( tar_archiveinit(pArchive) );
       pInfo = tar_getfileptr(pArchive, pwstrFilename);
@@ -515,19 +497,19 @@ HRESULT tar_deletefile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
 /**
  * Create a new sub-folder in the archive.
  */
-HRESULT tar_createfolder(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
+HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    // We can create a folder by writing an empty file with the correct
-   // file attributes. The tar_writefile() will know what to do.
+   // file attributes. The DMWriteFile() will know what to do.
    BYTE aEmpty[1] = { 0 };
-   return tar_writefile(pArchive, pwstrFilename, aEmpty, 0, FILE_ATTRIBUTE_DIRECTORY);
+   return DMWriteFile(pArchive, pwstrFilename, aEmpty, 0, FILE_ATTRIBUTE_DIRECTORY);
 }
 
 /**
  * Change the file-attributes of a file.
  */
-HRESULT tar_setfileattribs(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, DWORD dwAttributes)
+HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, DWORD dwAttributes)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    HR( tar_archiveinit(pArchive) );
@@ -550,13 +532,13 @@ HRESULT tar_setfileattribs(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, DWORD d
  * Create a new file in the archive.
  * This method expects a memory buffer containing the entire file contents.
  */
-HRESULT tar_writefile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes)
+HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    HRESULT Hr = S_OK;
    HR( tar_archiveinit(pArchive) );
    // Must remove file first in case it is already there
-   tar_deletefile(pArchive, pwstrFilename);
+   DMDelete(pArchive, pwstrFilename);
    // So we must create the .tar file header
    TAR_HEADER Empty = { 0 };
    TAR_HEADER Header = { 0 };
@@ -604,7 +586,7 @@ HRESULT tar_writefile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE
  * Reads a file from the archive.
  * The method returns the contents of the entire file in a memory buffer.
  */
-HRESULT tar_readfile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD& dwFileSize)
+HRESULT DMReadFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD& dwFileSize)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    HRESULT Hr = S_OK;

@@ -71,17 +71,20 @@ typedef struct tagTAR_ARCHIVE
 extern "C" {
 #endif
 
-HRESULT tar_createarchive(LPCWSTR pstrFilename);
-HRESULT tar_openarchive(LPCWSTR pstrFilename, TAR_ARCHIVE** ppArchive);
-HRESULT tar_closearchive(TAR_ARCHIVE* pArchive);
-HRESULT tar_getfindinfo(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DATA* pData);
-HRESULT tar_getfilelist(TAR_ARCHIVE* pArchive, LPCWSTR pstrPath, CSimpleValArray<WIN32_FIND_DATA>& aList);
-HRESULT tar_renamefile(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, LPCWSTR pstrNewName);
-HRESULT tar_deletefile(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);
-HRESULT tar_createfolder(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);
-HRESULT tar_setfileattribs(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, DWORD dwAttributes);
-HRESULT tar_readfile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD& dwFileSize);
-HRESULT tar_writefile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes);
+HRESULT DMOpen(LPCWSTR pstrFilename, TAR_ARCHIVE** ppArchive);
+HRESULT DMClose(TAR_ARCHIVE* pArchive);
+
+HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pstrPath, CSimpleValArray<WIN32_FIND_DATA>& aList);
+
+HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, LPCWSTR pstrNewName);
+HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);
+HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);
+
+HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, DWORD dwAttributes);
+
+HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DATA* pData);
+HRESULT DMReadFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD& dwFileSize);
+HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes);
 
 #ifdef __cplusplus
 }

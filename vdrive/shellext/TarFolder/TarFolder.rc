@@ -86,7 +86,7 @@ BEGIN
     POPUP "ContextMenu"
     BEGIN
         MENUITEM SEPARATOR
-        MENUITEM "&Extract",                     ID_FILE_EXTRACT
+        MENUITEM "&Download",                    ID_FILE_EXTRACT
         MENUITEM SEPARATOR
         POPUP "&New"
         BEGIN
@@ -96,7 +96,7 @@ BEGIN
     POPUP "ViewMenu"
     BEGIN
         MENUITEM SEPARATOR
-        MENUITEM "&Extract",                     ID_FILE_EXTRACT
+        MENUITEM "&Download",                    ID_FILE_EXTRACT
         MENUITEM SEPARATOR
         POPUP "&New"
         BEGIN
@@ -107,12 +107,12 @@ BEGIN
     END
     POPUP "CommandMenu"
     BEGIN
-        MENUITEM "&Extract",                     ID_COMMAND_EXTRACT
+        MENUITEM "&Download",                    ID_COMMAND_EXTRACT
     END
     POPUP "ExplorerMenu"
     BEGIN
         MENUITEM SEPARATOR
-        MENUITEM "&Extract all...",              ID_FILE_EXTRACT
+        MENUITEM "&Download all...",             ID_FILE_EXTRACT
     END
 END
 
@@ -122,11 +122,11 @@ BEGIN
     BEGIN
         MENUITEM "&Open",                        ID_FILE_OPEN
         MENUITEM SEPARATOR
-        MENUITEM "&Extract",                     ID_FILE_EXTRACT
+        MENUITEM "&Download",                    ID_FILE_EXTRACT
     END
     POPUP "CommandMenu"
     BEGIN
-        MENUITEM "&Extract",                     ID_COMMAND_EXTRACT
+        MENUITEM "&Download",                    ID_COMMAND_EXTRACT
     END
 END
 
@@ -139,7 +139,7 @@ END
 STRINGTABLE DISCARDABLE 
 BEGIN
    IDS_NSE_PROJNAME        "vdrive"
-   IDS_NSE_DISPLAYNAME     "edoc2 virtual drive"
+   IDS_NSE_DISPLAYNAME     "vdrive"
    IDS_NSE_DESCRIPTION     "edoc2 virtual drive shell extension"
    IDS_NSE_FILEEXTENSION   ".tar"
    IDS_NSE_VENDOR          "www.edoc2.com"
@@ -152,12 +152,12 @@ BEGIN
    ID_FILE_OPEN            "Open document\nopen"
    ID_FILE_NEWFOLDER       "Create a new folder\nNewFolder"
    ID_FILE_PROPERTIES      "Show document properties\nproperties"
-   ID_FILE_EXTRACT         "Extract file(s) from TAR Archive\nextract"
+   ID_FILE_EXTRACT         "Download file(s) from Remote Archive\nDownload"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-   IDS_EXTRACTTITLE        "Extract file(s) from TAR folder to..."
+   IDS_EXTRACTTITLE        "Download file(s) from Remote folder to..."
    IDS_NEWFOLDER           "New Folder"
 END
 

@@ -56,7 +56,7 @@ HRESULT CTarFileStream::Read(LPVOID pData, ULONG dwSize, ULONG& dwBytesRead)
    if( m_uAccess != GENERIC_READ ) return E_ACCESSDENIED;
    // Read the entire file now and keep the contents in a memory buffer
    if( m_pData == NULL ) {
-      HR( tar_readfile(m_spFS->m_pArchive, m_wszFilename, &m_pData, m_dwFileSize) );
+      HR( DMReadFile(m_spFS->m_pArchive, m_wszFilename, &m_pData, m_dwFileSize) );
    }
    // Transfer data from memory buffer
    dwBytesRead = dwSize;
@@ -99,7 +99,7 @@ HRESULT CTarFileStream::Commit()
    if( m_uAccess != GENERIC_WRITE ) return E_FAIL;
    // On file creation, we write file contents to memory first, then
    // commit everything to disk on file close. This is the commit phase.
-   HR( tar_writefile(m_spFS->m_pArchive, m_wszFilename, m_pData, m_dwFileSize, FILE_ATTRIBUTE_NORMAL) );
+   HR( DMWriteFile(m_spFS->m_pArchive, m_wszFilename, m_pData, m_dwFileSize, FILE_ATTRIBUTE_NORMAL) );
    return S_OK;
 }
 

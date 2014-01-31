@@ -53,7 +53,7 @@ HRESULT CTarFileItem::SetProperty(REFPROPERTYKEY pkey, const CComPropVariant& v)
       HR( ::PropVariantToUInt32(v, &uFileAttribs) );
       WCHAR wszFilename[MAX_PATH] = { 0 };
       HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
-      HR( tar_setfileattribs(_GetTarArchivePtr(), wszFilename, uFileAttribs) );
+      HR( DMSetFileAttr(_GetTarArchivePtr(), wszFilename, uFileAttribs) );
       // Update properties of our NSE Item
       m_pWfd->dwFileAttributes = uFileAttribs;
       return S_OK;
@@ -91,7 +91,7 @@ HRESULT CTarFileItem::GetChild(LPCWSTR pwstrName, SHGNO ParseType, CNseItem** pI
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
    ::PathAppend(wszFilename, pwstrName);
    WIN32_FIND_DATA wfd = { 0 };
-   HR( tar_getfindinfo(_GetTarArchivePtr(), wszFilename, &wfd) );
+   HR( DMGetFileAttr(_GetTarArchivePtr(), wszFilename, &wfd) );
    *pItem = GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, wfd);
    return *pItem != NULL ? S_OK : E_OUTOFMEMORY;
 }
@@ -110,7 +110,7 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    // Note!, it is NOT safe to pass c++ objects array between modules.
    // use /MD to genereate these modules.
    CSimpleValArray<WIN32_FIND_DATA> aList;
-   HR( tar_getfilelist(_GetTarArchivePtr(), wszPath, aList) );
+   HR( DMGetChildrenList(_GetTarArchivePtr(), wszPath, aList) );
    for( int i = 0; i < aList.GetSize(); i++ ) {
       // Filter item according to the 'grfFlags' argument
       if( SHFilterEnumItem(grfFlags, aList[i]) != S_OK ) continue;
@@ -139,9 +139,9 @@ HRESULT CTarFileItem::CreateFolder()
    // Create new directory in archive
    WCHAR wszFilename[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
-   HR( tar_createfolder(_GetTarArchivePtr(), wszFilename) );
+   HR( DMCreateFolder(_GetTarArchivePtr(), wszFilename) );
    // Update properties of our NSE Item
-   tar_getfindinfo(_GetTarArchivePtr(), wszFilename, m_pWfd);
+   DMGetFileAttr(_GetTarArchivePtr(), wszFilename, m_pWfd);
    return S_OK;
 }
 
@@ -161,7 +161,7 @@ HRESULT CTarFileItem::Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName)
    // ++++
 
    // Rename the item in archive
-   HR( tar_renamefile(_GetTarArchivePtr(), wszFilename, pstrOutputName) );
+   HR( DMRename(_GetTarArchivePtr(), wszFilename, pstrOutputName) );
    return S_OK;
 }
 
@@ -172,7 +172,7 @@ HRESULT CTarFileItem::Delete()
 {
    WCHAR wszFilename[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
-   HR( tar_deletefile(_GetTarArchivePtr(), wszFilename) );
+   HR( DMDelete(_GetTarArchivePtr(), wszFilename) );
    return S_OK;
 }
 

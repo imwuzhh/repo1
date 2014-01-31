@@ -119,7 +119,7 @@ HRESULT CTarShellModule::DllUninstall()
  */
 HRESULT CTarShellModule::ShellAction(LPCWSTR pstrType, LPCWSTR pstrCmdLine)
 {
-   if( wcscmp(pstrType, L"ShellNew") == 0 ) return tar_createarchive(pstrCmdLine);
+   if( wcscmp(pstrType, L"ShellNew") == 0 ) E_FAIL;
    return S_OK;
 }
 
@@ -154,7 +154,7 @@ CTarFileSystem::CTarFileSystem() : m_cRef(1), m_pArchive(NULL)
 
 CTarFileSystem::~CTarFileSystem()
 {
-   tar_closearchive(m_pArchive);
+   DMClose(m_pArchive);
 }
 
 HRESULT CTarFileSystem::Init(PCIDLIST_ABSOLUTE pidlRoot)
@@ -170,7 +170,7 @@ HRESULT CTarFileSystem::Init(PCIDLIST_ABSOLUTE pidlRoot)
    // Initialize the .tar archive; this operation doesn't actually touch
    // the file because a file-system is spawned for many operations
    // that doesn't need the physical files.
-   HR( tar_openarchive(wszTarFilename, &m_pArchive) );
+   HR( DMOpen(wszTarFilename, &m_pArchive) );
    return S_OK;
 }
 

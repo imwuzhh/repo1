@@ -74,6 +74,11 @@ CNseItem* CTarFileItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE p
 
 /**
  * Create an NSE Item instance from static data.
+ *
+ * HarryWu, 2014.2.2
+ * pass parameter <WIN32_FIND_DATA:wfd> by ref should be more effective.
+ * and values in <WIN32_FIND_DATA:wfd> present in debug mode is not correct,
+ * if pass <WIN32_FIND_DATA:wfd> by value.
  */
 CNseItem* CTarFileItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA & wfd)
 {
@@ -119,7 +124,7 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
       // Create an NSE Item from the file-info data
       aItems.Add( GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, aList[i]) );
    }
-   if (aList != NULL) { delete [] aList; aList = NULL;}
+   DMFreeChildrenList(_GetTarArchivePtr(), aList, nListCount);
    return S_OK;
 }
 

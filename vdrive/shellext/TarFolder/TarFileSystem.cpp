@@ -56,10 +56,10 @@ LONG CTarShellModule::GetConfigInt(VFS_CONFIG Item)
       return VFS_LOCATION_MYCOMPUTER;
 
    case VFS_INT_MAX_FILENAME_LENGTH:
-      return TAR_MAXNAMELEN;
+      return MAX_PATH;
 
    case VFS_INT_MAX_PATHNAME_LENGTH:
-      return TAR_MAXPATHLEN;
+      return MAX_PATH;
 
    case VFS_INT_SHELLROOT_SFGAO:
        return   SFGAO_FOLDER 

@@ -65,10 +65,6 @@ HRESULT DMOpen(LPCWSTR pwstrFilename, TAR_ARCHIVE** ppArchive)
 {
    TAR_ARCHIVE* pArchive = new TAR_ARCHIVE();
    if( pArchive == NULL ) return E_OUTOFMEMORY;
-   pArchive->hFile = INVALID_HANDLE_VALUE;
-   pArchive->ftLastWrite.dwLowDateTime = 0;
-   pArchive->ftLastWrite.dwHighDateTime = 0;
-   wcscpy_s(pArchive->wszFilename, lengthof(pArchive->wszFilename), pwstrFilename);
    *ppArchive = pArchive;
    return S_OK;
 }
@@ -102,6 +98,7 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DA
    if (INVALID_HANDLE_VALUE  == hFind)
 	   return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
 
+   // Attention, if not closed, the file/folder will be locked!
    FindClose(hFind); hFind = INVALID_HANDLE_VALUE;
 
    return S_OK;
@@ -129,6 +126,7 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_D
 	   if (wfd.cFileName[0] != _T('.'))
 			retWin32FindData.push_back(wfd);
    }
+   // Attention! remember to close handle.
    FindClose(hFind);
 
    if (retWin32FindData.size() == 0){
@@ -150,6 +148,18 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_D
    }
 
    return S_OK;
+}
+
+/**
+* HarryWu, 2014.2.2
+* Free the previous allocated memory of this module.
+* it is not safe to free them in other module.
+*/
+HRESULT DMFreeChildrenList(TAR_ARCHIVE* pArchive, WIN32_FIND_DATA * aList, int nListCount)
+{
+	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+	if (aList) delete [] aList;
+	return S_OK;
 }
 
 /**

@@ -3,6 +3,8 @@ EXPORTS
 	DMClose 
 	 
 	DMGetChildrenList 
+	DMFreeChildrenList
+	
 	DMRename 
 	DMDelete
 	DMCreateFolder

@@ -124,7 +124,7 @@ class CTarFileStream : public CNseFileStream
 {
 public:
    CRefPtr<CTarFileSystem> m_spFS;               // Reference to source archive
-   WCHAR m_wszFilename[TAR_MAXPATHLEN + 1];      // Local path to file
+   WCHAR m_wszFilename[MAX_PATH + 1];            // Local path to file
    LPBYTE m_pData;                               // Memory buffer
    DWORD m_dwAllocSize;                          // Allocated memory so far
    DWORD m_dwCurPos;                             // Current position in memory buffer

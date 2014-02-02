@@ -407,7 +407,7 @@ CNseItem* CNseBaseItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE p
 /**
  * Create a NSE Item from static data.
  */
-CNseItem* CNseBaseItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA wfd)
+CNseItem* CNseBaseItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA & wfd)
 {
    // TODO: You're a folder; override and implement this...
    ATLASSERT(false);

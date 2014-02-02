@@ -95,6 +95,13 @@ DWORD WINAPI LaunchThread(LPVOID pData)
       // Let a quick-dying launch process linger a bit...
       if( ::GetTickCount() - dwTick < 4000UL ) ::Sleep(3000UL);
 
+	  // HarryWu, 2014.2.2
+	  // Nice, viksoe have done the this work for us.
+	  // after the editor exit, this following code will
+	  // commit the changes to the virtual folder.
+	  // we just commit them to server.
+	  // Thanks.
+
       // Write changes to file back to virtual file-system...
       FILETIME ftAfter = GetFileModifiedTime(data.szDestFile);
       if( ftAfter.dwLowDateTime != 0 && ::CompareFileTime(&ftAfter, &ftWrite) > 0 ) {

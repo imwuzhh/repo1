@@ -244,7 +244,7 @@ public:
    virtual VFS_FOLDERSETTINGS GetFolderSettings() = 0;
 
    virtual CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, PCITEMID_CHILD pidlItem, BOOL bReleaseItem) = 0;
-   virtual CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA wfd) = 0;
+   virtual CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA & wfd) = 0;
 
    virtual HRESULT GetChild(LPCWSTR pstrName, SHGNO ParseType, CNseItem** pItem) = 0;
    virtual HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleArray<CNseItem*>& aList) = 0;
@@ -333,7 +333,7 @@ public:
    VFS_FOLDERSETTINGS GetFolderSettings();
 
    CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, PCITEMID_CHILD pidlItem, BOOL bReleaseItem);
-   CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA wfd);
+   CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA & wfd);
 
    HRESULT GetChild(LPCWSTR pstrName, SHGNO ParseType, CNseItem** pItem);
    HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aList);

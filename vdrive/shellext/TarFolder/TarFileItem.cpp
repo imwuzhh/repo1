@@ -75,7 +75,7 @@ CNseItem* CTarFileItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE p
 /**
  * Create an NSE Item instance from static data.
  */
-CNseItem* CTarFileItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA wfd)
+CNseItem* CTarFileItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA & wfd)
 {
    NSEFILEPIDLDATA data = { sizeof(NSEFILEPIDLDATA), TARFILE_MAGIC_ID, 1, wfd };
    return new CTarFileItem(pFolder, pidlFolder, GenerateITEMID(&data, sizeof(data)), TRUE);
@@ -103,20 +103,23 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
 {
    // Only directories have sub-items
    if( !IsFolder() ) return E_HANDLE;
+
    // Get actual path and retrieve a list of sub-items
    WCHAR wszPath[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszPath) );
+
    // HarryWu, 2014.1.29
    // Note!, it is NOT safe to pass c++ objects array between modules.
    // use /MD to genereate these modules.
-   CSimpleValArray<WIN32_FIND_DATA> aList;
-   HR( DMGetChildrenList(_GetTarArchivePtr(), wszPath, aList) );
-   for( int i = 0; i < aList.GetSize(); i++ ) {
+   WIN32_FIND_DATA * aList = NULL; int nListCount = 0;
+   HR( DMGetChildrenList(_GetTarArchivePtr(), wszPath, &aList, &nListCount) );
+   for( int i = 0; i < nListCount; i++ ) {
       // Filter item according to the 'grfFlags' argument
       if( SHFilterEnumItem(grfFlags, aList[i]) != S_OK ) continue;
       // Create an NSE Item from the file-info data
       aItems.Add( GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, aList[i]) );
    }
+   if (aList != NULL) { delete [] aList; aList = NULL;}
    return S_OK;
 }
 

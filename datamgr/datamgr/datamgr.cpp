@@ -130,36 +130,27 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_D
    FindClose(hFind);
 
    if (retWin32FindData.size() == 0){
-	   *retList = NULL;
-	   *nListCount = 0;
+	   *retList = NULL; *nListCount = 0;
 	   return S_OK;
    }
 
    *nListCount = retWin32FindData.size();
-   *retList = new WIN32_FIND_DATA[*nListCount];
-   WIN32_FIND_DATA *aList = *retList;
+
+   if (S_OK != DMMalloc((LPBYTE *)retList, retWin32FindData.size() * sizeof(WIN32_FIND_DATA))){
+	   *retList = NULL; *nListCount = 0;	
+	   return E_OUTOFMEMORY;
+   }
+
+   WIN32_FIND_DATA *aList = (WIN32_FIND_DATA *)(*retList);
 
    int index = 0;
    for(std::list<WIN32_FIND_DATA>::iterator it = retWin32FindData.begin(); 
-	   it != retWin32FindData.end();
-	   it ++){
+	   it != retWin32FindData.end(); it ++){
 		aList [index] = *it;
 		index ++;
    }
 
    return S_OK;
-}
-
-/**
-* HarryWu, 2014.2.2
-* Free the previous allocated memory of this module.
-* it is not safe to free them in other module.
-*/
-HRESULT DMFreeChildrenList(TAR_ARCHIVE* pArchive, WIN32_FIND_DATA * aList, int nListCount)
-{
-	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-	if (aList) delete [] aList;
-	return S_OK;
 }
 
 /**
@@ -271,7 +262,7 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE p
  * Reads a file from the archive.
  * The method returns the contents of the entire file in a memory buffer.
  */
-HRESULT DMReadFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD& dwFileSize)
+HRESULT DMReadFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD* pdwFileSize)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    OUTPUTLOG("%s(), pwstrFilename=%s", __FUNCTION__, pwstrFilename ? WSTR2ASTR(pwstrFilename) : "");
@@ -281,24 +272,51 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuff
 
    struct _stat _st = {0}; _wstat(fullpath.c_str(), &_st);
 
-   dwFileSize = _st.st_size;
-   *ppbBuffer = (LPBYTE)malloc(dwFileSize);
-   memset(*ppbBuffer, 'E', dwFileSize);
+   // Use DMFree() to free it.
+   if (S_OK != DMMalloc(ppbBuffer, _st.st_size))
+	   return E_OUTOFMEMORY;
+
+   memset(*ppbBuffer, 0, (_st.st_size));
 
    FILE * fin = _wfopen(fullpath.c_str(), _T("rb"));
-   if (fin){
-		dwFileSize = fread(*ppbBuffer, 1, dwFileSize, fin);
-		if (dwFileSize < _st.st_size)
-		{
-			fclose(fin); free(*ppbBuffer); dwFileSize = 0;
-			return E_FAIL;
-		}
-		fclose(fin);
-   }else{
-	   free(*ppbBuffer); dwFileSize = 0;
+   if (!fin){
+	   DMFree(*ppbBuffer);
 	   return AtlHresultFromLastError();
    }
 
-   return S_OK;
+	int bytesread = fread(*ppbBuffer, 1, _st.st_size, fin);
+	if (bytesread < _st.st_size)
+	{
+		fclose(fin); DMFree(*ppbBuffer);
+		return E_FAIL;
+	}
+
+	fclose(fin);
+	*pdwFileSize = _st.st_size;
+	return S_OK;
+}
+
+HRESULT DMMalloc(LPBYTE * ppBuffer, DWORD dwBufSize)
+{
+	*ppBuffer = (LPBYTE)malloc(dwBufSize);
+	if (*ppBuffer != NULL)
+		return S_OK;
+	else 
+		return E_OUTOFMEMORY;
+}
+
+HRESULT DMRealloc(LPBYTE * ppBuffer, DWORD dwBufSize)
+{
+	*ppBuffer = (LPBYTE)realloc(*ppBuffer, dwBufSize);
+	if (*ppBuffer != NULL)
+		return S_OK;
+	else 
+		return E_OUTOFMEMORY;
+}
+
+HRESULT DMFree(LPBYTE pBuffer)
+{
+	free(pBuffer);
+	return S_OK;
 }
 

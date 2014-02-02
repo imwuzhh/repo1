@@ -56,7 +56,7 @@ HRESULT CTarFileStream::Read(LPVOID pData, ULONG dwSize, ULONG& dwBytesRead)
    if( m_uAccess != GENERIC_READ ) return E_ACCESSDENIED;
    // Read the entire file now and keep the contents in a memory buffer
    if( m_pData == NULL ) {
-      HR( DMReadFile(m_spFS->m_pArchive, m_wszFilename, &m_pData, m_dwFileSize) );
+      HR( DMReadFile(m_spFS->m_pArchive, m_wszFilename, &m_pData, &m_dwFileSize) );
    }
    // Transfer data from memory buffer
    dwBytesRead = dwSize;
@@ -74,7 +74,7 @@ HRESULT CTarFileStream::Write(LPCVOID pData, ULONG dwSize, ULONG& dwBytesWritten
    // Grow the buffer?
    if( m_dwCurPos + dwSize > m_dwAllocSize || m_pData == NULL ) {
       while( m_dwCurPos + dwSize > m_dwAllocSize ) m_dwAllocSize *= 2;
-      m_pData = (LPBYTE) realloc(m_pData, m_dwAllocSize);
+      DMRealloc(&m_pData, m_dwAllocSize);
       if( m_pData == NULL ) return E_OUTOFMEMORY;
    }
    // NOTE: We limit the filesize because we're currently using
@@ -105,7 +105,7 @@ HRESULT CTarFileStream::Commit()
 
 HRESULT CTarFileStream::Close()
 {
-   if( m_pData != NULL ) free(m_pData);
+   if( m_pData != NULL ) DMFree(m_pData);
    m_pData = NULL;
    return S_OK;
 }

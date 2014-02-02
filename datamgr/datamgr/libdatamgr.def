@@ -3,7 +3,6 @@ EXPORTS
 	DMClose 
 	 
 	DMGetChildrenList 
-	DMFreeChildrenList
 	
 	DMRename 
 	DMDelete
@@ -14,3 +13,7 @@ EXPORTS
 	
 	DMReadFile 
 	DMWriteFile
+	
+	DMMalloc
+	DMRealloc
+	DMFree

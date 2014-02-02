@@ -124,7 +124,7 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
       // Create an NSE Item from the file-info data
       aItems.Add( GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, aList[i]) );
    }
-   DMFreeChildrenList(_GetTarArchivePtr(), aList, nListCount);
+   DMFree((LPBYTE)aList);
    return S_OK;
 }
 

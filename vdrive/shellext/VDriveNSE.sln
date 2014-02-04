@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TarFolder", "TarFolder\TarFolder.vcproj", "{59734B95-2C5C-4B66-9817-5EFF39B82135}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VDriveNSE", "TarFolder\VDriveNSE.vcproj", "{59734B95-2C5C-4B66-9817-5EFF39B82135}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

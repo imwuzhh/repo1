@@ -2,7 +2,6 @@
 *.user
 *.obj
 *.pdb
-*.dll
 *.suo
 *.aps
 Debug

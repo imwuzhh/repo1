@@ -67,7 +67,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\$(ProjectName)32.dll"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				GenerateManifest="false"
 				ModuleDefinitionFile="libdatamgr.def"
 				GenerateDebugInformation="true"
@@ -145,7 +145,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				OutputFile="$(OutDir)\$(ProjectName)64.dll"
-				LinkIncremental="2"
+				LinkIncremental="1"
 				ModuleDefinitionFile="libdatamgr.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"

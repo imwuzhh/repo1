@@ -1,9 +1,50 @@
+//////////////////////////////////////////////////////////////////////////
+// History
+// HarryWu, 2014.2.4
+// fix E_UNEXPECTED report error.
+// while copy/move internal folder with sub items into another internal
+// folder, shell will complains catastrophic error(E_UNEXPECTED), that
+// is because shell will initialize <dest>/target_folder, and then
+// try to commit it, but TarFolder have not initialize its m_pStream
+// member, so the Commit(...) call will return E_UNEXPECTED.
+// Here are some logs
+// ++++++
+// [2556] CFileStream::Init(000000000852A440), fullpath=Temp, FileName=3
+// [2556] CFileStream::Init(000000000852A600), fullpath=vdrive, FileName=3
+// [2556] CFileStream::Commit(000000000852A600), m_pStream=0000000000000000, m_bNeedCommit=0, flag=00000000
+// [2556] CFileStream::FinalRelease(000000000852A600), m_pStream=0000000000000000, m_bNeedCommit=0
+// [2556] CFileStream::FinalRelease(000000000852A440), m_pStream=000000000852FBF0, m_bNeedCommit=0
+// ------
+// the <000000000852A440> is the source folder, and <000000000852A600> is the dest folder.
+// source folder's m_pStream filed is initialized by TarFolder extension later.
+// So, to avoid this unexpected error, test the m_bNeedCommit flag,
+// if this flag is false, although m_pStream is NULL, return S_OK to shell.
+// 
 
 #include "stdafx.h"
 
 #include "FileStream.h"
 #include "ShellFolder.h"
 
+///////////////////////////////////////////////////////////////////////////////
+// Debug helper functions
+#include <string>
+static std::string WideStringToAnsi(const wchar_t * wstr){
+	if (!wstr) return "";
+	char szAnsi [MAX_PATH] = "";
+	WideCharToMultiByte(CP_ACP, 0, wstr, wcslen(wstr), szAnsi, lengthof(szAnsi), NULL, NULL);
+	return szAnsi;
+}
+static void OutputLog(const char * format, ...){
+	va_list va;
+	va_start(va, format);
+	char szMsg [0x400] = "";
+	_vsnprintf_s(szMsg, lengthof(szMsg), format, va);
+	OutputDebugStringA(szMsg);
+	OutputDebugStringA("\n");
+}
+#define WSTR2ASTR(w) (WideStringToAnsi(w).c_str())
+#define OUTPUTLOG OutputLog
 
 ///////////////////////////////////////////////////////////////////////////////
 // CFileStream
@@ -16,6 +57,7 @@ CFileStream::CFileStream() : m_pStream(NULL), m_bNeedCommit(false)
 void CFileStream::FinalRelease()
 {
    ATLTRACE(L"CFileStream::FinalRelease\n");
+   OUTPUTLOG("%s(%p), m_pStream=%p, m_bNeedCommit=%d", __FUNCTION__, this, m_pStream, (int)m_bNeedCommit);
    if( m_pStream != NULL && m_bNeedCommit ) m_pStream->Commit();
    delete m_pStream;
 }
@@ -24,6 +66,13 @@ HRESULT CFileStream::Init(CShellFolder* pFolder, PCUITEMID_CHILD pidlItem)
 {
    m_spFolder = pFolder;
    m_pidlItem = pidlItem;
+   NSEFILEPIDLDATA * pDebugInfo = (NSEFILEPIDLDATA *)pidlItem;
+   if (pDebugInfo->magic == TARFILE_MAGIC_ID){
+	    LPWSTR theName = NULL;
+	    m_spFolder->m_pidlMonitor.GetName(SIGDN_NORMALDISPLAY, &theName);
+        CoTaskMemFree(theName);
+		OUTPUTLOG("%s(%p), Folder=%s, FileName=%s", __FUNCTION__, this, WSTR2ASTR(theName), WSTR2ASTR(pDebugInfo->wfd.cFileName));
+   }
    return S_OK;
 }
 
@@ -107,7 +156,13 @@ STDMETHODIMP CFileStream::CopyTo(IStream* pstm, ULARGE_INTEGER cb, ULARGE_INTEGE
 STDMETHODIMP CFileStream::Commit(DWORD grfCommitFlags)
 {
    ATLTRACE(L"CFileStream::Commit  flags=0x%X\n", grfCommitFlags); grfCommitFlags;
-   if( m_pStream == NULL ) return E_UNEXPECTED;
+   // HarryWu, 2014.2.4
+   // I think that, if m_bNeedCommit is false, 
+   // E_UNEXPECTED can be skipped.
+   // otherwise, a <Catastrophic failure> reported and Abort.
+   OUTPUTLOG("%s(%p), m_pStream=%p, m_bNeedCommit=%d, flag=%08x", __FUNCTION__, this, m_pStream, (int)m_bNeedCommit, grfCommitFlags);
+   if( m_pStream == NULL && m_bNeedCommit) 
+	   return E_UNEXPECTED;
    if( !m_bNeedCommit ) return S_OK;
    HR( m_pStream->Commit() );
    m_bNeedCommit = false;

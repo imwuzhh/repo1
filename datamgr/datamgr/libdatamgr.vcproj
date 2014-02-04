@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="libdatamgr"
-	ProjectGUID="{59734B95-2C5C-4B66-9817-5EFF39B82135}"
+	ProjectGUID="{544C9092-7887-4BA4-AAF9-DA9E4F2EC304}"
 	RootNamespace="TarFolder"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"

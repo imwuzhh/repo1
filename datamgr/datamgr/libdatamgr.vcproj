@@ -72,6 +72,8 @@
 				ModuleDefinitionFile="libdatamgr.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -149,6 +151,8 @@
 				ModuleDefinitionFile="libdatamgr.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="1"
 				TargetMachine="17"
 			/>
 			<Tool
@@ -198,7 +202,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="2"
+				Optimization="0"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="."
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
@@ -227,8 +231,8 @@
 				ModuleDefinitionFile="libdatamgr.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
+				OptimizeReferences="1"
+				EnableCOMDATFolding="1"
 				TargetMachine="1"
 			/>
 			<Tool

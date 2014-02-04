@@ -534,14 +534,21 @@ HRESULT CNseBaseItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
    if( Cmd.pDataObject == NULL ) return E_FAIL;
    // Do paste operation...
    if( Cmd.pFO == NULL ) {
-      HR( ::SHCreateFileOperation(Cmd.hWnd, FOF_NOCOPYSECURITYATTRIBS | FOF_NOCONFIRMMKDIR | FOFX_NOSKIPJUNCTIONS, &Cmd.pFO) );
+      HR( ::SHCreateFileOperation(Cmd.hWnd
+		  // HarryWu, 2014.2.4
+		  // I try to skip the prompt, default to 'Yes'!
+		  // by OR the flag FOF_NOCONFIRMATION.
+		  , FOF_NOCOPYSECURITYATTRIBS | FOF_NOCONFIRMMKDIR | FOFX_NOSKIPJUNCTIONS | FOF_NOCONFIRMATION
+		  , &Cmd.pFO) );
    }
    // FIX: The Shell complains about E_INVALIDARG on IFileOperation::MoveItems() so we'll
    //      do the file-operation in two steps.
    CComPtr<IShellItem> spTargetFolder;
    HR( ::SHCreateItemFromIDList(_GetFullPidl(), IID_PPV_ARGS(&spTargetFolder)) );
    Cmd.pFO->CopyItems(Cmd.pDataObject, spTargetFolder);
-   if( Cmd.dwDropEffect == DROPEFFECT_MOVE ) Cmd.pFO->DeleteItems(Cmd.pDataObject);
+   if( Cmd.dwDropEffect == DROPEFFECT_MOVE ) {
+	   Cmd.pFO->DeleteItems(Cmd.pDataObject);
+   }
    // We handled this operation successfully for all items in selection
    return NSE_S_ALL_DONE;
 }

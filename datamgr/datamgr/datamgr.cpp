@@ -32,14 +32,12 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Debug helper functions
-std::string WideStringToAnsi(const wchar_t * wstr){
+static std::string WideStringToAnsi(const wchar_t * wstr){
+	if (!wstr) return "";
 	char szAnsi [MAX_PATH] = "";
 	WideCharToMultiByte(CP_ACP, 0, wstr, wcslen(wstr), szAnsi, lengthof(szAnsi), NULL, NULL);
 	return szAnsi;
 }
-
-#define WSTR2ASTR(w) (WideStringToAnsi(w).c_str())
-
 static void OutputLog(const char * format, ...){
 	va_list va;
 	va_start(va, format);
@@ -48,9 +46,11 @@ static void OutputLog(const char * format, ...){
 	OutputDebugStringA(szMsg);
 	OutputDebugStringA("\n");
 }
-
+#define WSTR2ASTR(w) (WideStringToAnsi(w).c_str())
 #define OUTPUTLOG OutputLog
 
+///////////////////////////////////////////////////////////////////////////////
+// cache directory
 #define VDRIVE_LOCAL_CACHE_ROOT _T("d:\\workspace\\temp\\vdrivecache\\")
 
 ///////////////////////////////////////////////////////////////////////////////

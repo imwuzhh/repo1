@@ -15,7 +15,6 @@
 BOOL CTarShellModule::GetConfigBool(VFS_CONFIG Item)
 {
    switch( Item ) {
-   case VFS_CAN_ROOT_PROPERTIES:
    case VFS_CAN_ROOT_URLPROTOCOL:
 	   return TRUE;
 

@@ -51,7 +51,7 @@ static void OutputLog(const char * format, ...){
 
 ///////////////////////////////////////////////////////////////////////////////
 // cache directory
-#define VDRIVE_LOCAL_CACHE_ROOT _T("d:\\workspace\\temp\\vdrivecache\\")
+#define VDRIVE_LOCAL_CACHE_ROOT _T("c:\\temp\\vdrivecache\\")
 
 ///////////////////////////////////////////////////////////////////////////////
 // TAR archive manipulation

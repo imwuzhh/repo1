@@ -247,8 +247,14 @@ HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, DWORD dwAttr
 
    OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, pwstrFilename);
 
-   // TODO: HarryWu, 2014.2.5
-   // setup attributes to file/folder
+   std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
+   fullpath += pwstrFilename;
+
+   if (!PathFileExists(fullpath.c_str()))
+	   return AtlHresultFromLastError();
+
+   if (!SetFileAttributes(fullpath.c_str(), dwAttributes))
+	   return AtlHresultFromLastError();
 
    return S_OK;
 }

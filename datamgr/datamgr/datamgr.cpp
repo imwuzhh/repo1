@@ -89,7 +89,7 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DA
    
    if (NULL == pstrFilename) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), pwstrPath=[%s]", __FUNCTION__, pstrFilename);
+   OUTPUTLOG("%s(), pwstrPath=[%s]", __FUNCTION__, WSTR2ASTR(pstrFilename));
 
    std::wstring fullpath  = VDRIVE_LOCAL_CACHE_ROOT;
    fullpath += pstrFilename;
@@ -105,6 +105,12 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DA
    // Attention, if not closed, the file/folder will be locked!
    FindClose(hFind);
 
+   // refine the attributes.
+   pData->dwFileAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;   
+   pData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
+   if (!IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+	   pData->dwFileAttributes |= FILE_ATTRIBUTE_VIRTUAL;
+
    return S_OK;
 }
 
@@ -117,7 +123,7 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_D
 
    if (NULL == pwstrPath) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), pwstrPath=[%s]", __FUNCTION__, pwstrPath);
+   OUTPUTLOG("%s(), pwstrPath=[%s]", __FUNCTION__, WSTR2ASTR(pwstrPath));
 
    *retList = NULL; *nListCount = 0;
 
@@ -153,8 +159,12 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_D
    for(std::list<WIN32_FIND_DATA>::iterator it = tmpList.begin(); 
 	   it != tmpList.end(); it ++){
 		aList [index] = *it;
-		// TODO: HarryWu, Attributes refine according TarFolder.
-		// ...
+		// refine the attributes.
+		WIN32_FIND_DATA * pData = &aList[index];
+		pData->dwFileAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;   
+		pData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
+		if (!IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+			pData->dwFileAttributes |= FILE_ATTRIBUTE_VIRTUAL;
 		index ++;
    }
 
@@ -172,7 +182,7 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPCWSTR pwstrNewN
 
    if (NULL == pwstrFilename || NULL == pwstrNewName) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), pwstrFilename=[%s], pwstrNewName=[%s]", __FUNCTION__, pwstrFilename, pwstrNewName);
+   OUTPUTLOG("%s(), pwstrFilename=[%s], pwstrNewName=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename), WSTR2ASTR(pwstrNewName));
 
    std::wstring sourcePath = VDRIVE_LOCAL_CACHE_ROOT;
    sourcePath += pwstrFilename;
@@ -194,7 +204,7 @@ HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
    
    if (NULL == pwstrFilename) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, pwstrFilename);
+   OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
 
    std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
    fullpath += pwstrFilename;
@@ -224,7 +234,7 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
    
    if (NULL == pwstrFilename ) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, pwstrFilename);
+   OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
 
    std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
    fullpath += pwstrFilename;
@@ -245,7 +255,7 @@ HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, DWORD dwAttr
    
    if (NULL == pwstrFilename) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, pwstrFilename);
+   OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
 
    std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
    fullpath += pwstrFilename;
@@ -271,7 +281,7 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE p
    
    if (NULL == pwstrFilename || !pbBuffer || !dwFileSize) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), pwstrFilename=[%s], dwFileSize=[%d]", __FUNCTION__, pwstrFilename, dwFileSize);
+   OUTPUTLOG("%s(), pwstrFilename=[%s], dwFileSize=[%d]", __FUNCTION__, WSTR2ASTR(pwstrFilename), dwFileSize);
 
    std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
    fullpath += pwstrFilename;
@@ -300,7 +310,7 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuff
 
 	if (NULL == pwstrFilename ) return E_INVALIDARG;
 
-	OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, pwstrFilename);
+	OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
 
 	std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
 	fullpath += pwstrFilename;

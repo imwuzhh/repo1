@@ -43,8 +43,7 @@ static void OutputLog(const char * format, ...){
 	va_start(va, format);
 	char szMsg [0x400] = "";
 	_vsnprintf_s(szMsg, lengthof(szMsg), format, va);
-	OutputDebugStringA(szMsg);
-	OutputDebugStringA("\n");
+	OutputDebugStringA(szMsg); OutputDebugStringA("\n");
 }
 #define WSTR2ASTR(w) (WideStringToAnsi(w).c_str())
 #define OUTPUTLOG OutputLog
@@ -87,19 +86,24 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive)
 HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DATA* pData)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   OUTPUTLOG("%s(), pwstrPath=%s", __FUNCTION__, (pstrFilename && wcslen(pstrFilename)) ? WSTR2ASTR(pstrFilename) : "<ROOT>");
+   
+   if (NULL == pstrFilename) return E_INVALIDARG;
 
-   std::wstring dir_prefix  = VDRIVE_LOCAL_CACHE_ROOT;
-   dir_prefix += pstrFilename;
-   if (!PathFileExists(dir_prefix.c_str())){
+   OUTPUTLOG("%s(), pwstrPath=[%s]", __FUNCTION__, pstrFilename);
+
+   std::wstring fullpath  = VDRIVE_LOCAL_CACHE_ROOT;
+   fullpath += pstrFilename;
+
+   if (!PathFileExists(fullpath.c_str())){
 	   return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
    }
-   HANDLE hFind = FindFirstFile(dir_prefix.c_str(), pData);
+
+   HANDLE hFind = FindFirstFile(fullpath.c_str(), pData);
    if (INVALID_HANDLE_VALUE  == hFind)
 	   return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
 
    // Attention, if not closed, the file/folder will be locked!
-   FindClose(hFind); hFind = INVALID_HANDLE_VALUE;
+   FindClose(hFind);
 
    return S_OK;
 }
@@ -110,46 +114,51 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DA
 HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_DATA ** retList, int * nListCount)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   OUTPUTLOG("%s(), pwstrPath=%s", __FUNCTION__, (pwstrPath && wcslen(pwstrPath)) ? WSTR2ASTR(pwstrPath) : "<ROOT>");
 
-   std::list<WIN32_FIND_DATA> retWin32FindData;
+   if (NULL == pwstrPath) return E_INVALIDARG;
 
-   std::wstring dir_prefix = VDRIVE_LOCAL_CACHE_ROOT;
-   dir_prefix += pwstrPath ? pwstrPath : _T("");
-   dir_prefix += _T("\\*");
+   OUTPUTLOG("%s(), pwstrPath=[%s]", __FUNCTION__, pwstrPath);
 
-   HANDLE hFind = INVALID_HANDLE_VALUE;
+   *retList = NULL; *nListCount = 0;
+
+   std::list<WIN32_FIND_DATA> tmpList;
+   std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
+   fullpath += pwstrPath;
+   fullpath += _T("\\*");
+
    WIN32_FIND_DATA wfd;
-   if (INVALID_HANDLE_VALUE == (hFind = FindFirstFile(dir_prefix.c_str(), &wfd)))
+   HANDLE hFind = FindFirstFile(fullpath.c_str(), &wfd);
+   if (INVALID_HANDLE_VALUE == hFind)
 	   return AtlHresultFromLastError();
-   while (FindNextFile(hFind, &wfd)){
-	   if (wfd.cFileName[0] != _T('.'))
-			retWin32FindData.push_back(wfd);
+
+   while (true){
+	   if (wcscmp(wfd.cFileName, _T(".")) && wcscmp(wfd.cFileName, _T("..")))
+			tmpList.push_back(wfd);
+	   if (!FindNextFile(hFind, &wfd))
+		   break;
    }
+
    // Attention! remember to close handle.
    FindClose(hFind);
 
-   if (retWin32FindData.size() == 0){
-	   *retList = NULL; *nListCount = 0;
-	   return S_OK;
-   }
+   if (tmpList.size() == 0) return S_OK;
 
-   *nListCount = retWin32FindData.size();
-
-   if (S_OK != DMMalloc((LPBYTE *)retList, retWin32FindData.size() * sizeof(WIN32_FIND_DATA))){
-	   *retList = NULL; *nListCount = 0;	
+   if (S_OK != DMMalloc((LPBYTE *)retList, tmpList.size() * sizeof(WIN32_FIND_DATA))){
 	   return E_OUTOFMEMORY;
    }
 
    WIN32_FIND_DATA *aList = (WIN32_FIND_DATA *)(*retList);
 
    int index = 0;
-   for(std::list<WIN32_FIND_DATA>::iterator it = retWin32FindData.begin(); 
-	   it != retWin32FindData.end(); it ++){
+   for(std::list<WIN32_FIND_DATA>::iterator it = tmpList.begin(); 
+	   it != tmpList.end(); it ++){
 		aList [index] = *it;
+		// TODO: HarryWu, Attributes refine according TarFolder.
+		// ...
 		index ++;
    }
 
+   *nListCount = tmpList.size();
    return S_OK;
 }
 
@@ -160,17 +169,19 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_D
 HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPCWSTR pwstrNewName)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   OUTPUTLOG("%s(), pwstrFilename=%s, pwstrNewName=%s", __FUNCTION__, pwstrFilename ? WSTR2ASTR(pwstrFilename) : "", pwstrNewName ? WSTR2ASTR(pwstrNewName) : "");
-   std::wstring dir_prefix = VDRIVE_LOCAL_CACHE_ROOT;
-   std::wstring origin = dir_prefix;
-   origin += pwstrFilename;
+
+   if (NULL == pwstrFilename || NULL == pwstrNewName) return E_INVALIDARG;
+
+   OUTPUTLOG("%s(), pwstrFilename=[%s], pwstrNewName=[%s]", __FUNCTION__, pwstrFilename, pwstrNewName);
+
+   std::wstring sourcePath = VDRIVE_LOCAL_CACHE_ROOT;
+   sourcePath += pwstrFilename;
    
-   wchar_t szNew [MAX_PATH] = _T(""); wcscpy_s(szNew, lengthof(szNew), origin.c_str());
+   wchar_t szNew [MAX_PATH] = _T(""); wcscpy_s(szNew, lengthof(szNew), sourcePath.c_str());
    wcsrchr(szNew, _T('\\'))[1] = 0;
    wcscat_s(szNew, lengthof(szNew), pwstrNewName);
 
-   MoveFile(origin.c_str(), szNew);
-
+   ::MoveFile(sourcePath.c_str(), szNew);
    return S_OK;
 }
 
@@ -180,7 +191,11 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPCWSTR pwstrNewN
 HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   OUTPUTLOG("%s(), pwstrFilename=%s", __FUNCTION__, pwstrFilename ? WSTR2ASTR(pwstrFilename) : "");
+   
+   if (NULL == pwstrFilename) return E_INVALIDARG;
+
+   OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, pwstrFilename);
+
    std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
    fullpath += pwstrFilename;
    
@@ -190,12 +205,6 @@ HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
    wchar_t szFullPath [MAX_PATH] = _T(""); memset(szFullPath, 0, sizeof(szFullPath));
    wcscpy_s(szFullPath, lengthof(szFullPath) - 1, fullpath.c_str());
 
-#if 0
-   std::wstring cmdstr = _T("/c \"rd /s /q %s\"");
-   wchar_t szCmd [MAX_PATH] = _T("");
-   _swprintf(szCmd, cmdstr.c_str(), szFullPath);
-   ShellExecute(GetActiveWindow(), _T("Open"), _T("c:\\windows\\system32\\cmd.exe"), szCmd, NULL, SW_HIDE);
-#else
    SHFILEOPSTRUCT shfop; memset(&shfop, 0, sizeof(shfop));
    shfop.hwnd = ::GetActiveWindow();
    shfop.wFunc = FO_DELETE;
@@ -203,7 +212,6 @@ HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
    shfop.pFrom = szFullPath;
    shfop.pTo = NULL;
    SHFileOperation(&shfop);
-#endif
    return S_OK;
 }
 
@@ -213,12 +221,18 @@ HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
 HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   OUTPUTLOG("%s(), pwstrFilename=%s", __FUNCTION__, pwstrFilename ? WSTR2ASTR(pwstrFilename) : "");
-   std::wstring dir_prefix = VDRIVE_LOCAL_CACHE_ROOT;
-   dir_prefix += pwstrFilename;
-   if (!PathFileExists(dir_prefix.c_str())){
-		SHCreateDirectory(GetActiveWindow(), dir_prefix.c_str());
+   
+   if (NULL == pwstrFilename ) return E_INVALIDARG;
+
+   OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, pwstrFilename);
+
+   std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
+   fullpath += pwstrFilename;
+
+   if (!PathFileExists(fullpath.c_str())){
+		SHCreateDirectory(GetActiveWindow(), fullpath.c_str());
    }
+
    return S_OK;
 }
 
@@ -228,7 +242,14 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
 HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, DWORD dwAttributes)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   OUTPUTLOG("%s(), pwstrFilename=%s", __FUNCTION__, pwstrFilename ? WSTR2ASTR(pwstrFilename) : "");
+   
+   if (NULL == pwstrFilename) return E_INVALIDARG;
+
+   OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, pwstrFilename);
+
+   // TODO: HarryWu, 2014.2.5
+   // setup attributes to file/folder
+
    return S_OK;
 }
 
@@ -241,10 +262,14 @@ HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, DWORD dwAttr
 HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   OUTPUTLOG("%s(), pwstrFilename=%s, dwFileSize=%d", __FUNCTION__, pwstrFilename ? WSTR2ASTR(pwstrFilename) : ""
-	   , dwFileSize);
+   
+   if (NULL == pwstrFilename || !pbBuffer || !dwFileSize) return E_INVALIDARG;
+
+   OUTPUTLOG("%s(), pwstrFilename=[%s], dwFileSize=[%d]", __FUNCTION__, pwstrFilename, dwFileSize);
+
    std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
    fullpath += pwstrFilename;
+
    FILE * fout = _wfopen(fullpath.c_str(), _T("wb"));
    if (fout){
 	   if (dwFileSize != fwrite(pbBuffer, 1, dwFileSize, fout)){
@@ -255,6 +280,7 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE p
    }else{
 	   return AtlHresultFromLastError();
    }
+
    return S_OK;
 }
 
@@ -264,25 +290,26 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE p
  */
 HRESULT DMReadFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD* pdwFileSize)
 {
-   CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   OUTPUTLOG("%s(), pwstrFilename=%s", __FUNCTION__, pwstrFilename ? WSTR2ASTR(pwstrFilename) : "");
+	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-   std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
-   fullpath += pwstrFilename;
+	if (NULL == pwstrFilename ) return E_INVALIDARG;
 
-   struct _stat _st = {0}; _wstat(fullpath.c_str(), &_st);
+	OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, pwstrFilename);
 
-   // Use DMFree() to free it.
-   if (S_OK != DMMalloc(ppbBuffer, _st.st_size))
+	std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
+	fullpath += pwstrFilename;
+
+	struct _stat _st = {0}; _wstat(fullpath.c_str(), &_st);
+
+	// Use DMFree() to free it.
+	if (S_OK != DMMalloc(ppbBuffer, _st.st_size))
 	   return E_OUTOFMEMORY;
 
-   memset(*ppbBuffer, 0, (_st.st_size));
-
-   FILE * fin = _wfopen(fullpath.c_str(), _T("rb"));
-   if (!fin){
+	FILE * fin = _wfopen(fullpath.c_str(), _T("rb"));
+	if (!fin){
 	   DMFree(*ppbBuffer);
 	   return AtlHresultFromLastError();
-   }
+	}
 
 	int bytesread = fread(*ppbBuffer, 1, _st.st_size, fin);
 	if (bytesread < _st.st_size)

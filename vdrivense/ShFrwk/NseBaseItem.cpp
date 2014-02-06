@@ -593,13 +593,20 @@ HRESULT CNseBaseItem::_DoNewFolder(VFS_MENUCOMMAND& Cmd, UINT uLabelRes)
    // Create a new folder.
    // TODO: Support FOF_RENAMEONCOLLISION flag.
    CComPtr<IFileOperation> spFO;
-   HR( ::SHCreateFileOperation(Cmd.hWnd, FOF_SILENT | FOF_NOCONFIRMATION | FOFX_NOSKIPJUNCTIONS, &spFO) );
+   HR( ::SHCreateFileOperation(Cmd.hWnd
+	   , FOF_SILENT | FOF_NOCONFIRMATION | FOFX_NOSKIPJUNCTIONS 
+	   , &spFO) );
    CComPtr<IShellItem> spTargetFolder;
    HR( ::SHCreateItemFromIDList(m_pFolder->m_pidlMonitor, IID_PPV_ARGS(&spTargetFolder)) );
    spFO->NewItem(spTargetFolder, FILE_ATTRIBUTE_DIRECTORY, bstrLabel, NULL, NULL);
    HR( spFO->PerformOperations() );
-   // Go into edit-mode for new item
-   HR( _AddSelectEdit(Cmd, bstrLabel) );
+
+   // HarryWu, 2014.2.6
+   // if do NOT go into edit mode, whatever. 
+   // ----------------------------------
+   //// Go into edit-mode for new item
+   //HR( _AddSelectEdit(Cmd, bstrLabel) );
+
    // We handled this operation successfully for all items in selection
    return NSE_S_ALL_DONE;
 }

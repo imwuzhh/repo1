@@ -161,8 +161,16 @@ STDMETHODIMP CFileStream::Commit(DWORD grfCommitFlags)
    // E_UNEXPECTED can be skipped.
    // otherwise, a <Catastrophic failure> reported and Abort.
    OUTPUTLOG("%s(%p), m_pStream=%p, m_bNeedCommit=%d, flag=%08x", __FUNCTION__, this, m_pStream, (int)m_bNeedCommit, grfCommitFlags);
-   if( m_pStream == NULL && m_bNeedCommit) 
-	   return E_UNEXPECTED;
+   // HarryWu, 2014.2.6
+   // According Bjarke's email reply, just fix it like this.
+   //////Thanks. I only got the time to look into this today, and it seems the fix you suggest is needed.
+   ////// If would rewrite it to just:
+   //////if( m_pStream == NULL ) return S_OK;
+   //////if( !m_bNeedCommit ) return S_OK;
+   //////Anyway, thanks for the fix again.
+   ////// regards
+   ////// bjarke
+   if( m_pStream == NULL) return S_OK;
    if( !m_bNeedCommit ) return S_OK;
    HR( m_pStream->Commit() );
    m_bNeedCommit = false;

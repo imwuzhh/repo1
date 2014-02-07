@@ -30,6 +30,7 @@ BOOL CTarShellModule::GetConfigBool(VFS_CONFIG Item)
    case VFS_CAN_ATTACHMENTSERVICES:
       return TRUE;
 
+   case VFS_HAVE_ICONOVERLAYS:
    case VFS_HAVE_SYSICONS:
    case VFS_HAVE_UNIQUE_NAMES:
    case VFS_HAVE_VIRTUAL_FILES:
@@ -128,20 +129,27 @@ HRESULT CTarShellModule::ShellAction(LPCWSTR pstrType, LPCWSTR pstrCmdLine)
 BOOL CTarShellModule::DllMain(DWORD dwReason, LPVOID lpReserved)
 {
 	while (dwReason == DLL_PROCESS_ATTACH){
-		wchar_t szFullResPath [MAX_PATH] = _T("");
-		HMODULE hMainModule = ::GetModuleHandle(_T("VDriveNSE64.dll"));
-		GetModuleFileName(hMainModule, szFullResPath, lengthof(szFullResPath));
-		if (NULL == wcsrchr(szFullResPath, _T('\\'))){
-			break;
-		}
+		wchar_t szLangId [MAX_PATH] = _T("");
+		GetUserDefaultLocaleName(szLangId, lengthof(szLangId));
+		if (!wcschr(szLangId, _T('-'))) break;
+		wcschr(szLangId, _T('-'))[0] = _T('_');
+		OutputDebugString(szLangId);
 
-		wcsrchr(szFullResPath, _T('\\'))[1] = 0; 
-		wcscat_s(szFullResPath, lengthof(szFullResPath), _T("VDriveNSE.zh_CN64.dll"));
+		wchar_t szFullResPath [MAX_PATH] = _T("");
+		GetModuleFileName(_pModule->get_m_hInst(), szFullResPath, lengthof(szFullResPath));
+		wchar_t * x64 = wcsstr(szFullResPath, _T("64.dll"));
+		wchar_t * x86 = wcsstr(szFullResPath, _T("32.dll"));
+		if (!x86 && !x64) break;
+		if (x64) *x64 = 0; if (x86) *x86 = 0;
+		wcscat_s(szFullResPath, lengthof(szFullResPath), _T("."));
+		wcscat_s(szFullResPath, lengthof(szFullResPath), szLangId);
+		wcscat_s(szFullResPath, lengthof(szFullResPath), x64 ? _T("64.dll") : _T("32.dll"));
+
 		HINSTANCE hResInst = LoadLibrary(szFullResPath);
 		if (hResInst)
 		{
 			_pModule->SetResourceInstance(hResInst);
-			OutputDebugStringA("Localized");
+			OutputDebugString(szFullResPath);
 		}
 		break;
 	}

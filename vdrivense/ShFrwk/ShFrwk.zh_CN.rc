@@ -24,7 +24,7 @@ IDR_SHELL_ROOT_CONTEXTMENU   REGISTRY DISCARDABLE    "../ShFrwk/res/ShellRootCon
 STRINGTABLE DISCARDABLE 
 BEGIN
    IDS_PAGE_VOLUME         "卷"
-   IDS_PAGE_ITEM           "通用"
+   IDS_PAGE_ITEM           "常规"
    IDS_READONLY            "只读(&R)"
    IDS_HIDDEN              "隐藏(&H)"
    IDS_MULTIPLEVALUES      "(multiple values)"

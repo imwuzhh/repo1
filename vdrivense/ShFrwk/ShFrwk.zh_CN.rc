@@ -23,10 +23,10 @@ IDR_SHELL_ROOT_CONTEXTMENU   REGISTRY DISCARDABLE    "../ShFrwk/res/ShellRootCon
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-   IDS_PAGE_VOLUME         "Volume"
-   IDS_PAGE_ITEM           "General"
-   IDS_READONLY            "&Read-only"
-   IDS_HIDDEN              "&Hidden"
+   IDS_PAGE_VOLUME         "¾í"
+   IDS_PAGE_ITEM           "Í¨ÓÃ"
+   IDS_READONLY            "Ö»¶Á(&R)"
+   IDS_HIDDEN              "Òþ²Ø(&H)"
    IDS_MULTIPLEVALUES      "(multiple values)"
 END
 

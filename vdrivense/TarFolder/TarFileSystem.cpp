@@ -127,7 +127,25 @@ HRESULT CTarShellModule::ShellAction(LPCWSTR pstrType, LPCWSTR pstrCmdLine)
  */
 BOOL CTarShellModule::DllMain(DWORD dwReason, LPVOID lpReserved)
 {
-   return TRUE;
+	while (dwReason == DLL_PROCESS_ATTACH){
+		wchar_t szFullResPath [MAX_PATH] = _T("");
+		HMODULE hMainModule = ::GetModuleHandle(_T("VDriveNSE64.dll"));
+		GetModuleFileName(hMainModule, szFullResPath, lengthof(szFullResPath));
+		if (NULL == wcsrchr(szFullResPath, _T('\\'))){
+			break;
+		}
+
+		wcsrchr(szFullResPath, _T('\\'))[1] = 0; 
+		wcscat_s(szFullResPath, lengthof(szFullResPath), _T("VDriveNSE.zh_CN64.dll"));
+		HINSTANCE hResInst = LoadLibrary(szFullResPath);
+		if (hResInst)
+		{
+			_pModule->SetResourceInstance(hResInst);
+			OutputDebugStringA("Localized");
+		}
+		break;
+	}
+    return TRUE;
 }
 
 /**
@@ -160,12 +178,6 @@ HRESULT CTarFileSystem::Init(PCIDLIST_ABSOLUTE pidlRoot)
 {
    // Get the filename of the Windows source file.
    WCHAR wszTarFilename[MAX_PATH] = L""; 
-   GetModuleFileNameW(GetModuleHandleA("vdrive64.dll"), wszTarFilename, MAX_PATH);
-   wcsrchr(wszTarFilename, L'\\')[1] = 0;
-   wcscat(wszTarFilename, L"sample.tar");
-#if 0
-   if( !::SHGetPathFromIDListW(pidlRoot, wszTarFilename) ) return E_FAIL;
-#endif
    // Initialize the .tar archive; this operation doesn't actually touch
    // the file because a file-system is spawned for many operations
    // that doesn't need the physical files.

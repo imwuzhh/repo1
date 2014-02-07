@@ -62,10 +62,27 @@ static void OutputLog(const char * format, ...){
  */
 HRESULT DMOpen(LPCWSTR pwstrFilename, TAR_ARCHIVE** ppArchive)
 {
+   HRESULT hr = E_FAIL;
    TAR_ARCHIVE* pArchive = new TAR_ARCHIVE();
    if( pArchive == NULL ) return E_OUTOFMEMORY;
+
+   // Setup local cache directory
+   if (GetTempPathW(lengthof(pArchive->context.cachedir), pArchive->context.cachedir) <= 0){
+	   hr = AtlHresultFromLastError();
+	   goto bail;
+   }
+   wcscat_s(pArchive->context.cachedir, lengthof(pArchive->context.cachedir), _T("\\vdrivecache"));
+
+   // Setup Username & passworld
+   wcscpy_s(pArchive->context.username, lengthof(pArchive->context.username), _T("HarryWu"));
+   wcscpy_s(pArchive->context.password, lengthof(pArchive->context.password), _T("__DUMMY_PASSWORD__"));
+
    *ppArchive = pArchive;
    return S_OK;
+bail:
+   if (pArchive != NULL) delete pArchive;
+   *ppArchive = NULL;
+   return hr;
 }
 
 /**

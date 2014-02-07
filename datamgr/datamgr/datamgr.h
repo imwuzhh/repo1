@@ -19,9 +19,17 @@
 #ifndef __LIB_DATAMGR_H__
 #define __LIB_DATAMGR_H__
 
+struct Edoc2Context {
+	wchar_t username      [32];
+	wchar_t password      [32];
+	wchar_t AccessToken   [128];
+	wchar_t cachedir      [1024];
+};
+
 typedef struct tagTAR_ARCHIVE
 {
    CComAutoCriticalSection csLock;               // Thread lock
+   struct Edoc2Context context;
 } TAR_ARCHIVE;
 
 #ifdef __cplusplus

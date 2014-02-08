@@ -71,6 +71,7 @@ HRESULT CNseBaseItem::GetSysIcon(UINT uIconFlags, int* pIconIndex)
  */
 HRESULT CNseBaseItem::GetIconOverlay(int* pIconIndex)
 {
+   if (IsFolder()) return S_FALSE;
    *pIconIndex = ::SHGetIconOverlayIndex(NULL, IDO_SHGIOI_LINK ); 
    return S_OK;
 }

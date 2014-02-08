@@ -78,5 +78,16 @@ STDMETHODIMP CContextMenu::Initialize(PCIDLIST_ABSOLUTE pidlFolder, IDataObject*
    return S_OK;
 }
 
+// HarryWu, 2014.2.8
+// By use this macro, coclass CContextMenu is register
+// to the map of DllGetClass() procedure.
+// and if the CLSID_ContextMenu is register-ed into 
+// somewhere of registry, then explorer.exe or other programs 
+// can load this cocloass and query IContextMenu interface.
+// ...
+// Another way, we can call CComObject<CContextMenu>'s 
+// CreateInstance() method to create coclass internal, 
+// and also query IContextMenu interface, and 
+// initialize it.
 
 OBJECT_ENTRY_AUTO(CLSID_ContextMenu, CContextMenu)

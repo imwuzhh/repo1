@@ -1153,6 +1153,11 @@ LRESULT CShellFolder::OnListRefreshed(UINT uMsg, WPARAM wParam, LPARAM lParam, B
    return 0;
 }
 
+LRESULT CShellFolder::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	return S_FALSE;
+}
+
 // Operations
 
 /**

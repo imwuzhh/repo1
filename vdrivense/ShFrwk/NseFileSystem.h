@@ -384,9 +384,6 @@ typedef struct tagNSEFILEPIDLDATA
    // Type identifiers
    BYTE magic;
    BYTE reserved;
-   // edoc2 Region Begin
-   DWORD dwId;     // Unique ID on remote server
-   DWORD dwAttr;   // Attributes for remote item
    // File data
    WIN32_FIND_DATA wfd;
 #if defined(_M_X64) || defined(_M_IA64)

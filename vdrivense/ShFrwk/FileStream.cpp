@@ -210,6 +210,8 @@ STDMETHODIMP CFileStream::Stat(STATSTG* pstatstg, DWORD grfStatFlag)
    pstatstg->ctime = wfd.ftCreationTime;
    pstatstg->mtime = wfd.ftLastWriteTime;
    pstatstg->atime = wfd.ftLastAccessTime;
+   // HarryWu, 2014.2.10
+   // How to setup folder's type.
    pstatstg->type = STGTY_STREAM;
    pstatstg->grfLocksSupported = 0;
    pstatstg->grfMode = STGM_READWRITE;

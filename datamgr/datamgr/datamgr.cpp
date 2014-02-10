@@ -50,7 +50,7 @@ static void OutputLog(const char * format, ...){
 
 ///////////////////////////////////////////////////////////////////////////////
 // cache directory
-#define VDRIVE_LOCAL_CACHE_ROOT _T("c:\\temp\\vdrivecache\\")
+#define VDRIVE_LOCAL_CACHE_ROOT pArchive->context.cachedir
 
 ///////////////////////////////////////////////////////////////////////////////
 // TAR archive manipulation
@@ -71,7 +71,10 @@ HRESULT DMOpen(LPCWSTR pwstrFilename, TAR_ARCHIVE** ppArchive)
 	   hr = AtlHresultFromLastError();
 	   goto bail;
    }
-   wcscat_s(pArchive->context.cachedir, lengthof(pArchive->context.cachedir), _T("\\vdrivecache"));
+   wcscat_s(pArchive->context.cachedir, lengthof(pArchive->context.cachedir), _T("\\vdrivecache\\"));
+   if (!PathFileExists(pArchive->context.cachedir)){
+	   SHCreateDirectory(GetActiveWindow(), pArchive->context.cachedir);
+   }
 
    // Setup Username & passworld
    wcscpy_s(pArchive->context.username, lengthof(pArchive->context.username), _T("HarryWu"));

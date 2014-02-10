@@ -980,6 +980,8 @@ STDMETHODIMP CShellFolder::EnumElements(DWORD reserved1, LPVOID reserved2, DWORD
       statstg.ctime = wfd.ftCreationTime;
       statstg.mtime = wfd.ftLastWriteTime;
       statstg.atime = wfd.ftLastAccessTime;
+	  // HarryWu, 2014.2.10
+	  // How to setup folder's type.
       statstg.type = STGTY_STREAM;
       aList.Add(statstg);
    }

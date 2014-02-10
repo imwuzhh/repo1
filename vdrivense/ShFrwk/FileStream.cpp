@@ -57,7 +57,7 @@ CFileStream::CFileStream() : m_pStream(NULL), m_bNeedCommit(false)
 void CFileStream::FinalRelease()
 {
    ATLTRACE(L"CFileStream::FinalRelease\n");
-   OUTPUTLOG("%s(%p), m_pStream=%p, m_bNeedCommit=%d", __FUNCTION__, this, m_pStream, (int)m_bNeedCommit);
+   //OUTPUTLOG("%s(%p), m_pStream=%p, m_bNeedCommit=%d", __FUNCTION__, this, m_pStream, (int)m_bNeedCommit);
    if( m_pStream != NULL && m_bNeedCommit ) m_pStream->Commit();
    delete m_pStream;
 }
@@ -71,7 +71,7 @@ HRESULT CFileStream::Init(CShellFolder* pFolder, PCUITEMID_CHILD pidlItem)
 	    LPWSTR theName = NULL;
 	    m_spFolder->m_pidlMonitor.GetName(SIGDN_NORMALDISPLAY, &theName);
         CoTaskMemFree(theName);
-		OUTPUTLOG("%s(%p), Folder=%s, FileName=%s", __FUNCTION__, this, WSTR2ASTR(theName), WSTR2ASTR(pDebugInfo->wfd.cFileName));
+		//OUTPUTLOG("%s(%p), Folder=%s, FileName=%s", __FUNCTION__, this, WSTR2ASTR(theName), WSTR2ASTR(pDebugInfo->wfd.cFileName));
    }
    return S_OK;
 }
@@ -160,16 +160,13 @@ STDMETHODIMP CFileStream::Commit(DWORD grfCommitFlags)
    // I think that, if m_bNeedCommit is false, 
    // E_UNEXPECTED can be skipped.
    // otherwise, a <Catastrophic failure> reported and Abort.
-   OUTPUTLOG("%s(%p), m_pStream=%p, m_bNeedCommit=%d, flag=%08x", __FUNCTION__, this, m_pStream, (int)m_bNeedCommit, grfCommitFlags);
+   //OUTPUTLOG("%s(%p), m_pStream=%p, m_bNeedCommit=%d, flag=%08x", __FUNCTION__, this, m_pStream, (int)m_bNeedCommit, grfCommitFlags);
+
    // HarryWu, 2014.2.6
    // According Bjarke's email reply, just fix it like this.
-   //////Thanks. I only got the time to look into this today, and it seems the fix you suggest is needed.
    ////// If would rewrite it to just:
    //////if( m_pStream == NULL ) return S_OK;
    //////if( !m_bNeedCommit ) return S_OK;
-   //////Anyway, thanks for the fix again.
-   ////// regards
-   ////// bjarke
    if( m_pStream == NULL) return S_OK;
    if( !m_bNeedCommit ) return S_OK;
    HR( m_pStream->Commit() );

@@ -109,19 +109,19 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DA
    
    if (NULL == pstrFilename) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), pwstrPath=[%s]", __FUNCTION__, WSTR2ASTR(pstrFilename));
-
    std::wstring fullpath  = VDRIVE_LOCAL_CACHE_ROOT;
    fullpath += pstrFilename;
 
    if (!PathFileExists(fullpath.c_str())){
+	   OUTPUTLOG("%s(), pwstrPath=[%s], return ERROR_FILE_NOT_FOUND.", __FUNCTION__, WSTR2ASTR(pstrFilename));
 	   return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
    }
 
    HANDLE hFind = FindFirstFile(fullpath.c_str(), pData);
-   if (INVALID_HANDLE_VALUE  == hFind)
+   if (INVALID_HANDLE_VALUE  == hFind){
+	   OUTPUTLOG("%s(), pwstrPath=[%s], return ERROR_FILE_NOT_FOUND.", __FUNCTION__, WSTR2ASTR(pstrFilename));
 	   return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
-
+   }
    // Attention, if not closed, the file/folder will be locked!
    FindClose(hFind);
 
@@ -130,6 +130,8 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DA
    pData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
    if (!IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 	   pData->dwFileAttributes |= FILE_ATTRIBUTE_VIRTUAL;
+
+   OUTPUTLOG("%s(), pwstrPath=[%s], return Attr=0x%08x.", __FUNCTION__, WSTR2ASTR(pstrFilename), pData->dwFileAttributes);
 
    return S_OK;
 }

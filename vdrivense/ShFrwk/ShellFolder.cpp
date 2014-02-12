@@ -1135,7 +1135,28 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
 
 LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-   return 0;
+	// Tag this window.
+	SetWindowLongPtr((HWND)wParam, GWLP_USERDATA, 0xEEDD00CC);
+
+	// HarryWu, 2014.2.12
+	// To dock a window pane on DefView, 
+	// Set the following style & Ex Style
+	// 	   , WS_CHILDWINDOW 
+	//     | WS_CLIPSIBLINGS 
+    //     | WS_VISIBLE
+	//     | WS_BORDER | WS_THICKFRAME
+	//     | WS_CLIPCHILDREN
+	//     | WS_EX_LEFT
+	//     | WS_EX_LTRREADING
+	//     | WS_EX_RIGHTSCROLLBAR
+	// And Also setup Z-order to HWND_TOP
+	//     SetWindowPos(hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+	// ...
+	// And Process WM_SIZE message.
+	//
+	// Spy++ confuse GetParent() and GetAncestor(GA_PARENT)
+
+    return 0;
 }
 
 LRESULT CShellFolder::OnGetNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)

@@ -27,26 +27,6 @@
 #include "ShellFolder.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-// Debug helper functions
-#include <string>
-static std::string WideStringToAnsi(const wchar_t * wstr){
-	if (!wstr) return "";
-	char szAnsi [MAX_PATH] = "";
-	WideCharToMultiByte(CP_ACP, 0, wstr, wcslen(wstr), szAnsi, lengthof(szAnsi), NULL, NULL);
-	return szAnsi;
-}
-static void OutputLog(const char * format, ...){
-	va_list va;
-	va_start(va, format);
-	char szMsg [0x400] = "";
-	_vsnprintf_s(szMsg, lengthof(szMsg), format, va);
-	OutputDebugStringA(szMsg);
-	OutputDebugStringA("\n");
-}
-#define WSTR2ASTR(w) (WideStringToAnsi(w).c_str())
-#define OUTPUTLOG OutputLog
-
-///////////////////////////////////////////////////////////////////////////////
 // CFileStream
 
 CFileStream::CFileStream() : m_pStream(NULL), m_bNeedCommit(false)

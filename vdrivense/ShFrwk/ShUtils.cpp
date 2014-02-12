@@ -650,3 +650,18 @@ LPCTSTR DbgGetGPSF(GETPROPERTYSTOREFLAGS Flags)
 
 #endif // _DEBUG
 
+std::string WideStringToAnsi(const wchar_t * wstr){
+	if (!wstr) return "";
+	char szAnsi [MAX_PATH] = "";
+	WideCharToMultiByte(CP_ACP, 0, wstr, wcslen(wstr), szAnsi, lengthof(szAnsi), NULL, NULL);
+	return szAnsi;
+}
+
+void OutputLog(const char * format, ...){
+	va_list va;
+	va_start(va, format);
+	char szMsg [0x400] = "";
+	_vsnprintf_s(szMsg, lengthof(szMsg), format, va);
+	OutputDebugStringA(szMsg);
+	OutputDebugStringA("\n");
+}

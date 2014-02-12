@@ -69,6 +69,11 @@
 #include <shlguid.h>
 #include <ntquery.h>
 #include <thumbcache.h>
+#include <string>
+#include <vector>
+#include <map>
+#include <set>
+#include <list>
 
 #pragma warning(disable : 4100)
 

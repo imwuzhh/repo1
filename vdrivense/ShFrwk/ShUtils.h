@@ -41,6 +41,13 @@
    #define HR(expr)  { HRESULT _hr; if(FAILED(_hr=(expr))) return _hr; }
 #endif // _DEBUG
 
+#ifndef WSTR2ASTR
+	#define WSTR2ASTR(w) (WideStringToAnsi(w).c_str())
+#endif
+
+#ifndef OUTPUTLOG
+	#define OUTPUTLOG OutputLog
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Debug functions
@@ -72,6 +79,8 @@ BOOL ILIsAligned64(PCUIDLIST_RELATIVE pidl);
 HMENU GetSubMenu(HMENU hMenu, LPCTSTR pstrTitle);
 FILETIME GetFileModifiedTime(LPCTSTR pstrFilename);
 BOOL IsFileTimeValid(const FILETIME& ft);
+std::string WideStringToAnsi(const wchar_t * wstr);
+void OutputLog(const char * format, ...);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -356,4 +365,3 @@ public:
       }
    }
 };
-

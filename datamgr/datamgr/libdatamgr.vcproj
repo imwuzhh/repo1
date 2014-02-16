@@ -362,6 +362,10 @@
 				RelativePath=".\xmlTree.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\xtar.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -374,6 +378,10 @@
 			</File>
 			<File
 				RelativePath=".\linkTree.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xtar.h"
 				>
 			</File>
 		</Filter>

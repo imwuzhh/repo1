@@ -30,6 +30,8 @@
 #endif // _DEBUG
 
 #include "datamgr.h"
+#include <tinystr.h>
+#include <tinyxml.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Debug helper functions
@@ -161,8 +163,9 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_D
 	   return AtlHresultFromLastError();
 
    while (true){
-	   if (wcscmp(wfd.cFileName, _T(".")) && wcscmp(wfd.cFileName, _T("..")))
-			tmpList.push_back(wfd);
+	   if (wcscmp(wfd.cFileName, _T(".")) && wcscmp(wfd.cFileName, _T(".."))){
+		   tmpList.push_back(wfd);
+	   }
 	   if (!FindNextFile(hFind, &wfd))
 		   break;
    }

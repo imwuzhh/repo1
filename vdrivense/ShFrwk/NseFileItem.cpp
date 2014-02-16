@@ -81,12 +81,14 @@ HRESULT CNseFileItem::GetColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column)
    static VFS_COLUMNINFO aColumns[] = {
       { PKEY_ItemNameDisplay,             SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
       { PKEY_ItemTypeText,                SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT | SHCOLSTATE_SLOW,  0 },
-      { PKEY_Size,                        SHCOLSTATE_TYPE_INT  | SHCOLSTATE_ONBYDEFAULT,                    0 },
+	  { PKEY_Size,                        SHCOLSTATE_TYPE_INT  | SHCOLSTATE_ONBYDEFAULT,                    0 },
       { PKEY_DateCreated,                 SHCOLSTATE_TYPE_DATE | SHCOLSTATE_ONBYDEFAULT,                    0 },
-      { PKEY_DateModified,                SHCOLSTATE_TYPE_DATE | SHCOLSTATE_HIDDEN,                         0 },
+      { PKEY_DateModified,                SHCOLSTATE_TYPE_DATE | SHCOLSTATE_ONBYDEFAULT,                    0 },
       { PKEY_FileAttributes,              SHCOLSTATE_TYPE_STR  | SHCOLSTATE_PREFER_VARCMP,                  VFS_COLF_WRITEABLE },
-      { PKEY_ItemType,                    SHCOLSTATE_TYPE_STR  | SHCOLSTATE_HIDDEN,                         0 },
-      { PKEY_ItemPathDisplay,             SHCOLSTATE_TYPE_STR  | SHCOLSTATE_SECONDARYUI,                    0 },
+      { PKEY_ItemType,                    SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
+	  { PKEY_FileVersion,                 SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
+	  { PKEY_Author,                      SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
+	  { PKEY_ItemPathDisplay,             SHCOLSTATE_TYPE_STR  | SHCOLSTATE_SECONDARYUI,                    0 },
       { PKEY_ItemPathDisplayNarrow,       SHCOLSTATE_TYPE_STR  | SHCOLSTATE_HIDDEN,                         0 },
       { PKEY_ItemFolderPathDisplayNarrow, SHCOLSTATE_TYPE_STR  | SHCOLSTATE_HIDDEN,                         0 },
       { PKEY_FileName,                    SHCOLSTATE_TYPE_STR  | SHCOLSTATE_HIDDEN,                         VFS_COLF_WRITEABLE },
@@ -295,9 +297,14 @@ VFS_FIND_DATA CNseFileItem::GetFindData()
 VFS_FOLDERSETTINGS CNseFileItem::GetFolderSettings()
 {
    VFS_FOLDERSETTINGS Settings = { 0 };
+   // HarryWu, 2014.2.15
+   // Comment them, Do not allow deep search in sub folders.
    // Allow deep-search in subfolders
    Settings.FlagsValue = FWF_USESEARCHFOLDER;
    Settings.FlagsMask = FWF_USESEARCHFOLDER;
+   // HarryWu, 2014.2.15
+   // Use Detail by default.
+   Settings.ViewMode = FLVM_DETAILS;
    return Settings;
 }
 

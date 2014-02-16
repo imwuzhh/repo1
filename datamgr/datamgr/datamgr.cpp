@@ -4,6 +4,7 @@
 #include <atlbase.h>
 #include <string>
 #include <list>
+#include <iostream>
 #include <sys/stat.h>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -180,6 +181,7 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_D
    int index = 0;
    for(std::list<WIN32_FIND_DATA>::iterator it = tmpList.begin(); 
 	   it != tmpList.end(); it ++){
+
 		aList [index] = *it;
 		// refine the attributes.
 		WIN32_FIND_DATA * pData = &aList[index];

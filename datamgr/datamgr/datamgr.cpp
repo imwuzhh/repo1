@@ -32,6 +32,7 @@
 #include "datamgr.h"
 #include <tinystr.h>
 #include <tinyxml.h>
+#include "linkTree.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Debug helper functions
@@ -134,6 +135,11 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DA
    if (!IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 	   pData->dwFileAttributes |= FILE_ATTRIBUTE_VIRTUAL;
 
+   Link link = {0};
+   linkTree::ReadLink(fullpath.c_str(), &link, IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
+
+   pData->nFileSizeLow = link.dwFileSize;
+
    OUTPUTLOG("%s(), pwstrPath=[%s], return Attr=0x%08x.", __FUNCTION__, WSTR2ASTR(pstrFilename), pData->dwFileAttributes);
 
    return S_OK;
@@ -163,7 +169,7 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_D
 	   return AtlHresultFromLastError();
 
    while (true){
-	   if (wcscmp(wfd.cFileName, _T(".")) && wcscmp(wfd.cFileName, _T(".."))){
+	   if (wcscmp(wfd.cFileName, _T(".")) && wcscmp(wfd.cFileName, _T("..")) && wcscmp(wfd.cFileName, SELFFILENAME)){
 		   tmpList.push_back(wfd);
 	   }
 	   if (!FindNextFile(hFind, &wfd))
@@ -192,6 +198,16 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_D
 		pData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
 		if (!IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 			pData->dwFileAttributes |= FILE_ATTRIBUTE_VIRTUAL;
+
+		std::wstring linkpath = VDRIVE_LOCAL_CACHE_ROOT;
+		linkpath += pwstrPath;
+		linkpath += _T("\\");
+		linkpath += pData->cFileName;
+		Link link = {0};
+		linkTree::ReadLink(linkpath.c_str(), &link, IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
+
+		pData->nFileSizeLow = link.dwFileSize;
+
 		index ++;
    }
 
@@ -211,14 +227,18 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPCWSTR pwstrNewN
 
    OUTPUTLOG("%s(), pwstrFilename=[%s], pwstrNewName=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename), WSTR2ASTR(pwstrNewName));
 
-   std::wstring sourcePath = VDRIVE_LOCAL_CACHE_ROOT;
-   sourcePath += pwstrFilename;
-   
-   wchar_t szNew [MAX_PATH] = _T(""); wcscpy_s(szNew, lengthof(szNew), sourcePath.c_str());
-   wcsrchr(szNew, _T('\\'))[1] = 0;
-   wcscat_s(szNew, lengthof(szNew), pwstrNewName);
+   { // Rename local link.
+	   std::wstring sourcePath = VDRIVE_LOCAL_CACHE_ROOT;
+	   sourcePath += pwstrFilename;
+	   wchar_t szNew [MAX_PATH] = _T(""); wcscpy_s(szNew, lengthof(szNew), sourcePath.c_str());
+	   wcsrchr(szNew, _T('\\'))[1] = 0;
+	   wcscat_s(szNew, lengthof(szNew), pwstrNewName);
+	   ::MoveFile(sourcePath.c_str(), szNew);
+   }
 
-   ::MoveFile(sourcePath.c_str(), szNew);
+   { // Rename File/Folder on remote
+
+   }
    return S_OK;
 }
 
@@ -232,23 +252,29 @@ HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
    if (NULL == pwstrFilename) return E_INVALIDARG;
 
    OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
-
-   std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
-   fullpath += pwstrFilename;
    
-   // HarryWu, 2014.2.1
-   // Notice, we must construct a double-null-ed string to specify the full path 
-   // to delete.
-   wchar_t szFullPath [MAX_PATH] = _T(""); memset(szFullPath, 0, sizeof(szFullPath));
-   wcscpy_s(szFullPath, lengthof(szFullPath) - 1, fullpath.c_str());
+   {// Delete local link
+	   std::wstring linkpath = VDRIVE_LOCAL_CACHE_ROOT;
+	   linkpath += pwstrFilename;
+	   
+	   // HarryWu, 2014.2.1
+	   // Notice, we must construct a double-null-end string to specify the full path 
+	   // to delete.
+	   wchar_t szFullPath [MAX_PATH] = _T(""); memset(szFullPath, 0, sizeof(szFullPath));
+	   wcscpy_s(szFullPath, lengthof(szFullPath) - 1, linkpath.c_str());
 
-   SHFILEOPSTRUCT shfop; memset(&shfop, 0, sizeof(shfop));
-   shfop.hwnd = ::GetActiveWindow();
-   shfop.wFunc = FO_DELETE;
-   shfop.fFlags = FOF_NO_UI;
-   shfop.pFrom = szFullPath;
-   shfop.pTo = NULL;
-   SHFileOperation(&shfop);
+	   SHFILEOPSTRUCT shfop; memset(&shfop, 0, sizeof(shfop));
+	   shfop.hwnd = ::GetActiveWindow();
+	   shfop.wFunc = FO_DELETE;
+	   shfop.fFlags = FOF_NO_UI;
+	   shfop.pFrom = szFullPath;
+	   shfop.pTo = NULL;
+	   SHFileOperation(&shfop);
+   }
+
+   {// Delete remote File/Folder
+
+   }
    return S_OK;
 }
 
@@ -263,11 +289,20 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
 
    OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
 
-   std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
-   fullpath += pwstrFilename;
+   {// Write link info for this foler.
+	   std::wstring linkpath = VDRIVE_LOCAL_CACHE_ROOT;
+	   linkpath += pwstrFilename;
+	   if (!PathFileExists(linkpath.c_str())){
+		   SHCreateDirectory(GetActiveWindow(), linkpath.c_str());
+	   }
+	   Link link = {0};
+	   link.dwType = FolderLink;
+	   link.dwId = rand();
+	   linkTree::WriteLink(linkpath.c_str(), &link, TRUE);
+   }
 
-   if (!PathFileExists(fullpath.c_str())){
-		SHCreateDirectory(GetActiveWindow(), fullpath.c_str());
+   {// Create Folder On remote
+
    }
 
    return S_OK;
@@ -284,13 +319,13 @@ HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, DWORD dwAttr
 
    OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
 
-   std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
-   fullpath += pwstrFilename;
+   std::wstring linkpath = VDRIVE_LOCAL_CACHE_ROOT;
+   linkpath += pwstrFilename;
 
-   if (!PathFileExists(fullpath.c_str()))
+   if (!PathFileExists(linkpath.c_str()))
 	   return AtlHresultFromLastError();
 
-   if (!SetFileAttributes(fullpath.c_str(), dwAttributes))
+   if (!SetFileAttributes(linkpath.c_str(), dwAttributes))
 	   return AtlHresultFromLastError();
 
    return S_OK;
@@ -310,18 +345,22 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE p
 
    OUTPUTLOG("%s(), pwstrFilename=[%s], dwFileSize=[%d]", __FUNCTION__, WSTR2ASTR(pwstrFilename), dwFileSize);
 
-   std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
-   fullpath += pwstrFilename;
+   {// Write to link.
+	   Link link = {0}; 
+	   link.dwFileSize = dwFileSize;
+	   link.dwId = rand();
+	   link.dwVersion = 0x00000001;
 
-   FILE * fout = _wfopen(fullpath.c_str(), _T("wb"));
-   if (fout){
-	   if (dwFileSize != fwrite(pbBuffer, 1, dwFileSize, fout)){
-		   fclose(fout);
-		   return E_FAIL;
-	   }
-	   fclose(fout);
-   }else{
-	   return AtlHresultFromLastError();
+	   std::wstring linkpath = VDRIVE_LOCAL_CACHE_ROOT;
+	   linkpath += pwstrFilename;
+
+	   linkTree::WriteLink(linkpath.c_str(), &link, FALSE);
+   }
+   // HarryWu, 2014.2.15
+   // TODO: Post file content to server
+   // pbBuffer, dwFileSize
+   {
+
    }
 
    return S_OK;
@@ -339,30 +378,25 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuff
 
 	OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
 
-	std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
-	fullpath += pwstrFilename;
+	*ppbBuffer = NULL; *pdwFileSize = 0;
 
-	struct _stat _st = {0}; _wstat(fullpath.c_str(), &_st);
-
-	// Use DMFree() to free it.
-	if (S_OK != DMMalloc(ppbBuffer, _st.st_size))
-	   return E_OUTOFMEMORY;
-
-	FILE * fin = _wfopen(fullpath.c_str(), _T("rb"));
-	if (!fin){
-	   DMFree(*ppbBuffer);
-	   return AtlHresultFromLastError();
-	}
-
-	int bytesread = fread(*ppbBuffer, 1, _st.st_size, fin);
-	if (bytesread < _st.st_size)
+	Link link = {0};
 	{
-		fclose(fin); DMFree(*ppbBuffer);
-		return E_FAIL;
+		std::wstring linkpath = VDRIVE_LOCAL_CACHE_ROOT;
+		linkpath += pwstrFilename;
+		if (!linkTree::ReadLink(linkpath.c_str(), &link, FALSE))
+			return AtlHresultFromLastError();
 	}
 
-	fclose(fin);
-	*pdwFileSize = _st.st_size;
+	// HarryWu, 2014.2.15
+	// TODO: Read file contents from remote.
+	// ...
+	{
+		DMMalloc(ppbBuffer, link.dwFileSize);
+		if (ppbBuffer == NULL) return E_OUTOFMEMORY;
+		memset(*ppbBuffer, 'E', link.dwFileSize);
+		*pdwFileSize = link.dwFileSize;
+	}
 	return S_OK;
 }
 

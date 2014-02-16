@@ -1,5 +1,27 @@
+#include <Windows.h>
+#include <atlbase.h>
 
-#include "stdafx.h"
+///////////////////////////////////////////////////////////////////////////////
+// Macros
+
+#ifndef lengthof
+#define lengthof(x)  (sizeof(x)/sizeof(x[0]))
+#endif  // lengthof
+
+#ifndef offsetof
+#define offsetof(type, field)  ((int)&((type*)0)->field)
+#endif  // offsetof
+
+#ifndef IsBitSet
+#define IsBitSet(val, bit)  (((val)&(bit))!=0)
+#endif // IsBitSet
+
+
+#ifdef _DEBUG
+#define HR(expr)  { HRESULT _hr; if(FAILED(_hr=(expr))) { _CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, NULL, #expr); _CrtDbgBreak(); return _hr; } }  
+#else
+#define HR(expr)  { HRESULT _hr; if(FAILED(_hr=(expr))) return _hr; }
+#endif // _DEBUG
 
 #include "xtar.h"
 

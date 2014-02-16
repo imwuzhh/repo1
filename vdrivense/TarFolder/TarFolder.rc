@@ -90,13 +90,11 @@ BEGIN
     BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Download",                    ID_FILE_EXTRACT
-        MENUITEM SEPARATOR
+		MENUITEM SEPARATOR
         POPUP "&New"
         BEGIN
             MENUITEM "&Folder",                  ID_FILE_NEWFOLDER
         END
-        MENUITEM SEPARATOR
-        MENUITEM "&Properties",                  ID_FILE_PROPERTIES
     END
     POPUP "CommandMenu"
     BEGIN
@@ -113,9 +111,17 @@ IDM_FILE MENU DISCARDABLE
 BEGIN
     POPUP "ContextMenu"
     BEGIN
-        MENUITEM "&Open",                        ID_FILE_OPEN
+        MENUITEM "&Preview",                     ID_FILE_PREVIEW
+		MENUITEM "&Download",                    ID_FILE_EXTRACT
         MENUITEM SEPARATOR
-        MENUITEM "&Download",                    ID_FILE_EXTRACT
+        MENUITEM "Share"                         ID_FILE_SHARE
+        MENUITEM "Link"                          ID_FILE_INNERLINK
+        MENUITEM "Distribute"                    ID_FILE_DISTRIBUTE
+        MENUITEM SEPARATOR
+        MENUITEM "Edit"                          ID_FILE_EXTEDIT
+		MENUITEM "Lock/Unlock"                   ID_FILE_LOCK
+        MENUITEM "History"                       ID_FILE_OLDVERSION
+        MENUITEM SEPARATOR
     END
     POPUP "CommandMenu"
     BEGIN

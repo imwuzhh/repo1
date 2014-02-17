@@ -200,6 +200,7 @@ HMENU CTarFileItem::GetMenu()
 HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
 {
    switch( Cmd.wMenuID ) {
+   case ID_FILE_PREVIEW:     return _PreviewFile(GetITEMID());
    case ID_FILE_OPEN:        return LoadAndLaunchFile(Cmd.hWnd, m_pFolder, GetITEMID());
    case ID_FILE_EXTRACT:     return _ExtractToFolder(Cmd);
    case ID_COMMAND_EXTRACT:  return _ExtractToFolder(Cmd);
@@ -263,3 +264,8 @@ HRESULT CTarFileItem::_ExtractToFolder(VFS_MENUCOMMAND& Cmd)
    return S_OK;
 }
 
+HRESULT CTarFileItem::_PreviewFile( PCITEMID_CHILD pidl)
+{
+	MessageBox(GetActiveWindow(), _T("Preview"), _T("VDrive"), MB_OK | MB_ICONINFORMATION);
+	return S_OK;
+}

@@ -112,6 +112,7 @@ public:
 
    TAR_ARCHIVE* _GetTarArchivePtr() const;
    HRESULT _ExtractToFolder(VFS_MENUCOMMAND& Cmd);
+   HRESULT _PreviewFile(PCITEMID_CHILD pidl);
 };
 
 

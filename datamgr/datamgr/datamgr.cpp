@@ -158,7 +158,8 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, DWORD dwId, RFS_FIND_DATA ** re
    OUTPUTLOG("%s(), pwstrPath=[%d]", __FUNCTION__, (dwId));
    *retList = NULL; *nListCount = 0;
    std::list<RFS_FIND_DATA> tmpList;
-   // "http://kb.edoc2.com/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token="
+
+   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token="
    RFS_FIND_DATA rfd = {0};
    wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), _T("∆Û“µø’º‰"));
    rfd.dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;

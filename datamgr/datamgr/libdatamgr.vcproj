@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../../3rd/tinyxml"
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -125,7 +125,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../../3rd/tinyxml"
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include"
 				PreprocessorDefinitions="WIN32;WIN64;_DEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -204,7 +204,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;../../3rd/tinyxml"
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				ExceptionHandling="1"
 				RuntimeLibrary="0"
@@ -286,7 +286,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;../../3rd/tinyxml"
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include"
 				PreprocessorDefinitions="WIN32;WIN64;NDEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				ExceptionHandling="1"
 				RuntimeLibrary="0"
@@ -418,6 +418,78 @@
 				RelativePath="..\..\3rd\tinyxml\tinyxmlparser.cpp"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="jsoncpp"
+			>
+			<Filter
+				Name="headers"
+				>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\include\json\autolink.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\include\json\config.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\include\json\features.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\include\json\forwards.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\include\json\json.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\include\json\reader.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\include\json\value.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\include\json\writer.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="src"
+				>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\src\json_batchallocator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\src\json_internalarray.inl"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\src\json_internalmap.inl"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\src\json_reader.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\src\json_value.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\src\json_valueiterator.inl"
+					>
+				</File>
+				<File
+					RelativePath="..\..\3rd\libjsoncpp\src\json_writer.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

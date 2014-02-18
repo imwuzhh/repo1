@@ -337,6 +337,7 @@ HRESULT CNseFileItem::_GetIdQuick(PCITEMID_CHILD pidlChild, DWORD * pdwID) const
 		ATLASSERT(::ILIsChild(pidlChild));
 		const VFS_FIND_DATA* pWfd = &(reinterpret_cast<const NSEFILEPIDLDATA*>(pidlChild))->wfd;
 		*pdwID = pWfd->dwId;
-	}
+	}else
+		*pdwID = 0; // The Root ID.
 	return S_OK;
 }

@@ -36,6 +36,10 @@ typedef struct _RFS_FIND_DATAA {
 	DWORD dwCreatorType;
 	WORD  wFinderFlags;
 #endif
+	DWORD dwId;
+	DWORD dwVersion;
+	DWORD dwAttributes;
+	unsigned char md5 [16];
 } RFS_FIND_DATAA, *PRFS_FIND_DATAA, *LPRFS_FIND_DATAA;
 typedef struct _RFS_FIND_DATAW {
 	DWORD dwFileAttributes;
@@ -53,6 +57,10 @@ typedef struct _RFS_FIND_DATAW {
 	DWORD dwCreatorType;
 	WORD  wFinderFlags;
 #endif
+	DWORD dwId;
+	DWORD dwVersion;
+	DWORD dwAttributes;
+	unsigned char md5 [16];
 } RFS_FIND_DATAW, *PRFS_FIND_DATAW, *LPRFS_FIND_DATAW;
 #ifdef UNICODE
 typedef RFS_FIND_DATAW RFS_FIND_DATA;

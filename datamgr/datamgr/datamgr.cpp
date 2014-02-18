@@ -154,21 +154,23 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, RFS_FIND_DATA
 HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, DWORD dwId, RFS_FIND_DATA ** retList, int * nListCount)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-
    if (~0ul == dwId) return E_INVALIDARG;
-
    OUTPUTLOG("%s(), pwstrPath=[%d]", __FUNCTION__, (dwId));
-
    *retList = NULL; *nListCount = 0;
-
    std::list<RFS_FIND_DATA> tmpList;
+   // "http://kb.edoc2.com/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token="
+   RFS_FIND_DATA rfd = {0};
+   wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), _T("ÆóÒµ¿Õ¼ä"));
+   rfd.dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;
+   rfd.dwId = rand();
+   rfd.dwVersion = 0x10000000;
+   tmpList.push_back(rfd);
 
    if (tmpList.size() == 0) return S_OK;
 
-   if (S_OK != DMMalloc((LPBYTE *)retList, tmpList.size() * sizeof(WIN32_FIND_DATA))){
+   if (S_OK != DMMalloc((LPBYTE *)retList, tmpList.size() * sizeof(RFS_FIND_DATA))){
 	   return E_OUTOFMEMORY;
    }
-
    RFS_FIND_DATA *aList = (RFS_FIND_DATA *)(*retList);
 
    int index = 0;
@@ -183,7 +185,6 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, DWORD dwId, RFS_FIND_DATA ** re
 			pData->dwFileAttributes |= FILE_ATTRIBUTE_VIRTUAL;
 		index ++;
    }
-
    *nListCount = tmpList.size();
    return S_OK;
 }

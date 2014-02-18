@@ -24,7 +24,6 @@ BOOL CTarShellModule::GetConfigBool(VFS_CONFIG Item)
    case VFS_CAN_PROGRESSUI:
    case VFS_CAN_ROOT_PREVIEW:
    case VFS_CAN_ROOT_SHELLNEW:
-   case VFS_CAN_ROOT_PROPSHEET:
    case VFS_CAN_ROOT_DROPTARGET:
    case VFS_CAN_ROOT_CONTEXTMENU:
       return TRUE;
@@ -69,7 +68,6 @@ LONG CTarShellModule::GetConfigInt(VFS_CONFIG Item)
               | SFGAO_STREAM
               | SFGAO_BROWSABLE 
               | SFGAO_HASSUBFOLDER 
-              | SFGAO_HASPROPSHEET 
               | SFGAO_FILESYSANCESTOR
               | SFGAO_STORAGEANCESTOR;
 

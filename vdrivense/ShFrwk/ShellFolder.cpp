@@ -566,7 +566,7 @@ STDMETHODIMP CShellFolder::GetAttributesOf(UINT cidl, PCUITEMID_CHILD_ARRAY rgpi
       // than possibly just fetching information out of the PIDL structure.
       if( IsBitSet(dwOrigAttributes, SFGAO_VALIDATE) ) {
          CNseItemPtr spTemp;
-         const WIN32_FIND_DATA wfd = spItem->GetFindData();
+         const VFS_FIND_DATA wfd = spItem->GetFindData();
          HRESULT Hr = m_spFolderItem->GetChild(wfd.cFileName, SHGDN_FORPARSING, &spTemp);
          if( FAILED(Hr) ) return Hr;
       }
@@ -669,7 +669,7 @@ STDMETHODIMP CShellFolder::GetDisplayNameOf(PCUITEMID_CHILD pidl, SHGDNF uFlags,
       }
    }
    WCHAR wszName[300] = { 0 };
-   const WIN32_FIND_DATA wfd = spItem->GetFindData();
+   const VFS_FIND_DATA wfd = spItem->GetFindData();
    // This is part of the hack to get the SaveAs dialog working.
    // We have redirected the file to a temporary file in the %TEMP% folder.
    if( IsBitSet(uFlags, SHGDN_FORPARSING) && wfd.cAlternateFileName[1] == VFS_HACK_SAVEAS_JUNCTION ) {
@@ -1031,7 +1031,7 @@ STDMETHODIMP CShellFolder::SetStateBits(DWORD grfStateBits, DWORD grfMask)
 STDMETHODIMP CShellFolder::Stat(STATSTG* pStatstg, DWORD grfStatFlag)
 {
    ATLTRACE(L"CShellFolder::Stat\n");
-   const WIN32_FIND_DATA wfd = m_spFolderItem->GetFindData();
+   const VFS_FIND_DATA wfd = m_spFolderItem->GetFindData();
    ::ZeroMemory(pStatstg, sizeof(STATSTG));
    if( !IsBitSet(grfStatFlag, STATFLAG_NONAME) ) pStatstg->pwcsName = ::StrDup(wfd.cFileName);
    pStatstg->grfMode = STGM_READWRITE;
@@ -1494,10 +1494,10 @@ HRESULT CShellFolder::_ParseDisplayNameWithBind(CNseItemPtr& spItem, PWSTR pszDi
       // The Shell wants to create a new file. For convenience it may provide a WIN32_FIND_DATA structure
       // with prefilled entries. We'll mark the item with the VFS_HACK_SAVEAS_JUNCTION flag so the physical object
       // can be requested.
-      WIN32_FIND_DATAW wfd = { 0 };
+      VFS_FIND_DATA wfd = { 0 };
       CComPtr<IFileSystemBindData> spFSBD;
       ::SHGetBindCtxParam(pbc, STR_FILE_SYS_BIND_DATA, IID_PPV_ARGS(&spFSBD));
-      if( spFSBD != NULL ) spFSBD->GetFindData(&wfd);
+      if( spFSBD != NULL ) spFSBD->GetFindData((WIN32_FIND_DATA *)&wfd);
       if( wfd.cFileName[0] == '\0' ) wcscpy_s(wfd.cFileName, lengthof(wfd.cFileName), pszDisplayName);
       if( wfd.dwFileAttributes == 0 ) wfd.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
       wfd.cAlternateFileName[0] = '\0';
@@ -1517,7 +1517,7 @@ HRESULT CShellFolder::_ParseDisplayNameWithBind(CNseItemPtr& spItem, PWSTR pszDi
    if( spItem != NULL && Opts.grfMode == STGM_READWRITE ) {
       // During the FileSave dialog, the Shell may want to overwrite an existing file. Let's
       // mark the file so the physical object can be requested.
-      WIN32_FIND_DATA wfd = spItem->GetFindData();
+      VFS_FIND_DATA wfd = spItem->GetFindData();
       wfd.cAlternateFileName[1] = VFS_HACK_SAVEAS_JUNCTION;
       spItem = m_spFolderItem->GenerateChild(this, m_pidlFolder, wfd);
    }

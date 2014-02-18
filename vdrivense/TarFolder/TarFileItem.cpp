@@ -80,7 +80,7 @@ CNseItem* CTarFileItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE p
  * and values in <WIN32_FIND_DATA:wfd> present in debug mode is not correct,
  * if pass <WIN32_FIND_DATA:wfd> by value.
  */
-CNseItem* CTarFileItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA & wfd)
+CNseItem* CTarFileItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const VFS_FIND_DATA & wfd)
 {
    NSEFILEPIDLDATA data = { sizeof(NSEFILEPIDLDATA), TARFILE_MAGIC_ID, 1, wfd };
    return new CTarFileItem(pFolder, pidlFolder, GenerateITEMID(&data, sizeof(data)), TRUE);
@@ -95,8 +95,8 @@ HRESULT CTarFileItem::GetChild(LPCWSTR pwstrName, SHGNO ParseType, CNseItem** pI
    WCHAR wszFilename[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
    ::PathAppend(wszFilename, pwstrName);
-   WIN32_FIND_DATA wfd = { 0 };
-   HR( DMGetFileAttr(_GetTarArchivePtr(), wszFilename, &wfd) );
+   VFS_FIND_DATA wfd = { 0 };
+   HR( DMGetFileAttr(_GetTarArchivePtr(), wszFilename, (RFS_FIND_DATA *)&wfd) );
    *pItem = GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, wfd);
    return *pItem != NULL ? S_OK : E_OUTOFMEMORY;
 }
@@ -116,13 +116,13 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    // HarryWu, 2014.1.29
    // Note!, it is NOT safe to pass c++ objects array between modules.
    // use /MD to genereate these modules.
-   WIN32_FIND_DATA * aList = NULL; int nListCount = 0;
+   RFS_FIND_DATA * aList = NULL; int nListCount = 0;
    HR( DMGetChildrenList(_GetTarArchivePtr(), wszPath, &aList, &nListCount) );
    for( int i = 0; i < nListCount; i++ ) {
       // Filter item according to the 'grfFlags' argument
-      if( SHFilterEnumItem(grfFlags, aList[i]) != S_OK ) continue;
+      if( SHFilterEnumItem(grfFlags, *(WIN32_FIND_DATA *)(&aList[i])) != S_OK ) continue;
       // Create an NSE Item from the file-info data
-      aItems.Add( GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, aList[i]) );
+      aItems.Add( GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, *(VFS_FIND_DATA *)(&aList[i])) );
    }
    DMFree((LPBYTE)aList);
    return S_OK;
@@ -149,7 +149,7 @@ HRESULT CTarFileItem::CreateFolder()
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
    HR( DMCreateFolder(_GetTarArchivePtr(), wszFilename) );
    // Update properties of our NSE Item
-   DMGetFileAttr(_GetTarArchivePtr(), wszFilename, m_pWfd);
+   DMGetFileAttr(_GetTarArchivePtr(), wszFilename, (RFS_FIND_DATA *)m_pWfd);
    return S_OK;
 }
 
@@ -200,6 +200,7 @@ HMENU CTarFileItem::GetMenu()
 HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
 {
    switch( Cmd.wMenuID ) {
+   case ID_FILE_PREVIEW:     return _PreviewFile(GetITEMID());
    case ID_FILE_OPEN:        return LoadAndLaunchFile(Cmd.hWnd, m_pFolder, GetITEMID());
    case ID_FILE_EXTRACT:     return _ExtractToFolder(Cmd);
    case ID_COMMAND_EXTRACT:  return _ExtractToFolder(Cmd);
@@ -263,3 +264,8 @@ HRESULT CTarFileItem::_ExtractToFolder(VFS_MENUCOMMAND& Cmd)
    return S_OK;
 }
 
+HRESULT CTarFileItem::_PreviewFile( PCITEMID_CHILD pidl)
+{
+	MessageBox(GetActiveWindow(), _T("Preview"), _T("VDrive"), MB_OK | MB_ICONINFORMATION);
+	return S_OK;
+}

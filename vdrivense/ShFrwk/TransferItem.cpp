@@ -253,7 +253,7 @@ STDMETHODIMP CTransferDestination::CreateItem(LPCWSTR pszName, DWORD dwAttribute
    {
       bool bIsFolder = IsBitSet(dwAttributes, FILE_ATTRIBUTE_DIRECTORY);
       // Create a new PIDL item from a WIN32_FIND_DATA structure
-      WIN32_FIND_DATA wfd = { 0 };
+      VFS_FIND_DATA wfd = { 0 };
       wcscpy_s(wfd.cFileName, lengthof(wfd.cFileName), pszName);
       wfd.dwFileAttributes = dwAttributes;
       wfd.nFileSizeLow = (DWORD) ullSize;
@@ -263,7 +263,7 @@ STDMETHODIMP CTransferDestination::CreateItem(LPCWSTR pszName, DWORD dwAttribute
       CNseItemPtr spPrevItem;
       m_spFolder->m_spFolderItem->GetChild(wfd.cFileName, SHGDN_FORPARSING, &spPrevItem);
       if( spPrevItem != NULL ) {
-         const WIN32_FIND_DATA wfd2 = spPrevItem->GetFindData();
+         const VFS_FIND_DATA wfd2 = spPrevItem->GetFindData();
          if( IsBitSet(dwFlags, TSF_COPY_CREATION_TIME) ) wfd.ftCreationTime = wfd2.ftCreationTime;
          if( IsBitSet(dwFlags, TSF_COPY_WRITE_TIME) ) wfd.ftLastWriteTime = wfd2.ftLastWriteTime;
          if( !bIsFolder ) {
@@ -366,7 +366,7 @@ STDMETHODIMP CTransferMediumItem::GetItem(IShellItem** ppsi)
 ///////////////////////////////////////////////////////////////////////////////
 // CShellItemResources
 
-HRESULT CShellItemResources::Init(CShellFolder* pFolder, const WIN32_FIND_DATA wfd)
+HRESULT CShellItemResources::Init(CShellFolder* pFolder, const VFS_FIND_DATA wfd)
 {
    m_spFolder = pFolder;
 
@@ -401,7 +401,7 @@ STDMETHODIMP CShellItemResources::GetSize(ULONGLONG* pullSize)
 STDMETHODIMP CShellItemResources::GetTimes(FILETIME* pftCreation, FILETIME* pftWrite, FILETIME* pftAccess)
 {
    ATLTRACE(L"CShellItemResources::GetTimes\n");
-   const WIN32_FIND_DATA wfd = m_spItem->GetFindData();
+   const VFS_FIND_DATA wfd = m_spItem->GetFindData();
    if( pftCreation != NULL ) *pftCreation = wfd.ftCreationTime;
    if( pftAccess != NULL ) *pftAccess = wfd.ftLastAccessTime;
    if( pftWrite != NULL ) *pftWrite = wfd.ftLastAccessTime;

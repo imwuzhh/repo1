@@ -133,7 +133,7 @@ HRESULT LoadAndLaunchFile(HWND hWnd, CShellFolder* pFolder, PCUITEMID_CHILD pidl
 {
    CNseItemPtr spItem = pFolder->GenerateChildItem(pidlItem);
    if( spItem == NULL ) return E_FAIL;
-   const WIN32_FIND_DATA wfd = spItem->GetFindData();
+   const VFS_FIND_DATA wfd = spItem->GetFindData();
 
    // Generate a temporary filename that we should save the file to.
    // We'll then copy it to disk and launch this local copy.

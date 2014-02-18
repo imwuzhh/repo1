@@ -174,7 +174,7 @@ STDMETHODIMP CFileStream::Stat(STATSTG* pstatstg, DWORD grfStatFlag)
    ATLTRACE(L"CFileStream::Stat  flags=0x%X\n", grfStatFlag);
    CNseItemPtr spItem = m_spFolder->GenerateChildItem(m_pidlItem.GetItem(0));
    if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
-   const WIN32_FIND_DATA wfd = spItem->GetFindData();
+   const VFS_FIND_DATA wfd = spItem->GetFindData();
    pstatstg->pwcsName = NULL;
    if( !IsBitSet(grfStatFlag, STATFLAG_NONAME) ) ::SHStrDup(wfd.cFileName, &pstatstg->pwcsName);
    pstatstg->cbSize.LowPart = wfd.nFileSizeLow;

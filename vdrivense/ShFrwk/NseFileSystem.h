@@ -120,7 +120,49 @@ typedef struct tagVFS_STREAM_REASON {
 
 typedef DWORD VFS_PROPSTATE;
 
-typedef WIN32_FIND_DATA VFS_FIND_DATA;
+typedef struct _VFS_FIND_DATAA {
+	DWORD dwFileAttributes;
+	FILETIME ftCreationTime;
+	FILETIME ftLastAccessTime;
+	FILETIME ftLastWriteTime;
+	DWORD nFileSizeHigh;
+	DWORD nFileSizeLow;
+	DWORD dwReserved0;
+	DWORD dwReserved1;
+	CHAR   cFileName[ MAX_PATH ];
+	CHAR   cAlternateFileName[ 14 ];
+#ifdef _MAC
+	DWORD dwFileType;
+	DWORD dwCreatorType;
+	WORD  wFinderFlags;
+#endif
+} VFS_FIND_DATAA, *PVFS_FIND_DATAA, *LPVFS_FIND_DATAA;
+typedef struct _VFS_FIND_DATAW {
+	DWORD dwFileAttributes;
+	FILETIME ftCreationTime;
+	FILETIME ftLastAccessTime;
+	FILETIME ftLastWriteTime;
+	DWORD nFileSizeHigh;
+	DWORD nFileSizeLow;
+	DWORD dwReserved0;
+	DWORD dwReserved1;
+	WCHAR  cFileName[ MAX_PATH ];
+	WCHAR  cAlternateFileName[ 14 ];
+#ifdef _MAC
+	DWORD dwFileType;
+	DWORD dwCreatorType;
+	WORD  wFinderFlags;
+#endif
+} VFS_FIND_DATAW, *PVFS_FIND_DATAW, *LPVFS_FIND_DATAW;
+#ifdef UNICODE
+typedef VFS_FIND_DATAW VFS_FIND_DATA;
+typedef PVFS_FIND_DATAW PVFS_FIND_DATA;
+typedef LPVFS_FIND_DATAW LPVFS_FIND_DATA;
+#else
+typedef VFS_FIND_DATAA VFS_FIND_DATA;
+typedef PVFS_FIND_DATAA PVFS_FIND_DATA;
+typedef LPVFS_FIND_DATAA LPVFS_FIND_DATA;
+#endif // UNICODE
 
 typedef struct tagVFS_FOLDERSETTINGS
 {
@@ -244,7 +286,7 @@ public:
    virtual VFS_FOLDERSETTINGS GetFolderSettings() = 0;
 
    virtual CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, PCITEMID_CHILD pidlItem, BOOL bReleaseItem) = 0;
-   virtual CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA & wfd) = 0;
+   virtual CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const VFS_FIND_DATA & wfd) = 0;
 
    virtual HRESULT GetChild(LPCWSTR pstrName, SHGNO ParseType, CNseItem** pItem) = 0;
    virtual HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleArray<CNseItem*>& aList) = 0;
@@ -333,7 +375,7 @@ public:
    VFS_FOLDERSETTINGS GetFolderSettings();
 
    CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, PCITEMID_CHILD pidlItem, BOOL bReleaseItem);
-   CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA & wfd);
+   CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const VFS_FIND_DATA & wfd);
 
    HRESULT GetChild(LPCWSTR pstrName, SHGNO ParseType, CNseItem** pItem);
    HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aList);
@@ -385,7 +427,7 @@ typedef struct tagNSEFILEPIDLDATA
    BYTE magic;
    BYTE reserved;
    // File data
-   WIN32_FIND_DATA wfd;
+   VFS_FIND_DATA wfd;
 #if defined(_M_X64) || defined(_M_IA64)
    // Alignment on 64bit platform
    SHORT padding;
@@ -399,7 +441,7 @@ typedef struct tagNSEFILEPIDLDATA
 class CNseFileItem : public CNseBaseItem
 {
 public:
-   WIN32_FIND_DATA* m_pWfd;                // Reference to data inside PIDL
+   VFS_FIND_DATA * m_pWfd;                // Reference to data inside PIDL
 
    CNseFileItem(CShellFolder* pShellFolder, PCIDLIST_RELATIVE pidlFolder, PCITEMID_CHILD pidlItem, BOOL bReleaseItem);
 

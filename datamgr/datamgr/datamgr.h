@@ -19,6 +19,52 @@
 #ifndef __LIB_DATAMGR_H__
 #define __LIB_DATAMGR_H__
 
+
+typedef struct _RFS_FIND_DATAA {
+	DWORD dwFileAttributes;
+	FILETIME ftCreationTime;
+	FILETIME ftLastAccessTime;
+	FILETIME ftLastWriteTime;
+	DWORD nFileSizeHigh;
+	DWORD nFileSizeLow;
+	DWORD dwReserved0;
+	DWORD dwReserved1;
+	CHAR   cFileName[ MAX_PATH ];
+	CHAR   cAlternateFileName[ 14 ];
+#ifdef _MAC
+	DWORD dwFileType;
+	DWORD dwCreatorType;
+	WORD  wFinderFlags;
+#endif
+} RFS_FIND_DATAA, *PRFS_FIND_DATAA, *LPRFS_FIND_DATAA;
+typedef struct _RFS_FIND_DATAW {
+	DWORD dwFileAttributes;
+	FILETIME ftCreationTime;
+	FILETIME ftLastAccessTime;
+	FILETIME ftLastWriteTime;
+	DWORD nFileSizeHigh;
+	DWORD nFileSizeLow;
+	DWORD dwReserved0;
+	DWORD dwReserved1;
+	WCHAR  cFileName[ MAX_PATH ];
+	WCHAR  cAlternateFileName[ 14 ];
+#ifdef _MAC
+	DWORD dwFileType;
+	DWORD dwCreatorType;
+	WORD  wFinderFlags;
+#endif
+} RFS_FIND_DATAW, *PRFS_FIND_DATAW, *LPRFS_FIND_DATAW;
+#ifdef UNICODE
+typedef RFS_FIND_DATAW RFS_FIND_DATA;
+typedef PRFS_FIND_DATAW PRFS_FIND_DATA;
+typedef LPRFS_FIND_DATAW LPRFS_FIND_DATA;
+#else
+typedef RFS_FIND_DATAA RFS_FIND_DATA;
+typedef PRFS_FIND_DATAA PRFS_FIND_DATA;
+typedef LPRFS_FIND_DATAA LPRFS_FIND_DATA;
+#endif // UNICODE
+
+
 struct Edoc2Context {
 	wchar_t username      [32];
 	wchar_t password      [32];
@@ -39,7 +85,7 @@ extern "C" {
 HRESULT DMOpen(LPCWSTR pstrFilename, TAR_ARCHIVE** ppArchive);
 HRESULT DMClose(TAR_ARCHIVE* pArchive);
 
-HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_DATA ** aList, int * nListCount);
+HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, RFS_FIND_DATA ** aList, int * nListCount);
 
 HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, LPCWSTR pstrNewName);
 HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);
@@ -47,7 +93,7 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);
 
 HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, DWORD dwAttributes);
 
-HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DATA* pData);
+HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, RFS_FIND_DATA * pData);
 HRESULT DMReadFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD * dwFileSize);
 HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes);
 

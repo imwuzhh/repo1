@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="."
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -125,7 +125,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="."
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml"
 				PreprocessorDefinitions="WIN32;WIN64;_DEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -204,7 +204,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="."
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				ExceptionHandling="1"
 				RuntimeLibrary="0"
@@ -286,7 +286,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="."
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml"
 				PreprocessorDefinitions="WIN32;WIN64;NDEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				ExceptionHandling="1"
 				RuntimeLibrary="0"
@@ -354,6 +354,18 @@
 				RelativePath=".\libdatamgr.def"
 				>
 			</File>
+			<File
+				RelativePath=".\linkTree.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\xmlTree.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\xtar.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -364,12 +376,48 @@
 				RelativePath=".\datamgr.h"
 				>
 			</File>
+			<File
+				RelativePath=".\linkTree.h"
+				>
+			</File>
+			<File
+				RelativePath=".\xtar.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
+		</Filter>
+		<Filter
+			Name="TinyXML"
+			>
+			<File
+				RelativePath="..\..\3rd\tinyxml\tinystr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\3rd\tinyxml\tinystr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\3rd\tinyxml\tinyxml.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\3rd\tinyxml\tinyxml.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\3rd\tinyxml\tinyxmlerror.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\3rd\tinyxml\tinyxmlparser.cpp"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

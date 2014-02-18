@@ -19,6 +19,16 @@
 #define ID_FILE_NEWFOLDER               3
 #define ID_FILE_PROPERTIES              4
 #define ID_FILE_EDIT                    5
+#define ID_FILE_SHARE                   6
+#define ID_FILE_UPLOAD                  7
+#define ID_FILE_PREVIEW                 8
+#define ID_FILE_INNERLINK               9
+#define ID_FILE_DISTRIBUTE              10
+#define ID_FILE_LOCK                    11
+#define ID_FILE_UNLOCK                  12
+#define ID_FILE_OLDVERSION              13
+#define ID_FILE_VIEWLOG                 14
+#define ID_FILE_EXTEDIT                 15
 
 #define ID_COMMAND_EXTRACT              400
 

@@ -151,36 +151,17 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, RFS_FIND_DATA
 /**
  * Return the list of children of a sub-folder.
  */
-HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, RFS_FIND_DATA ** retList, int * nListCount)
+HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, DWORD dwId, RFS_FIND_DATA ** retList, int * nListCount)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-   if (NULL == pwstrPath) return E_INVALIDARG;
+   if (~0ul == dwId) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), pwstrPath=[%s]", __FUNCTION__, WSTR2ASTR(pwstrPath));
+   OUTPUTLOG("%s(), pwstrPath=[%d]", __FUNCTION__, (dwId));
 
    *retList = NULL; *nListCount = 0;
 
-   std::list<WIN32_FIND_DATA> tmpList;
-   std::wstring fullpath = VDRIVE_LOCAL_CACHE_ROOT;
-   fullpath += pwstrPath;
-   fullpath += _T("\\*");
-
-   WIN32_FIND_DATA wfd;
-   HANDLE hFind = FindFirstFile(fullpath.c_str(), &wfd);
-   if (INVALID_HANDLE_VALUE == hFind)
-	   return AtlHresultFromLastError();
-
-   while (true){
-	   if (wcscmp(wfd.cFileName, _T(".")) && wcscmp(wfd.cFileName, _T("..")) && wcscmp(wfd.cFileName, SELFFILENAME)){
-		   tmpList.push_back(wfd);
-	   }
-	   if (!FindNextFile(hFind, &wfd))
-		   break;
-   }
-
-   // Attention! remember to close handle.
-   FindClose(hFind);
+   std::list<RFS_FIND_DATA> tmpList;
 
    if (tmpList.size() == 0) return S_OK;
 
@@ -188,29 +169,18 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, RFS_FIND_DAT
 	   return E_OUTOFMEMORY;
    }
 
-   WIN32_FIND_DATA *aList = (WIN32_FIND_DATA *)(*retList);
+   RFS_FIND_DATA *aList = (RFS_FIND_DATA *)(*retList);
 
    int index = 0;
-   for(std::list<WIN32_FIND_DATA>::iterator it = tmpList.begin(); 
+   for(std::list<RFS_FIND_DATA>::iterator it = tmpList.begin(); 
 	   it != tmpList.end(); it ++){
-
 		aList [index] = *it;
 		// refine the attributes.
-		WIN32_FIND_DATA * pData = &aList[index];
+		RFS_FIND_DATA * pData = &aList[index];
 		pData->dwFileAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;   
 		pData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
 		if (!IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
 			pData->dwFileAttributes |= FILE_ATTRIBUTE_VIRTUAL;
-
-		std::wstring linkpath = VDRIVE_LOCAL_CACHE_ROOT;
-		linkpath += pwstrPath;
-		linkpath += _T("\\");
-		linkpath += pData->cFileName;
-		Link link = {0};
-		linkTree::ReadLink(linkpath.c_str(), &link, IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
-
-		pData->nFileSizeLow = link.dwFileSize;
-
 		index ++;
    }
 

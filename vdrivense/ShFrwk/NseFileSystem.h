@@ -475,6 +475,7 @@ public:
    // Implementation
 
    HRESULT _GetPathnameQuick(PCIDLIST_RELATIVE pidlPath, PCITEMID_CHILD pidlChild, LPWSTR pszPath) const;
+   HRESULT _GetIdQuick(PCITEMID_CHILD pidlChild, DWORD * pdwID) const;
 };
 
 

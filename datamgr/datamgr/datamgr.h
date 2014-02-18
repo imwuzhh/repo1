@@ -85,7 +85,7 @@ extern "C" {
 HRESULT DMOpen(LPCWSTR pstrFilename, TAR_ARCHIVE** ppArchive);
 HRESULT DMClose(TAR_ARCHIVE* pArchive);
 
-HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, RFS_FIND_DATA ** aList, int * nListCount);
+HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, DWORD dwId, RFS_FIND_DATA ** aList, int * nListCount);
 
 HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, LPCWSTR pstrNewName);
 HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);

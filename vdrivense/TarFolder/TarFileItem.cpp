@@ -113,11 +113,16 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    WCHAR wszPath[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszPath) );
 
+   // HarryWu, 2014.2.18
+   // Get the actual id to retrieve a list of sub-items
+   DWORD dwId = ~0ul;
+   HR( _GetIdQuick(m_pidlItem, &dwId));
+
    // HarryWu, 2014.1.29
    // Note!, it is NOT safe to pass c++ objects array between modules.
    // use /MD to genereate these modules.
    RFS_FIND_DATA * aList = NULL; int nListCount = 0;
-   HR( DMGetChildrenList(_GetTarArchivePtr(), wszPath, &aList, &nListCount) );
+   HR( DMGetChildrenList(_GetTarArchivePtr(), dwId, &aList, &nListCount) );
    for( int i = 0; i < nListCount; i++ ) {
       // Filter item according to the 'grfFlags' argument
       if( SHFilterEnumItem(grfFlags, *(WIN32_FIND_DATA *)(&aList[i])) != S_OK ) continue;

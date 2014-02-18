@@ -330,3 +330,13 @@ HRESULT CNseFileItem::_GetPathnameQuick(PCIDLIST_RELATIVE pidlPath, PCITEMID_CHI
    return S_OK;
 }
 
+HRESULT CNseFileItem::_GetIdQuick(PCITEMID_CHILD pidlChild, DWORD * pdwID) const
+{
+	ATLASSERT(ILIsAligned64(pidlPath));
+	if( !::ILIsEmpty(pidlChild) ) {
+		ATLASSERT(::ILIsChild(pidlChild));
+		const VFS_FIND_DATA* pWfd = &(reinterpret_cast<const NSEFILEPIDLDATA*>(pidlChild))->wfd;
+		*pdwID = pWfd->dwId;
+	}
+	return S_OK;
+}

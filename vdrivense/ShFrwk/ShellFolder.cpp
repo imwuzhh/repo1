@@ -1136,7 +1136,7 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
 LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	// Tag this window.
-	SetWindowLongPtr((HWND)wParam, GWLP_USERDATA, 0xEEDD00CC);
+	SetWindowLongPtr((HWND)wParam, GWLP_USERDATA, 0xED0CED0C);
 
 	// HarryWu, 2014.2.12
 	// To dock a window pane on DefView, 

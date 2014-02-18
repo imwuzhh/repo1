@@ -172,23 +172,23 @@ HRESULT CNseBaseItem::GetProperty(REFPROPERTYKEY pkey, CComPropVariant& v)
 {
    ATLASSERT(v.vt==VT_EMPTY);
    if( pkey == PKEY_ParsingName ) {
-      const WIN32_FIND_DATA wfd = GetFindData();
+      const VFS_FIND_DATA wfd = GetFindData();
       return ::InitPropVariantFromString(wfd.cFileName, &v);
    }
    if( pkey == PKEY_ItemName ) {
-      const WIN32_FIND_DATA wfd = GetFindData();
+      const VFS_FIND_DATA wfd = GetFindData();
       return ::InitPropVariantFromString(wfd.cFileName, &v);
    }
    if( pkey == PKEY_ItemNameDisplay ) {
-      const WIN32_FIND_DATA wfd = GetFindData();
+      const VFS_FIND_DATA wfd = GetFindData();
       return ::InitPropVariantFromString(wfd.cFileName, &v);
    }
    if( pkey == PKEY_FileName ) {
-      const WIN32_FIND_DATA wfd = GetFindData();
+      const VFS_FIND_DATA wfd = GetFindData();
       return ::InitPropVariantFromString(wfd.cFileName, &v);
    }
    if( pkey == PKEY_FileAttributes ) {
-      const WIN32_FIND_DATA wfd = GetFindData();
+      const VFS_FIND_DATA wfd = GetFindData();
       return ::InitPropVariantFromUInt32(wfd.dwFileAttributes, &v);
    }
    if( pkey == PKEY_ParsingPath ) {
@@ -239,7 +239,7 @@ HRESULT CNseBaseItem::GetProperty(REFPROPERTYKEY pkey, CComPropVariant& v)
       return ::InitPropVariantFromInt32(PERCEIVED_TYPE_UNKNOWN, &v);
    }
    if( pkey == PKEY_FindData ) {
-      const WIN32_FIND_DATA wfd = GetFindData();
+      const VFS_FIND_DATA wfd = GetFindData();
       return ::InitPropVariantFromBuffer(&wfd, sizeof(WIN32_FIND_DATAW), &v);
    }
    if( pkey == PKEY_SFGAOFlags ) {
@@ -409,7 +409,7 @@ CNseItem* CNseBaseItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE p
 /**
  * Create a NSE Item from static data.
  */
-CNseItem* CNseBaseItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA & wfd)
+CNseItem* CNseBaseItem::GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const VFS_FIND_DATA & wfd)
 {
    // TODO: You're a folder; override and implement this...
    ATLASSERT(false);

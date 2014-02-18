@@ -15,7 +15,7 @@ CNseFileItem::CNseFileItem(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, 
    if( pidlItem == NULL ) 
    {
       // Create empty root item
-      static WIN32_FIND_DATA s_wfdEmpty = { 0 };
+      static VFS_FIND_DATA s_wfdEmpty = { 0 };
       m_pWfd = &s_wfdEmpty;
       m_pWfd->dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
    }
@@ -318,13 +318,13 @@ HRESULT CNseFileItem::_GetPathnameQuick(PCIDLIST_RELATIVE pidlPath, PCITEMID_CHI
       pidlChild = NULL;
    }
    while( !::ILIsEmpty(pidlPath) ) {
-      const WIN32_FIND_DATA* pWfd = &(reinterpret_cast<const NSEFILEPIDLDATA*>(pidlPath))->wfd;
+      const VFS_FIND_DATA* pWfd = &(reinterpret_cast<const NSEFILEPIDLDATA*>(pidlPath))->wfd;
       ::PathAppend(pszPath, pWfd->cFileName);
       pidlPath = static_cast<PCIDLIST_RELATIVE>(::ILNext(pidlPath));
    }
    if( !::ILIsEmpty(pidlChild) ) {
       ATLASSERT(::ILIsChild(pidlChild));
-      const WIN32_FIND_DATA* pWfd = &(reinterpret_cast<const NSEFILEPIDLDATA*>(pidlChild))->wfd;
+      const VFS_FIND_DATA* pWfd = &(reinterpret_cast<const NSEFILEPIDLDATA*>(pidlChild))->wfd;
       ::PathAppend(pszPath, pWfd->cFileName);
    }
    return S_OK;

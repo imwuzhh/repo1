@@ -94,7 +94,7 @@ public:
    HRESULT SetProperty(REFPROPERTYKEY pkey, const CComPropVariant& v);
 
    CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, PCITEMID_CHILD pidlItem, BOOL bReleaseItem);
-   CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const WIN32_FIND_DATA & wfd);
+   CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const VFS_FIND_DATA & wfd);
 
    HRESULT GetChild(LPCWSTR pstrName, SHGNO ParseType, CNseItem** pItem);
    HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aList);

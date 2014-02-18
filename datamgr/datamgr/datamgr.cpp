@@ -107,7 +107,7 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive)
  * Convert the archive file information to a Windows WIN32_FIND_DATA structure, which
  * contains the basic information we must know about a virtual file/folder.
  */
-HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DATA* pData)
+HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, RFS_FIND_DATA* pData)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    
@@ -121,13 +121,16 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DA
 	   return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
    }
 
-   HANDLE hFind = FindFirstFile(fullpath.c_str(), pData);
+   WIN32_FIND_DATA tempWfd = {0};
+   HANDLE hFind = FindFirstFile(fullpath.c_str(), &tempWfd);
    if (INVALID_HANDLE_VALUE  == hFind){
 	   OUTPUTLOG("%s(), pwstrPath=[%s], return ERROR_FILE_NOT_FOUND.", __FUNCTION__, WSTR2ASTR(pstrFilename));
 	   return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
    }
    // Attention, if not closed, the file/folder will be locked!
    FindClose(hFind);
+
+   *pData = *(RFS_FIND_DATA *)&tempWfd;
 
    // refine the attributes.
    pData->dwFileAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;   
@@ -148,7 +151,7 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, WIN32_FIND_DA
 /**
  * Return the list of children of a sub-folder.
  */
-HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, WIN32_FIND_DATA ** retList, int * nListCount)
+HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, LPCWSTR pwstrPath, RFS_FIND_DATA ** retList, int * nListCount)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 

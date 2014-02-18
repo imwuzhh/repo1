@@ -140,7 +140,7 @@ public:
       COM_INTERFACE_ENTRY(IShellItemResources)      
    END_COM_MAP()
 
-   HRESULT Init(CShellFolder* pFolder, const WIN32_FIND_DATA wfd);
+   HRESULT Init(CShellFolder* pFolder, const VFS_FIND_DATA wfd);
    HRESULT Init(CShellFolder* pFolder, PCUITEMID_CHILD pidlChild);
 
    // IShellItemResources

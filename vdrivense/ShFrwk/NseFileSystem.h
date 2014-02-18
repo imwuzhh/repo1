@@ -136,6 +136,10 @@ typedef struct _VFS_FIND_DATAA {
 	DWORD dwCreatorType;
 	WORD  wFinderFlags;
 #endif
+	DWORD dwId;
+	DWORD dwVersion;
+	DWORD dwAttributes;
+	unsigned char md5 [16];
 } VFS_FIND_DATAA, *PVFS_FIND_DATAA, *LPVFS_FIND_DATAA;
 typedef struct _VFS_FIND_DATAW {
 	DWORD dwFileAttributes;
@@ -153,6 +157,10 @@ typedef struct _VFS_FIND_DATAW {
 	DWORD dwCreatorType;
 	WORD  wFinderFlags;
 #endif
+	DWORD dwId;
+	DWORD dwVersion;
+	DWORD dwAttributes;
+	unsigned char md5 [16];
 } VFS_FIND_DATAW, *PVFS_FIND_DATAW, *LPVFS_FIND_DATAW;
 #ifdef UNICODE
 typedef VFS_FIND_DATAW VFS_FIND_DATA;

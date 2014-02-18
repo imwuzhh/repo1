@@ -33,6 +33,7 @@
 #include <tinystr.h>
 #include <tinyxml.h>
 #include "linkTree.h"
+#include <json/json.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Debug helper functions
@@ -159,7 +160,25 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, DWORD dwId, RFS_FIND_DATA ** re
    *retList = NULL; *nListCount = 0;
    std::list<RFS_FIND_DATA> tmpList;
 
+   // HarryWu, 2014.2.18
+   // Test code.
+   // 1) get sub folders for Enterprise Level
    // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token="
+   // 2) get sub foders for Personal Level
+   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPersonalFolder?token="
+   // 3) get sub folder by id.
+   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetChildFolderListByFolderId?token=2ef01717-6f61-4592-a606-7292f3cb5a57&folderId=16086"
+   // 4) get sub files by id
+   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FileRead/GetChildFileListByFolderId?token=c8132990-f885-440f-9c5b-88fa685d2482&folderId=16415"
+   std::string jsonstr = "{\"FolderId\" : \"1\"}";
+
+   Json::Value root;
+   Json::Reader reader; 
+   if (reader.parse(jsonstr, root, false)){
+	   Json::Value folderId = root.get("FolderId", "");
+	   std::string test = folderId.asString();
+	   test = test;
+   }
    RFS_FIND_DATA rfd = {0};
    wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), _T("∆Û“µø’º‰"));
    rfd.dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;

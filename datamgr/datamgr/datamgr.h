@@ -77,6 +77,7 @@ struct Edoc2Context {
 	wchar_t username      [32];
 	wchar_t password      [32];
 	wchar_t AccessToken   [128];
+	DWORD   dwUserId;
 	wchar_t cachedir      [1024];
 };
 

@@ -152,10 +152,9 @@ HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, RFS_FIND_DATA
 /**
  * Return the list of children of a sub-folder.
  */
-HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, DWORD dwId, RFS_FIND_DATA ** retList, int * nListCount)
+HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA ** retList, int * nListCount)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   if (~0ul == dwId) return E_INVALIDARG;
    OUTPUTLOG("%s(), pwstrPath=[%d]", __FUNCTION__, (dwId));
    *retList = NULL; *nListCount = 0;
    std::list<RFS_FIND_DATA> tmpList;
@@ -182,7 +181,7 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, DWORD dwId, RFS_FIND_DATA ** re
    RFS_FIND_DATA rfd = {0};
    wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), _T("∆Û“µø’º‰"));
    rfd.dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;
-   rfd.dwId = rand();
+   rfd.dwId.id = rand();
    rfd.dwVersion = 0x10000000;
    tmpList.push_back(rfd);
 

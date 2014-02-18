@@ -120,6 +120,11 @@ typedef struct tagVFS_STREAM_REASON {
 
 typedef DWORD VFS_PROPSTATE;
 
+struct LocalId{
+	DWORD category;
+	DWORD id;
+};
+
 typedef struct _VFS_FIND_DATAA {
 	DWORD dwFileAttributes;
 	FILETIME ftCreationTime;
@@ -136,7 +141,7 @@ typedef struct _VFS_FIND_DATAA {
 	DWORD dwCreatorType;
 	WORD  wFinderFlags;
 #endif
-	DWORD dwId;
+	LocalId dwId;
 	DWORD dwVersion;
 	DWORD dwAttributes;
 	unsigned char md5 [16];
@@ -157,7 +162,7 @@ typedef struct _VFS_FIND_DATAW {
 	DWORD dwCreatorType;
 	WORD  wFinderFlags;
 #endif
-	DWORD dwId;
+	LocalId dwId;
 	DWORD dwVersion;
 	DWORD dwAttributes;
 	unsigned char md5 [16];
@@ -475,7 +480,7 @@ public:
    // Implementation
 
    HRESULT _GetPathnameQuick(PCIDLIST_RELATIVE pidlPath, PCITEMID_CHILD pidlChild, LPWSTR pszPath) const;
-   HRESULT _GetIdQuick(PCITEMID_CHILD pidlChild, DWORD * pdwID) const;
+   HRESULT _GetIdQuick(PCITEMID_CHILD pidlChild, LocalId * pdwID) const;
 };
 
 

@@ -19,6 +19,10 @@
 #ifndef __LIB_DATAMGR_H__
 #define __LIB_DATAMGR_H__
 
+struct RemoteId {
+	DWORD category;
+	DWORD id;
+};
 
 typedef struct _RFS_FIND_DATAA {
 	DWORD dwFileAttributes;
@@ -36,7 +40,7 @@ typedef struct _RFS_FIND_DATAA {
 	DWORD dwCreatorType;
 	WORD  wFinderFlags;
 #endif
-	DWORD dwId;
+	RemoteId dwId;
 	DWORD dwVersion;
 	DWORD dwAttributes;
 	unsigned char md5 [16];
@@ -57,7 +61,7 @@ typedef struct _RFS_FIND_DATAW {
 	DWORD dwCreatorType;
 	WORD  wFinderFlags;
 #endif
-	DWORD dwId;
+	RemoteId dwId;
 	DWORD dwVersion;
 	DWORD dwAttributes;
 	unsigned char md5 [16];
@@ -94,7 +98,7 @@ extern "C" {
 HRESULT DMOpen(LPCWSTR pstrFilename, TAR_ARCHIVE** ppArchive);
 HRESULT DMClose(TAR_ARCHIVE* pArchive);
 
-HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, DWORD dwId, RFS_FIND_DATA ** aList, int * nListCount);
+HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA ** aList, int * nListCount);
 
 HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, LPCWSTR pstrNewName);
 HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);

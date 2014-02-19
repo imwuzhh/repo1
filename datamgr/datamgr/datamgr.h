@@ -19,6 +19,19 @@
 #ifndef __LIB_DATAMGR_H__
 #define __LIB_DATAMGR_H__
 
+enum {
+	VdriveCat = (0),
+	VdriveId  = (0),
+	PublicCat = (1),
+	PublicId  = (0),
+	PersonCat = (2),
+	PersonId  = (0),
+	RecycleCat= (3),
+	RecycleId = (0),
+	SearchCat = (4),
+	SearchId  = (0),
+};
+
 struct RemoteId {
 	DWORD category;
 	DWORD id;

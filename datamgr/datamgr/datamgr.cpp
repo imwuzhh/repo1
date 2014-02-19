@@ -35,6 +35,21 @@
 #include "linkTree.h"
 #include <json/json.h>
 
+/*
+// Json request
+{
+	Method: dummy,
+	Parameters: [paraname1: paravalue1, paraname2: paravalue2, ...]
+}
+
+// Json response
+{
+	Ack: dummy,
+	Status: statusDescription,
+	Return: [ret1: retvalue1, ret2: retvalue2, ...]
+}
+*/
+
 ///////////////////////////////////////////////////////////////////////////////
 // Debug helper functions
 static std::string WideStringToAnsi(const wchar_t * wstr){

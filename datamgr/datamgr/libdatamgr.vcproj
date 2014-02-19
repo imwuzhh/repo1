@@ -359,6 +359,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Utility.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\xmlTree.cpp"
 				>
 			</File>
@@ -378,6 +382,10 @@
 			</File>
 			<File
 				RelativePath=".\linkTree.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Utility.h"
 				>
 			</File>
 			<File

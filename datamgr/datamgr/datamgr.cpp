@@ -34,6 +34,7 @@
 #include <tinyxml.h>
 #include "linkTree.h"
 #include <json/json.h>
+#include "Utility.h"
 
 /*
 // Json request
@@ -119,52 +120,6 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive)
 }
 
 /**
- * Return file information.
- * Convert the archive file information to a Windows WIN32_FIND_DATA structure, which
- * contains the basic information we must know about a virtual file/folder.
- */
-HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, RFS_FIND_DATA* pData)
-{
-   CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   
-   if (NULL == pstrFilename) return E_INVALIDARG;
-
-   std::wstring fullpath  = VDRIVE_LOCAL_CACHE_ROOT;
-   fullpath += pstrFilename;
-
-   if (!PathFileExists(fullpath.c_str())){
-	   OUTPUTLOG("%s(), pwstrPath=[%s], return ERROR_FILE_NOT_FOUND.", __FUNCTION__, WSTR2ASTR(pstrFilename));
-	   return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
-   }
-
-   WIN32_FIND_DATA tempWfd = {0};
-   HANDLE hFind = FindFirstFile(fullpath.c_str(), &tempWfd);
-   if (INVALID_HANDLE_VALUE  == hFind){
-	   OUTPUTLOG("%s(), pwstrPath=[%s], return ERROR_FILE_NOT_FOUND.", __FUNCTION__, WSTR2ASTR(pstrFilename));
-	   return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
-   }
-   // Attention, if not closed, the file/folder will be locked!
-   FindClose(hFind);
-
-   *pData = *(RFS_FIND_DATA *)&tempWfd;
-
-   // refine the attributes.
-   pData->dwFileAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;   
-   pData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
-   if (!IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
-	   pData->dwFileAttributes |= FILE_ATTRIBUTE_VIRTUAL;
-
-   Link link = {0};
-   linkTree::ReadLink(fullpath.c_str(), &link, IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
-
-   pData->nFileSizeLow = link.dwFileSize;
-
-   OUTPUTLOG("%s(), pwstrPath=[%s], return Attr=0x%08x.", __FUNCTION__, WSTR2ASTR(pstrFilename), pData->dwFileAttributes);
-
-   return S_OK;
-}
-
-/**
  * Return the list of children of a sub-folder.
  */
 HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA ** retList, int * nListCount)
@@ -184,21 +139,35 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
    // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetChildFolderListByFolderId?token=2ef01717-6f61-4592-a606-7292f3cb5a57&folderId=16086"
    // 4) get sub files by id
    // "http://192.168.253.242/EDoc2WebApi/api/Doc/FileRead/GetChildFileListByFolderId?token=c8132990-f885-440f-9c5b-88fa685d2482&folderId=16415"
-   std::string jsonstr = "{\"FolderId\" : \"1\"}";
 
-   Json::Value root;
-   Json::Reader reader; 
-   if (reader.parse(jsonstr, root, false)){
-	   Json::Value folderId = root.get("FolderId", "");
-	   std::string test = folderId.asString();
-	   test = test;
+   if (dwId.category == VdriveCat && dwId.id == VdriveId){
+	   std::list<RFS_FIND_DATA> publicList;
+	   Utility::GetTopPublic(pArchive->context.AccessToken, publicList);
+	   tmpList.merge(publicList, Utility::RfsComparation);
+	   std::list<RFS_FIND_DATA> personalList;
+	   Utility::GetTopPersonal(pArchive->context.AccessToken, personalList);
+	   tmpList.merge(personalList, Utility::RfsComparation);
+	   RFS_FIND_DATA recycleBin;
+	   Utility::ConstructRecycleFolder(recycleBin);
+	   tmpList.push_back(recycleBin);
+	   RFS_FIND_DATA searchBin;
+	   Utility::ConstructSearchFolder(searchBin);
+	   tmpList.push_back(searchBin);
+   }else if (dwId.category == RecycleCat){
+
+   }else if (dwId.category == SearchCat){
+
+   }else if (dwId.category == PublicCat || dwId.category == PersonCat){
+	   std::list<RFS_FIND_DATA> childFolders;
+	   Utility::GetChildFolders(pArchive->context.AccessToken, dwId, childFolders);
+	   tmpList.merge(childFolders, Utility::RfsComparation);
+	   std::list<RFS_FIND_DATA> childFiles;
+	   Utility::GetChildFiles(pArchive->context.AccessToken, dwId, childFiles);
+	   tmpList.merge(childFiles, Utility::RfsComparation);
+   }else{
+	   OUTPUTLOG("Invalid RemoteId{%d,%d}", dwId.category, dwId.id);
+	   return E_INVALIDARG;
    }
-   RFS_FIND_DATA rfd = {0};
-   wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), _T("∆Û“µø’º‰"));
-   rfd.dwFileAttributes |= FILE_ATTRIBUTE_DIRECTORY;
-   rfd.dwId.id = rand();
-   rfd.dwVersion = 0x10000000;
-   tmpList.push_back(rfd);
 
    if (tmpList.size() == 0) return S_OK;
 
@@ -209,8 +178,7 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
 
    int index = 0;
    for(std::list<RFS_FIND_DATA>::iterator it = tmpList.begin(); 
-	   it != tmpList.end(); it ++){
-		aList [index] = *it;
+	   it != tmpList.end(); it ++){ aList [index] = *it;
 		// refine the attributes.
 		RFS_FIND_DATA * pData = &aList[index];
 		pData->dwFileAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;   
@@ -314,6 +282,52 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
    }
 
    return S_OK;
+}
+
+/**
+* Return file information.
+* Convert the archive file information to a Windows WIN32_FIND_DATA structure, which
+* contains the basic information we must know about a virtual file/folder.
+*/
+HRESULT DMGetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, RFS_FIND_DATA* pData)
+{
+	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+	if (NULL == pstrFilename) return E_INVALIDARG;
+
+	std::wstring fullpath  = VDRIVE_LOCAL_CACHE_ROOT;
+	fullpath += pstrFilename;
+
+	if (!PathFileExists(fullpath.c_str())){
+		OUTPUTLOG("%s(), pwstrPath=[%s], return ERROR_FILE_NOT_FOUND.", __FUNCTION__, WSTR2ASTR(pstrFilename));
+		return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
+	}
+
+	WIN32_FIND_DATA tempWfd = {0};
+	HANDLE hFind = FindFirstFile(fullpath.c_str(), &tempWfd);
+	if (INVALID_HANDLE_VALUE  == hFind){
+		OUTPUTLOG("%s(), pwstrPath=[%s], return ERROR_FILE_NOT_FOUND.", __FUNCTION__, WSTR2ASTR(pstrFilename));
+		return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
+	}
+	// Attention, if not closed, the file/folder will be locked!
+	FindClose(hFind);
+
+	*pData = *(RFS_FIND_DATA *)&tempWfd;
+
+	// refine the attributes.
+	pData->dwFileAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;   
+	pData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
+	if (!IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
+		pData->dwFileAttributes |= FILE_ATTRIBUTE_VIRTUAL;
+
+	Link link = {0};
+	linkTree::ReadLink(fullpath.c_str(), &link, IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
+
+	pData->nFileSizeLow = link.dwFileSize;
+
+	OUTPUTLOG("%s(), pwstrPath=[%s], return Attr=0x%08x.", __FUNCTION__, WSTR2ASTR(pstrFilename), pData->dwFileAttributes);
+
+	return S_OK;
 }
 
 /**

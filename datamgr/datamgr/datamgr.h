@@ -89,7 +89,6 @@ typedef PRFS_FIND_DATAA PRFS_FIND_DATA;
 typedef LPRFS_FIND_DATAA LPRFS_FIND_DATA;
 #endif // UNICODE
 
-
 struct Edoc2Context {
 	wchar_t username      [32];
 	wchar_t password      [32];

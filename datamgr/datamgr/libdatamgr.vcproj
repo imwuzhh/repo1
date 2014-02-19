@@ -44,7 +44,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include"
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include;../../3rd/libcurl/curl.x86/include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -66,6 +66,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libcurl.lib"
 				OutputFile="$(OutDir)\$(ProjectName)32.dll"
 				LinkIncremental="1"
 				GenerateManifest="false"
@@ -125,7 +126,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include"
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include;../../3rd/libcurl/curl.x64/include"
 				PreprocessorDefinitions="WIN32;WIN64;_DEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -146,6 +147,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libcurl.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.dll"
 				LinkIncremental="1"
 				ModuleDefinitionFile="libdatamgr.def"
@@ -204,7 +206,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include"
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include;../../3rd/libcurl/curl.x86/include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				ExceptionHandling="1"
 				RuntimeLibrary="0"
@@ -225,8 +227,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libcurl.lib"
 				OutputFile="$(OutDir)\$(ProjectName)32.dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="../../3rd/libcurl/curl.x86/lib"
 				GenerateManifest="false"
 				ModuleDefinitionFile="libdatamgr.def"
 				GenerateDebugInformation="true"
@@ -286,7 +290,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include"
+				AdditionalIncludeDirectories=".;../../3rd/tinyxml;../../3rd/libjsoncpp/include;../../3rd/libcurl/curl.x64/include"
 				PreprocessorDefinitions="WIN32;WIN64;NDEBUG;_WINDOWS;_USRDLL;TARFOLDER_EXPORTS"
 				ExceptionHandling="1"
 				RuntimeLibrary="0"
@@ -306,8 +310,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="libcurl.lib"
 				OutputFile="$(OutDir)\$(ProjectName)64.dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="../../3rd/libcurl/curl.x64/lib"
 				ModuleDefinitionFile="libdatamgr.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"

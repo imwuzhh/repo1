@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="VDriveNSE.zh_CN"
-	ProjectGUID="{59734B95-2C5C-4B66-9817-5EFF39B82135}"
+	ProjectGUID="{0A0B40DB-BD55-45CF-956A-D3C50962A229}"
 	RootNamespace="TarFolder"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="196613"

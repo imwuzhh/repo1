@@ -64,65 +64,218 @@ Utility::~Utility(void)
 {
 }
 
-BOOL Utility::Login(const wchar_t * user, const wchar_t * pass, wchar_t * accessToken)
+BOOL Utility::Login(TAR_ARCHIVE * pArchive)
 {
+	const wchar_t * svcaddr = pArchive->context.service;
+	const wchar_t * user = pArchive->context.username;
+	const wchar_t * pass = pArchive->context.password;
+	wchar_t * accessToken= pArchive->context.AccessToken;
+	int maxTokenLength   = lengthof(pArchive->context.AccessToken);
+
 	// "http://192.168.253.242/EDoc2WebApi/api/Org/UserRead/UserLogin?userLoginName=admin&password=edoc2"
 	wchar_t url [MaxUrlLength] = _T("");
-	std::wstring strServer = _T("192.168.253.242:80");
 	wsprintf(url
-		, _T("http://%s/EDoc2WebApi/api/Org/UserRead/UserLogin?userLoginName=%s&password=%s")
-		//, _T("http://www.baidu.com/")
-		, strServer.c_str(), user, pass);
+		, _T("%s/EDoc2WebApi/api/Org/UserRead/UserLogin?userLoginName=%s&password=%s")
+		, svcaddr, user, pass);
 
 	std::wstring response;
 	if (!HttpRequest(url, response))
-	{
 		return FALSE;
+
+	if (response.empty())
+		return FALSE;
+
+	// HarryWu, 2014.2.21
+	// if token have ", TopPublic will be OK,
+	// but, TopPersonal will fail.
+	int position = response.find(_T("\""));
+	while ( position != std::wstring::npos ){
+		response.replace( position, 1, _T(""));
+		position = response.find(_T("\""), position + 1 );
 	}
+
+	wcscpy_s(accessToken, maxTokenLength, response.c_str());
 	return TRUE;
 }
 
-BOOL Utility::GetTopPublic(const wchar_t * accessToken, std::list<RFS_FIND_DATA> & topPublic)
+BOOL Utility::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPublic)
 {
-	if (accessToken == NULL || !*accessToken){
-		wchar_t szToken [MaxUrlLength] = _T("");
-		if (!Login(_T("admin"), _T("edoc2"), szToken))
-		{
+	if (pArchive->context.AccessToken[0] == _T('\0')){
+		if (!Login(pArchive)){
+			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context.username), (char *)CW2A(pArchive->context.password));
 			return FALSE;
 		}
-		accessToken = szToken;
 	}
 
-	// "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token="
+	// "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token=2ef01717-6f61-4592-a606-7292f3cb5a57"
 	wchar_t url [MaxUrlLength] = _T("");
-	std::wstring strServer = _T("192.168.253.242:80");
 	wsprintf(url
-		, _T("http://%s/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token=%s")
-		, strServer.c_str(), accessToken);
+		, _T("%s/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token=%s")
+		, pArchive->context.service, pArchive->context.AccessToken);
 
+	// {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
 	std::wstring response;
     if (!HttpRequest(url, response))
-	{
 		return FALSE;
+
+	if (response.empty())
+		return FALSE;
+
+	Json::Value root;
+	Json::Reader reader; 
+	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
+		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+		Json::Value folderId = root.get("FolderId", 0);
+		RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+		rfd.dwId.id = folderId.asInt();
+		rfd.dwId.category = PublicCat;
+		if (rfd.dwId.id == 0) return FALSE;
+
+		Json::Value folderName = root.get("FolderName", "");
+		std::string test = folderName.asString();
+		if (test.empty()) return FALSE;
+		wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
+		
+		rfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+		
+		topPublic.push_back(rfd);
 	}
 	return TRUE;
 }
 
-BOOL Utility::GetTopPersonal(const wchar_t * accessToken, std::list<RFS_FIND_DATA> & topPersonal)
+BOOL Utility::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPersonal)
 {
-	// "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPersonalFolder?token="
+	if (pArchive->context.AccessToken[0] == _T('\0')){
+		if (!Login(pArchive)){
+			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context.username), (char *)CW2A(pArchive->context.password));
+			return FALSE;
+		}
+	}
+	// "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPersonalFolder?token=2ef01717-6f61-4592-a606-7292f3cb5a57"
+	wchar_t url [MaxUrlLength] = _T("");
+	wsprintf(url
+		, _T("%s/EDoc2WebApi/api/Doc/FolderRead/GetTopPersonalFolder?token=%s")
+		, pArchive->context.service, pArchive->context.AccessToken);
+
+	// {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
+	std::wstring response;
+	if (!HttpRequest(url, response))
+		return FALSE;
+
+	if (response.empty())
+		return FALSE;
+
+	Json::Value root;
+	Json::Reader reader; 
+	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
+		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+		Json::Value folderId = root.get("FolderId", 0);
+		RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+		rfd.dwId.id = folderId.asInt();
+		rfd.dwId.category = PersonCat;
+		if (rfd.dwId.id == 0) return FALSE;
+
+		Json::Value folderName = root.get("FolderName", "");
+		std::string test = folderName.asString();
+		if (test.empty()) return FALSE;
+		wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
+
+		rfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+
+		topPersonal.push_back(rfd);
+	}
 	return TRUE;
 }
 
-BOOL Utility::GetChildFolders(const wchar_t * accessToken, const RemoteId & folderId, std::list<RFS_FIND_DATA> & childFolders)
+BOOL Utility::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & childFolders)
 {
-	// "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetChildFolderListByFolderId?token=
+	if (pArchive->context.AccessToken[0] == _T('\0')){
+		if (!Login(pArchive)){
+			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context.username), (char *)CW2A(pArchive->context.password));
+			return FALSE;
+		}
+	}
+	// "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetChildFolderListByFolderId?token=2ef01717-6f61-4592-a606-7292f3cb5a57&folderId=16086"
+	wchar_t url [MaxUrlLength] = _T("");
+	wsprintf(url
+		, _T("%s/EDoc2WebApi/api/Doc/FolderRead/GetChildFolderListByFolderId?token=%s&folderId=%d")
+		, pArchive->context.service, pArchive->context.AccessToken, remoteId.id);
+
+	// {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
+	std::wstring response;
+	if (!HttpRequest(url, response))
+		return FALSE;
+
+	if (response.empty())
+		return FALSE;
+
+	Json::Value root;
+	Json::Reader reader; 
+	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
+		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+		for (size_t index = 0; index < root.size(); index ++){
+			Json::Value folderId = root[index].get("FolderId", 0).asInt();
+			RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+			rfd.dwId.id = folderId.asInt();
+			rfd.dwId.category = remoteId.category;
+			if (rfd.dwId.id == 0) return FALSE;
+
+			Json::Value folderName = root[index].get("FolderName", "").asString();
+			std::string test = folderName.asString();
+			if (test.empty()) return FALSE;
+			wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
+
+			rfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+
+			childFolders.push_back(rfd);
+		}
+	}
 	return TRUE;
 }
 
-BOOL Utility::GetChildFiles(const wchar_t * accessToken, const RemoteId & folderId, std::list<RFS_FIND_DATA> & childFiles)
+BOOL Utility::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & childFiles)
 {
-	// "http://192.168.253.242/EDoc2WebApi/api/Doc/FileRead/GetChildFileListByFolderId?token=
+	if (pArchive->context.AccessToken[0] == _T('\0')){
+		if (!Login(pArchive)){
+			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context.username), (char *)CW2A(pArchive->context.password));
+			return FALSE;
+		}
+	}
+	// "http://192.168.253.242/EDoc2WebApi/api/Doc/FileRead/GetChildFileListByFolderId?token=c8132990-f885-440f-9c5b-88fa685d2482&folderId=16415"
+	wchar_t url [MaxUrlLength] = _T("");
+	wsprintf(url
+		, _T("%s/EDoc2WebApi/api/Doc/FileRead/GetChildFileListByFolderId?token=%s&folderId=%d")
+		, pArchive->context.service, pArchive->context.AccessToken, remoteId.id);
+
+	// {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
+	std::wstring response;
+	if (!HttpRequest(url, response))
+		return FALSE;
+
+	if (response.empty())
+		return FALSE;
+
+	Json::Value root;
+	Json::Reader reader; 
+	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
+		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+		for (size_t index = 0; index < root.size(); index ++){
+			Json::Value folderId = root[index].get("FileId", 0).asInt();
+			RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+			rfd.dwId.id = folderId.asInt();
+			rfd.dwId.category = remoteId.category;
+			if (rfd.dwId.id == 0) return FALSE;
+
+			Json::Value folderName = root[index].get("FileName", "").asString();
+			std::string test = folderName.asString();
+			if (test.empty()) return FALSE;
+			wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
+
+			rfd.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+
+			childFiles.push_back(rfd);
+		}
+	}
 	return TRUE;
 }
 
@@ -183,6 +336,7 @@ int XferProgress(void *clientp,
 				curl_off_t ultotal,
 				curl_off_t ulnow)
 {
+	return 0;
 	OUTPUTLOG("%s(%.2f), %d/%d Bytes", __FUNCTION__
 		, 100.0f * dlnow / (dltotal ? dltotal : 1)
 		, (unsigned int)dlnow
@@ -245,7 +399,9 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 		/*
 		curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 10000L);
 		*/
-		curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, 1000L);
+		/*		*/
+		curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, 500L);
+
 
 		// HarryWu, 2014.2.20
 		// Progress support.
@@ -271,8 +427,9 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 			* Do something nice with it!
 			*/ 
 			OUTPUTLOG("%lu bytes retrieved\n", (long)chunk.size);
-
-			response = (wchar_t *)CA2W(chunk.memory);
+			// HarryWu, 2014.2.21
+			// I guess that, you are using utf-8.
+			response = (wchar_t *)CA2WEX<128>(chunk.memory, CP_UTF8);
 		}
 
 		/* always cleanup */

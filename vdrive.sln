@@ -8,6 +8,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VDriveNSE", "vdrivense\TarF
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libdatamgr", "datamgr\datamgr\libdatamgr.vcproj", "{544C9092-7887-4BA4-AAF9-DA9E4F2EC304}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VDriveNSE.zh_CN", "vdrivense\TarFolder\VDriveNSE.zh_CN.vcproj", "{0A0B40DB-BD55-45CF-956A-D3C50962A229}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -32,6 +34,14 @@ Global
 		{544C9092-7887-4BA4-AAF9-DA9E4F2EC304}.Release|Win32.Build.0 = Release|Win32
 		{544C9092-7887-4BA4-AAF9-DA9E4F2EC304}.Release|x64.ActiveCfg = Release|x64
 		{544C9092-7887-4BA4-AAF9-DA9E4F2EC304}.Release|x64.Build.0 = Release|x64
+		{0A0B40DB-BD55-45CF-956A-D3C50962A229}.Debug|Win32.ActiveCfg = Debug|Win32
+		{0A0B40DB-BD55-45CF-956A-D3C50962A229}.Debug|Win32.Build.0 = Debug|Win32
+		{0A0B40DB-BD55-45CF-956A-D3C50962A229}.Debug|x64.ActiveCfg = Debug|x64
+		{0A0B40DB-BD55-45CF-956A-D3C50962A229}.Debug|x64.Build.0 = Debug|x64
+		{0A0B40DB-BD55-45CF-956A-D3C50962A229}.Release|Win32.ActiveCfg = Release|Win32
+		{0A0B40DB-BD55-45CF-956A-D3C50962A229}.Release|Win32.Build.0 = Release|Win32
+		{0A0B40DB-BD55-45CF-956A-D3C50962A229}.Release|x64.ActiveCfg = Release|x64
+		{0A0B40DB-BD55-45CF-956A-D3C50962A229}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

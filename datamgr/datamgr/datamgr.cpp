@@ -97,9 +97,12 @@ HRESULT DMOpen(LPCWSTR pwstrFilename, TAR_ARCHIVE** ppArchive)
 	   SHCreateDirectory(GetActiveWindow(), pArchive->context.cachedir);
    }
 
+   // Setup Service address
+   wcscpy_s(pArchive->context.service, lengthof(pArchive->context.service), _T("http://192.168.253.242"));
    // Setup Username & passworld
-   wcscpy_s(pArchive->context.username, lengthof(pArchive->context.username), _T("HarryWu"));
-   wcscpy_s(pArchive->context.password, lengthof(pArchive->context.password), _T("__DUMMY_PASSWORD__"));
+   wcscpy_s(pArchive->context.username, lengthof(pArchive->context.username), _T("admin"));
+   wcscpy_s(pArchive->context.password, lengthof(pArchive->context.password), _T("edoc2"));
+   pArchive->context.AccessToken [0] = _T('\0');
 
    *ppArchive = pArchive;
    return S_OK;
@@ -132,9 +135,9 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
    // HarryWu, 2014.2.18
    // Test code.
    // 1) get sub folders for Enterprise Level
-   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token="
+   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token=2ef01717-6f61-4592-a606-7292f3cb5a57"
    // 2) get sub foders for Personal Level
-   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPersonalFolder?token="
+   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPersonalFolder?token=2ef01717-6f61-4592-a606-7292f3cb5a57"
    // 3) get sub folder by id.
    // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetChildFolderListByFolderId?token=2ef01717-6f61-4592-a606-7292f3cb5a57&folderId=16086"
    // 4) get sub files by id
@@ -142,10 +145,10 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
 
    if (dwId.category == VdriveCat && dwId.id == VdriveId){
 	   std::list<RFS_FIND_DATA> publicList;
-	   Utility::GetTopPublic(pArchive->context.AccessToken, publicList);
+	   Utility::GetTopPublic(pArchive, publicList);
 	   tmpList.merge(publicList, Utility::RfsComparation);
 	   std::list<RFS_FIND_DATA> personalList;
-	   Utility::GetTopPersonal(pArchive->context.AccessToken, personalList);
+	   Utility::GetTopPersonal(pArchive, personalList);
 	   tmpList.merge(personalList, Utility::RfsComparation);
 	   RFS_FIND_DATA recycleBin;
 	   Utility::ConstructRecycleFolder(recycleBin);
@@ -159,10 +162,10 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
 
    }else if (dwId.category == PublicCat || dwId.category == PersonCat){
 	   std::list<RFS_FIND_DATA> childFolders;
-	   Utility::GetChildFolders(pArchive->context.AccessToken, dwId, childFolders);
+	   Utility::GetChildFolders(pArchive, dwId, childFolders);
 	   tmpList.merge(childFolders, Utility::RfsComparation);
 	   std::list<RFS_FIND_DATA> childFiles;
-	   Utility::GetChildFiles(pArchive->context.AccessToken, dwId, childFiles);
+	   Utility::GetChildFiles(pArchive, dwId, childFiles);
 	   tmpList.merge(childFiles, Utility::RfsComparation);
    }else{
 	   OUTPUTLOG("Invalid RemoteId{%d,%d}", dwId.category, dwId.id);

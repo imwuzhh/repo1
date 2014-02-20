@@ -90,6 +90,7 @@ typedef LPRFS_FIND_DATAA LPRFS_FIND_DATA;
 #endif // UNICODE
 
 struct Edoc2Context {
+	wchar_t service       [128];
 	wchar_t username      [32];
 	wchar_t password      [32];
 	wchar_t AccessToken   [128];
@@ -97,11 +98,11 @@ struct Edoc2Context {
 	wchar_t cachedir      [1024];
 };
 
-typedef struct tagTAR_ARCHIVE
+struct TAR_ARCHIVE
 {
    CComAutoCriticalSection csLock;               // Thread lock
    struct Edoc2Context context;
-} TAR_ARCHIVE;
+};
 
 #ifdef __cplusplus
 extern "C" {

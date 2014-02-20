@@ -622,11 +622,25 @@ STDMETHODIMP CShellFolder::GetUIObjectOf(HWND hwndOwner, UINT cidl, PCUITEMID_CH
    {
       // BUG: We don't support merging of menus for multiple items, but the menu
       //      can disable its menuitems if needed.
-      CNseItemPtr spItem = GenerateChildItem(pidlItem);
-      if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
-      if( ::IsMenu(m_hMenu) ) ::DestroyMenu(m_hMenu);
-      m_hMenu = spItem->GetMenu();
-      m_hContextMenu = ::GetSubMenu(m_hMenu, _T("ContextMenu"));
+	  if( ::IsMenu(m_hMenu) ) ::DestroyMenu(m_hMenu);
+	  CNseItemPtr spItem = GenerateChildItem(pidlItem);
+	  if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
+	  m_hMenu = spItem->GetMenu();
+	  m_hContextMenu = ::GetSubMenu(m_hMenu, _T("ContextMenu"));
+	  
+	  if (cidl > 1){ // HarryWu, refine menu for multiple selections.
+		  ::RemoveMenu(m_hContextMenu, ID_FILE_VIEWLOG, MF_BYCOMMAND);
+		  ::RemoveMenu(m_hContextMenu, ID_FILE_INNERLINK, MF_BYCOMMAND);
+		  if (!spItem->IsFolder()){
+			  ::RemoveMenu(m_hContextMenu, ID_FILE_PREVIEW, MF_BYCOMMAND);
+			  ::RemoveMenu(m_hContextMenu, ID_FILE_EXTEDIT, MF_BYCOMMAND);
+			  ::RemoveMenu(m_hContextMenu, ID_FILE_LOCK, MF_BYCOMMAND);
+			  ::RemoveMenu(m_hContextMenu, ID_FILE_OLDVERSION, MF_BYCOMMAND);
+		  }
+	  }
+
+	  // HarryWu, 2014.2.20
+	  // Disable menu items here.
       DEFCONTEXTMENU dcm = { hwndOwner, static_cast<IContextMenuCB*>(this), m_pidlMonitor, static_cast<IShellFolder*>(this), cidl, rgpidl, NULL, 0, NULL };
       return ::SHCreateDefaultContextMenu(&dcm, riid, ppRetVal);
    }

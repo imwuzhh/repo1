@@ -29,6 +29,8 @@
 #define ID_FILE_OLDVERSION              13
 #define ID_FILE_VIEWLOG                 14
 #define ID_FILE_EXTEDIT                 15
+#define ID_FILE_PREV                    16
+#define ID_FILE_NEXT                    17
 
 #define ID_COMMAND_EXTRACT              400
 

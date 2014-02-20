@@ -29,6 +29,25 @@
 #define HR(expr)  { HRESULT _hr; if(FAILED(_hr=(expr))) return _hr; }
 #endif // _DEBUG
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Debug helper functions
+static std::string WideStringToAnsi(const wchar_t * wstr){
+	if (!wstr) return "";
+	char szAnsi [MAX_PATH] = "";
+	WideCharToMultiByte(CP_ACP, 0, wstr, wcslen(wstr), szAnsi, lengthof(szAnsi), NULL, NULL);
+	return szAnsi;
+}
+static void OutputLog(const char * format, ...){
+	va_list va;
+	va_start(va, format);
+	char szMsg [0x400] = "";
+	_vsnprintf_s(szMsg, lengthof(szMsg), format, va);
+	OutputDebugStringA(szMsg); OutputDebugStringA("\n");
+}
+#define WSTR2ASTR(w) (WideStringToAnsi(w).c_str())
+#define OUTPUTLOG OutputLog
+
 #include "datamgr.h"
 #include "Utility.h"
 #include <json/json.h>
@@ -52,6 +71,7 @@ BOOL Utility::Login(const wchar_t * user, const wchar_t * pass, wchar_t * access
 	std::wstring strServer = _T("192.168.253.242:80");
 	wsprintf(url
 		, _T("http://%s/EDoc2WebApi/api/Org/UserRead/UserLogin?userLoginName=%s&password=%s")
+		//, _T("http://www.baidu.com/")
 		, strServer.c_str(), user, pass);
 
 	std::wstring response;
@@ -157,14 +177,27 @@ WriteMemoryCallback(void *contents, size_t size, size_t nmemb, void *userp)
 	return realsize;
 }
 
+int XferProgress(void *clientp,
+				curl_off_t dltotal,
+				curl_off_t dlnow,
+				curl_off_t ultotal,
+				curl_off_t ulnow)
+{
+	OUTPUTLOG("%s(%.2f), %d/%d Bytes", __FUNCTION__
+		, 100.0f * dlnow / (dltotal ? dltotal : 1)
+		, (unsigned int)dlnow
+		, (unsigned int)dltotal);
+	return 0; // non-zero will abort xfer.
+}
 
 BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 {
 	CURL *curl;
 	CURLcode res;
 
-	struct MemoryStruct chunk;
+	DWORD dwBeginTicks = 0;
 
+	struct MemoryStruct chunk;
 	chunk.memory = (char *)malloc(1);  /* will be grown as needed by the realloc above */ 
 	chunk.size = 0;    /* no data at this point */ 
 
@@ -172,7 +205,9 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 
 	curl = curl_easy_init();
 	if(curl) {
-		curl_easy_setopt(curl, CURLOPT_URL, CW2A(requestUrl));
+		// HarryWu, 2014.2.20
+		// Carefully use CW2A() utility, type convertion.
+		curl_easy_setopt(curl, CURLOPT_URL, (char *)CW2A(requestUrl));
 
 #ifdef SKIP_PEER_VERIFICATION
 		/*
@@ -204,14 +239,30 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 		/* we pass our 'chunk' struct to the callback function */ 
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
 
+		// HarryWu, 2014.2.20
+		// Setup timeout for connection & read/write, not for dns
+		// Async Dns with timeout require c-ares utility.
+		/*
+		curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 10000L);
+		*/
+		curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, 1000L);
+
+		// HarryWu, 2014.2.20
+		// Progress support.
+		curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
+		curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, XferProgress);
+		curl_easy_setopt(curl, CURLOPT_XFERINFODATA, 0L);
+
 		/* Perform the request, res will get the return code */
+		dwBeginTicks = GetTickCount();
 		res = curl_easy_perform(curl);
+		// HarryWu, 2014.2.20
+		// printf() does not check type of var of CW2A().
+		OUTPUTLOG("curl: request [%s] Cost [%d] ms", (char *)CW2A(requestUrl), GetTickCount() - dwBeginTicks);
 
 		/* Check for errors */
 		if(res != CURLE_OK){
-			fprintf(stderr
-					,"curl_easy_perform() failed: %s\n"
-					,curl_easy_strerror(res));
+			OUTPUTLOG("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
 		}else{
 			/*
 			* Now, our chunk.memory points to a memory block that is chunk.size
@@ -219,9 +270,9 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 			*
 			* Do something nice with it!
 			*/ 
-			printf("%lu bytes retrieved\n", (long)chunk.size);
+			OUTPUTLOG("%lu bytes retrieved\n", (long)chunk.size);
 
-			response = CA2W(chunk.memory);
+			response = (wchar_t *)CA2W(chunk.memory);
 		}
 
 		/* always cleanup */
@@ -236,3 +287,9 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 
 	return TRUE;
 }
+
+BOOL Utility::JsonRequest(const wchar_t * reqJson, std::wstring & response)
+{
+	return TRUE;
+}
+

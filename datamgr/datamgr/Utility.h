@@ -21,4 +21,5 @@ public:
 	static bool RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right);
 public:
 	static BOOL HttpRequest(const wchar_t * requestUrl, std::wstring & response);
+	static BOOL JsonRequest(const wchar_t * reqJson, std::wstring & response);
 };

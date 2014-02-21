@@ -6,6 +6,8 @@
 #include <list>
 #include <iostream>
 #include <sys/stat.h>
+#include <tinystr.h>
+#include <tinyxml.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Macros
@@ -66,11 +68,11 @@ Utility::~Utility(void)
 
 BOOL Utility::Login(TAR_ARCHIVE * pArchive)
 {
-	const wchar_t * svcaddr = pArchive->context.service;
-	const wchar_t * user = pArchive->context.username;
-	const wchar_t * pass = pArchive->context.password;
-	wchar_t * accessToken= pArchive->context.AccessToken;
-	int maxTokenLength   = lengthof(pArchive->context.AccessToken);
+	const wchar_t * svcaddr = pArchive->context->service;
+	const wchar_t * user = pArchive->context->username;
+	const wchar_t * pass = pArchive->context->password;
+	wchar_t * accessToken= pArchive->context->AccessToken;
+	int maxTokenLength   = lengthof(pArchive->context->AccessToken);
 
 	// "http://192.168.253.242/EDoc2WebApi/api/Org/UserRead/UserLogin?userLoginName=admin&password=edoc2"
 	wchar_t url [MaxUrlLength] = _T("");
@@ -100,9 +102,9 @@ BOOL Utility::Login(TAR_ARCHIVE * pArchive)
 
 BOOL Utility::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPublic)
 {
-	if (pArchive->context.AccessToken[0] == _T('\0')){
+	if (pArchive->context->AccessToken[0] == _T('\0')){
 		if (!Login(pArchive)){
-			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context.username), (char *)CW2A(pArchive->context.password));
+			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
 			return FALSE;
 		}
 	}
@@ -111,7 +113,7 @@ BOOL Utility::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & to
 	wchar_t url [MaxUrlLength] = _T("");
 	wsprintf(url
 		, _T("%s/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token=%s")
-		, pArchive->context.service, pArchive->context.AccessToken);
+		, pArchive->context->service, pArchive->context->AccessToken);
 
 	// {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
 	std::wstring response;
@@ -125,8 +127,9 @@ BOOL Utility::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & to
 	Json::Reader reader; 
 	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
 		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
-		Json::Value folderId = root.get("FolderId", 0);
 		RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+
+		Json::Value folderId = root.get("FolderId", 0);
 		rfd.dwId.id = folderId.asInt();
 		rfd.dwId.category = PublicCat;
 		if (rfd.dwId.id == 0) return FALSE;
@@ -137,7 +140,10 @@ BOOL Utility::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & to
 		wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
 		
 		rfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
-		
+		SYSTEMTIME stime; GetSystemTime(&stime);
+		FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
+		rfd.ftLastAccessTime = rfd.ftLastWriteTime = rfd.ftCreationTime = ftime;
+
 		topPublic.push_back(rfd);
 	}
 	return TRUE;
@@ -145,9 +151,9 @@ BOOL Utility::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & to
 
 BOOL Utility::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPersonal)
 {
-	if (pArchive->context.AccessToken[0] == _T('\0')){
+	if (pArchive->context->AccessToken[0] == _T('\0')){
 		if (!Login(pArchive)){
-			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context.username), (char *)CW2A(pArchive->context.password));
+			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
 			return FALSE;
 		}
 	}
@@ -155,7 +161,7 @@ BOOL Utility::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & 
 	wchar_t url [MaxUrlLength] = _T("");
 	wsprintf(url
 		, _T("%s/EDoc2WebApi/api/Doc/FolderRead/GetTopPersonalFolder?token=%s")
-		, pArchive->context.service, pArchive->context.AccessToken);
+		, pArchive->context->service, pArchive->context->AccessToken);
 
 	// {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
 	std::wstring response;
@@ -169,8 +175,9 @@ BOOL Utility::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & 
 	Json::Reader reader; 
 	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
 		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
-		Json::Value folderId = root.get("FolderId", 0);
 		RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+
+		Json::Value folderId = root.get("FolderId", 0);
 		rfd.dwId.id = folderId.asInt();
 		rfd.dwId.category = PersonCat;
 		if (rfd.dwId.id == 0) return FALSE;
@@ -181,6 +188,9 @@ BOOL Utility::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & 
 		wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
 
 		rfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+		SYSTEMTIME stime; GetSystemTime(&stime);
+		FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
+		rfd.ftLastAccessTime = rfd.ftLastWriteTime = rfd.ftCreationTime = ftime;
 
 		topPersonal.push_back(rfd);
 	}
@@ -189,9 +199,9 @@ BOOL Utility::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & 
 
 BOOL Utility::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & childFolders)
 {
-	if (pArchive->context.AccessToken[0] == _T('\0')){
+	if (pArchive->context->AccessToken[0] == _T('\0')){
 		if (!Login(pArchive)){
-			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context.username), (char *)CW2A(pArchive->context.password));
+			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
 			return FALSE;
 		}
 	}
@@ -199,7 +209,7 @@ BOOL Utility::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId,
 	wchar_t url [MaxUrlLength] = _T("");
 	wsprintf(url
 		, _T("%s/EDoc2WebApi/api/Doc/FolderRead/GetChildFolderListByFolderId?token=%s&folderId=%d")
-		, pArchive->context.service, pArchive->context.AccessToken, remoteId.id);
+		, pArchive->context->service, pArchive->context->AccessToken, remoteId.id);
 
 	// {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
 	std::wstring response;
@@ -214,18 +224,22 @@ BOOL Utility::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId,
 	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
 		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
 		for (size_t index = 0; index < root.size(); index ++){
-			Json::Value folderId = root[index].get("FolderId", 0).asInt();
 			RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+
+			Json::Value folderId = root[index].get("FolderId", 0);
 			rfd.dwId.id = folderId.asInt();
 			rfd.dwId.category = remoteId.category;
 			if (rfd.dwId.id == 0) return FALSE;
 
-			Json::Value folderName = root[index].get("FolderName", "").asString();
+			Json::Value folderName = root[index].get("FolderName", "");
 			std::string test = folderName.asString();
 			if (test.empty()) return FALSE;
 			wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
 
 			rfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+			SYSTEMTIME stime; GetSystemTime(&stime);
+			FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
+			rfd.ftLastAccessTime = rfd.ftLastWriteTime = rfd.ftCreationTime = ftime;
 
 			childFolders.push_back(rfd);
 		}
@@ -235,9 +249,9 @@ BOOL Utility::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId,
 
 BOOL Utility::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & childFiles)
 {
-	if (pArchive->context.AccessToken[0] == _T('\0')){
+	if (pArchive->context->AccessToken[0] == _T('\0')){
 		if (!Login(pArchive)){
-			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context.username), (char *)CW2A(pArchive->context.password));
+			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
 			return FALSE;
 		}
 	}
@@ -245,7 +259,7 @@ BOOL Utility::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, s
 	wchar_t url [MaxUrlLength] = _T("");
 	wsprintf(url
 		, _T("%s/EDoc2WebApi/api/Doc/FileRead/GetChildFileListByFolderId?token=%s&folderId=%d")
-		, pArchive->context.service, pArchive->context.AccessToken, remoteId.id);
+		, pArchive->context->service, pArchive->context->AccessToken, remoteId.id);
 
 	// {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
 	std::wstring response;
@@ -260,18 +274,28 @@ BOOL Utility::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, s
 	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
 		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
 		for (size_t index = 0; index < root.size(); index ++){
-			Json::Value folderId = root[index].get("FileId", 0).asInt();
 			RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+
+			// Parse id
+			Json::Value folderId = root[index].get("FileId", 0);
 			rfd.dwId.id = folderId.asInt();
 			rfd.dwId.category = remoteId.category;
 			if (rfd.dwId.id == 0) return FALSE;
 
-			Json::Value folderName = root[index].get("FileName", "").asString();
+			// Parse Name
+			Json::Value folderName = root[index].get("FileName", "");
 			std::string test = folderName.asString();
 			if (test.empty()) return FALSE;
 			wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
 
+			// Parse FileCurSize
+			Json::Value fileSize = root[index].get("FileCurSize", 0);
+			rfd.nFileSizeLow = fileSize.asInt();
+
 			rfd.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+			SYSTEMTIME stime; GetSystemTime(&stime);
+			FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
+			rfd.ftLastAccessTime = rfd.ftLastWriteTime = rfd.ftCreationTime = ftime;
 
 			childFiles.push_back(rfd);
 		}
@@ -279,23 +303,47 @@ BOOL Utility::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, s
 	return TRUE;
 }
 
-BOOL Utility::ConstructRecycleFolder(RFS_FIND_DATA & recycleFolder)
+BOOL Utility::ConstructRecycleFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & recycleFolder)
 {
 	memset(&recycleFolder, 0, sizeof(recycleFolder));
 	recycleFolder.dwId.category = RecycleCat;
 	recycleFolder.dwId.id = 0;
-	wcscpy_s(recycleFolder.cFileName, lengthof(recycleFolder.cFileName), _T("RecycleBin"));
+	LoadLocalizedName(pArchive->context->localeName, _T("RecycleBin"), recycleFolder.cFileName, lengthof(recycleFolder.cFileName));
 	recycleFolder.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+	SYSTEMTIME stime; GetSystemTime(&stime);
+	FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
+	recycleFolder.ftLastAccessTime = recycleFolder.ftLastWriteTime = recycleFolder.ftCreationTime = ftime;
 	return TRUE;
 }
 
-BOOL Utility::ConstructSearchFolder(RFS_FIND_DATA & searchFolder)
+BOOL Utility::ConstructSearchFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & searchFolder)
 {
 	memset(&searchFolder, 0, sizeof(searchFolder));
 	searchFolder.dwId.category = SearchCat;
 	searchFolder.dwId.id = 0;
-	wcscpy_s(searchFolder.cFileName, lengthof(searchFolder.cFileName), _T("SearchBin"));
+	LoadLocalizedName(pArchive->context->localeName, _T("SearchBin"), searchFolder.cFileName, lengthof(searchFolder.cFileName));
 	searchFolder.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+	SYSTEMTIME stime; GetSystemTime(&stime);
+	FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
+	searchFolder.ftLastAccessTime = searchFolder.ftLastWriteTime = searchFolder.ftCreationTime = ftime;
+	return TRUE;
+}
+
+BOOL Utility::DeleteItem(TAR_ARCHIVE * pArchive, const RFS_FIND_DATA * pWfd)
+{
+	Json::StyledWriter writer;
+	Json::Value  root;
+	root ["Server"] = pArchive->context->service;
+	root ["Port"]   = 60684;
+	root ["Version"]= "1.0.0.1";
+	root ["Method"] = "DeleteItem";
+	Json::Value idlist; idlist.append((int)pWfd->dwId.id);
+	Json::Value parameters; parameters["idlist"] = idlist;
+	root ["Params"] = parameters;
+	std::string jsonString = writer.write(root);
+
+	std::wstring response;
+	Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
 	return TRUE;
 }
 
@@ -447,6 +495,15 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 
 BOOL Utility::JsonRequest(const wchar_t * reqJson, std::wstring & response)
 {
+	OUTPUTLOG("%s(), JsonRequest: %s", __FUNCTION__, (const char *)CW2A(reqJson));
 	return TRUE;
 }
 
+BOOL Utility::LoadLocalizedName(const wchar_t * localeName, const wchar_t * key, wchar_t * retVaule, int cchMax)
+{
+	if (key && retVaule) wcscpy_s(retVaule, cchMax, key);
+	TiXmlDocument * xdoc = new TiXmlDocument();
+	if (!xdoc) return FALSE;
+	delete xdoc;
+	return TRUE;
+}

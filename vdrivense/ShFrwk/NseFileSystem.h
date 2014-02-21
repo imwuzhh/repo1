@@ -144,6 +144,8 @@ typedef struct _VFS_FIND_DATAA {
 	LocalId dwId;
 	DWORD dwVersion;
 	DWORD dwAttributes;
+	DWORD dwPage;
+	DWORD dwTotalPage;
 	unsigned char md5 [16];
 } VFS_FIND_DATAA, *PVFS_FIND_DATAA, *LPVFS_FIND_DATAA;
 typedef struct _VFS_FIND_DATAW {
@@ -165,6 +167,8 @@ typedef struct _VFS_FIND_DATAW {
 	LocalId dwId;
 	DWORD dwVersion;
 	DWORD dwAttributes;
+	DWORD dwPage;
+	DWORD dwTotalPage;
 	unsigned char md5 [16];
 } VFS_FIND_DATAW, *PVFS_FIND_DATAW, *LPVFS_FIND_DATAW;
 #ifdef UNICODE

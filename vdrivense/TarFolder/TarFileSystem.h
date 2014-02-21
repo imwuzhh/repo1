@@ -49,6 +49,7 @@ public:
    BOOL DllMain(DWORD dwReason, LPVOID lpReserved);
 
    HRESULT CreateFileSystem(PCIDLIST_ABSOLUTE pidlRoot, CNseFileSystem** ppFS);
+   HRESULT LoadLangResource();
 };
 
 

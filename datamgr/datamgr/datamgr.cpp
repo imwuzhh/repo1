@@ -39,15 +39,19 @@
 /*
 // Json request
 {
-	Method: dummy,
-	Parameters: [paraname1: paravalue1, paraname2: paravalue2, ...]
+	Server: "127.0.0.1",
+	Port: 60684,
+	Version: "1.0.0.1", 
+	Method: "SampleRequest",
+	Param: {param1: value1, param2: value2, ...}
 }
 
 // Json response
 {
-	Ack: dummy,
-	Status: statusDescription,
-	Return: [ret1: retvalue1, ret2: retvalue2, ...]
+	Ack: "SampleRequest",
+	statusCode: 0,
+	Status: "Code is 0, so everything is ok.",
+	Return: {ret1: value1, ret2: value2, ...}
 }
 */
 
@@ -71,10 +75,63 @@ static void OutputLog(const char * format, ...){
 
 ///////////////////////////////////////////////////////////////////////////////
 // cache directory
-#define VDRIVE_LOCAL_CACHE_ROOT pArchive->context.cachedir
+#define VDRIVE_LOCAL_CACHE_ROOT ((pArchive && pArchive->context) \
+								? (pArchive->context->cachedir) \
+								: _T(""))
+
+///////////////////////////////////////////////////////////////////////////////
+// Global Context
+static Edoc2Context * gspEdoc2Context = NULL;
 
 ///////////////////////////////////////////////////////////////////////////////
 // TAR archive manipulation
+
+/**
+* Initialize 
+*/
+HRESULT DMInit(){
+	HRESULT hr = E_FAIL;
+	if (gspEdoc2Context) return S_OK;
+
+	gspEdoc2Context = new Edoc2Context();
+	memset(gspEdoc2Context, 0, sizeof(Edoc2Context));
+
+	struct Edoc2Context & context = *gspEdoc2Context;
+
+	// Setup locale.
+	GetUserDefaultLocaleName(context.localeName, lengthof(context.localeName));
+
+	// Setup local cache directory
+	if (GetTempPathW(lengthof(context.cachedir), context.cachedir) <= 0){
+		hr = AtlHresultFromLastError();
+		goto bail;
+	}
+	wcscat_s(context.cachedir, lengthof(context.cachedir), _T("\\vdrivecache\\"));
+	if (!PathFileExists(context.cachedir)){
+		SHCreateDirectory(GetActiveWindow(), context.cachedir);
+	}
+
+	// Setup Service address
+	wcscpy_s(context.service, lengthof(context.service), _T("http://192.168.253.242"));
+	// Setup Username & passworld
+	wcscpy_s(context.username, lengthof(context.username), _T("admin"));
+	wcscpy_s(context.password, lengthof(context.password), _T("edoc2"));
+	// Cleanup AccessToken
+	context.AccessToken [0] = _T('\0');
+
+	hr = S_OK;
+bail:
+	return hr;
+}
+
+HRESULT DMCleanup()
+{
+	if (gspEdoc2Context){
+		delete gspEdoc2Context;
+		gspEdoc2Context = NULL;
+	}
+	return S_OK;
+}
 
 /**
  * Opens an existing .tar archive.
@@ -86,24 +143,8 @@ HRESULT DMOpen(LPCWSTR pwstrFilename, TAR_ARCHIVE** ppArchive)
    HRESULT hr = E_FAIL;
    TAR_ARCHIVE* pArchive = new TAR_ARCHIVE();
    if( pArchive == NULL ) return E_OUTOFMEMORY;
-
-   // Setup local cache directory
-   if (GetTempPathW(lengthof(pArchive->context.cachedir), pArchive->context.cachedir) <= 0){
-	   hr = AtlHresultFromLastError();
-	   goto bail;
-   }
-   wcscat_s(pArchive->context.cachedir, lengthof(pArchive->context.cachedir), _T("\\vdrivecache\\"));
-   if (!PathFileExists(pArchive->context.cachedir)){
-	   SHCreateDirectory(GetActiveWindow(), pArchive->context.cachedir);
-   }
-
-   // Setup Service address
-   wcscpy_s(pArchive->context.service, lengthof(pArchive->context.service), _T("http://192.168.253.242"));
-   // Setup Username & passworld
-   wcscpy_s(pArchive->context.username, lengthof(pArchive->context.username), _T("admin"));
-   wcscpy_s(pArchive->context.password, lengthof(pArchive->context.password), _T("edoc2"));
-   pArchive->context.AccessToken [0] = _T('\0');
-
+   // Retrieve the session context ptr.
+   pArchive->context = gspEdoc2Context;
    *ppArchive = pArchive;
    return S_OK;
 bail:
@@ -151,10 +192,10 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
 	   Utility::GetTopPersonal(pArchive, personalList);
 	   tmpList.merge(personalList, Utility::RfsComparation);
 	   RFS_FIND_DATA recycleBin;
-	   Utility::ConstructRecycleFolder(recycleBin);
+	   Utility::ConstructRecycleFolder(pArchive, recycleBin);
 	   tmpList.push_back(recycleBin);
 	   RFS_FIND_DATA searchBin;
-	   Utility::ConstructSearchFolder(searchBin);
+	   Utility::ConstructSearchFolder(pArchive, searchBin);
 	   tmpList.push_back(searchBin);
    }else if (dwId.category == RecycleCat){
 
@@ -224,10 +265,12 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPCWSTR pwstrNewN
 /**
  * Delete a file or folder.
  */
-HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
+HRESULT DMDelete(TAR_ARCHIVE* pArchive, const RFS_FIND_DATA * pWfd)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   
+
+   LPCWSTR pwstrFilename = pWfd->cFileName;
+
    if (NULL == pwstrFilename) return E_INVALIDARG;
 
    OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
@@ -252,7 +295,7 @@ HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
    }
 
    {// Delete remote File/Folder
-
+	   Utility::DeleteItem(pArchive, pWfd);
    }
    return S_OK;
 }

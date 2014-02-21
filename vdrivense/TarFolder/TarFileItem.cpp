@@ -185,7 +185,7 @@ HRESULT CTarFileItem::Delete()
 {
    WCHAR wszFilename[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
-   HR( DMDelete(_GetTarArchivePtr(), wszFilename) );
+   HR( DMDelete(_GetTarArchivePtr(), (RFS_FIND_DATA *)m_pWfd) );
    return S_OK;
 }
 

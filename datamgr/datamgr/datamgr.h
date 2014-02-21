@@ -56,6 +56,8 @@ typedef struct _RFS_FIND_DATAA {
 	RemoteId dwId;
 	DWORD dwVersion;
 	DWORD dwAttributes;
+	DWORD dwPage;
+	DWORD dwTotalPage;
 	unsigned char md5 [16];
 } RFS_FIND_DATAA, *PRFS_FIND_DATAA, *LPRFS_FIND_DATAA;
 typedef struct _RFS_FIND_DATAW {
@@ -77,6 +79,8 @@ typedef struct _RFS_FIND_DATAW {
 	RemoteId dwId;
 	DWORD dwVersion;
 	DWORD dwAttributes;
+	DWORD dwPage;
+	DWORD dwTotalPage;
 	unsigned char md5 [16];
 } RFS_FIND_DATAW, *PRFS_FIND_DATAW, *LPRFS_FIND_DATAW;
 #ifdef UNICODE
@@ -90,23 +94,27 @@ typedef LPRFS_FIND_DATAA LPRFS_FIND_DATA;
 #endif // UNICODE
 
 struct Edoc2Context {
+	DWORD   dwUserId;
+	wchar_t localeName    [32];
 	wchar_t service       [128];
 	wchar_t username      [32];
 	wchar_t password      [32];
 	wchar_t AccessToken   [128];
-	DWORD   dwUserId;
 	wchar_t cachedir      [1024];
 };
 
 struct TAR_ARCHIVE
 {
    CComAutoCriticalSection csLock;               // Thread lock
-   struct Edoc2Context context;
+   struct Edoc2Context * context;
 };
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+HRESULT DMInit();
+HRESULT DMCleanup();
 
 HRESULT DMOpen(LPCWSTR pstrFilename, TAR_ARCHIVE** ppArchive);
 HRESULT DMClose(TAR_ARCHIVE* pArchive);
@@ -114,7 +122,7 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive);
 HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA ** aList, int * nListCount);
 
 HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, LPCWSTR pstrNewName);
-HRESULT DMDelete(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);
+HRESULT DMDelete(TAR_ARCHIVE* pArchive, const RFS_FIND_DATA * pWfd);
 HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);
 
 HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, DWORD dwAttributes);

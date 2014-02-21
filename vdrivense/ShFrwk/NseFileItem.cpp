@@ -80,7 +80,6 @@ HRESULT CNseFileItem::GetColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column)
 {
    static VFS_COLUMNINFO aColumns[] = {
       { PKEY_ItemNameDisplay,             SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
-      { PKEY_ItemTypeText,                SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT | SHCOLSTATE_SLOW,  0 },
 	  { PKEY_Size,                        SHCOLSTATE_TYPE_INT  | SHCOLSTATE_ONBYDEFAULT,                    0 },
       { PKEY_DateCreated,                 SHCOLSTATE_TYPE_DATE | SHCOLSTATE_ONBYDEFAULT,                    0 },
       { PKEY_DateModified,                SHCOLSTATE_TYPE_DATE | SHCOLSTATE_ONBYDEFAULT,                    0 },
@@ -304,7 +303,7 @@ VFS_FOLDERSETTINGS CNseFileItem::GetFolderSettings()
    Settings.FlagsMask = FWF_USESEARCHFOLDER;
    // HarryWu, 2014.2.15
    // Use Detail by default.
-   Settings.ViewMode = FLVM_DETAILS;
+   // Settings.ViewMode = FLVM_DETAILS;
    return Settings;
 }
 

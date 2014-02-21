@@ -125,30 +125,13 @@ HRESULT CTarShellModule::ShellAction(LPCWSTR pstrType, LPCWSTR pstrCmdLine)
  */
 BOOL CTarShellModule::DllMain(DWORD dwReason, LPVOID lpReserved)
 {
-	while (dwReason == DLL_PROCESS_ATTACH){
-		wchar_t szLangId [MAX_PATH] = _T("");
-		GetUserDefaultLocaleName(szLangId, lengthof(szLangId));
-		if (!wcschr(szLangId, _T('-'))) break;
-		wcschr(szLangId, _T('-'))[0] = _T('_');
-		OutputDebugString(szLangId);
-
-		wchar_t szFullResPath [MAX_PATH] = _T("");
-		GetModuleFileName(_pModule->get_m_hInst(), szFullResPath, lengthof(szFullResPath));
-		wchar_t * x64 = wcsstr(szFullResPath, _T("64.dll"));
-		wchar_t * x86 = wcsstr(szFullResPath, _T("32.dll"));
-		if (!x86 && !x64) break;
-		if (x64) *x64 = 0; if (x86) *x86 = 0;
-		wcscat_s(szFullResPath, lengthof(szFullResPath), _T("."));
-		wcscat_s(szFullResPath, lengthof(szFullResPath), szLangId);
-		wcscat_s(szFullResPath, lengthof(szFullResPath), x64 ? _T("64.dll") : _T("32.dll"));
-
-		HINSTANCE hResInst = LoadLibrary(szFullResPath);
-		if (hResInst)
-		{
-			_pModule->SetResourceInstance(hResInst);
-			OutputDebugString(szFullResPath);
-		}
-		break;
+	if (dwReason == DLL_PROCESS_ATTACH){
+		LoadLangResource();
+		DMInit();
+	}
+	if (dwReason == DLL_PROCESS_DETACH)
+	{
+		DMCleanup();
 	}
     return TRUE;
 }
@@ -164,6 +147,35 @@ HRESULT CTarShellModule::CreateFileSystem(PCIDLIST_ABSOLUTE pidlRoot, CNseFileSy
    if( SUCCEEDED(Hr) ) *ppFS = pFS;
    else delete pFS; 
    return Hr;
+}
+
+HRESULT CTarShellModule::LoadLangResource()
+{
+	wchar_t szLangId [MAX_PATH] = _T("");
+	GetUserDefaultLocaleName(szLangId, lengthof(szLangId));
+	if (!wcschr(szLangId, _T('-'))) return S_OK;
+
+	wcschr(szLangId, _T('-'))[0] = _T('_');
+	OutputDebugString(szLangId);
+
+	wchar_t szFullResPath [MAX_PATH] = _T("");
+	GetModuleFileName(_pModule->get_m_hInst(), szFullResPath, lengthof(szFullResPath));
+	wchar_t * x64 = wcsstr(szFullResPath, _T("64.dll"));
+	wchar_t * x86 = wcsstr(szFullResPath, _T("32.dll"));
+	if (!x86 && !x64) return S_OK;
+
+	if (x64) *x64 = 0; if (x86) *x86 = 0;
+	wcscat_s(szFullResPath, lengthof(szFullResPath), _T("."));
+	wcscat_s(szFullResPath, lengthof(szFullResPath), szLangId);
+	wcscat_s(szFullResPath, lengthof(szFullResPath), x64 ? _T("64.dll") : _T("32.dll"));
+
+	HINSTANCE hResInst = LoadLibrary(szFullResPath);
+	if (hResInst)
+	{
+		_pModule->SetResourceInstance(hResInst);
+		OutputDebugString(szFullResPath);
+	}
+	return S_OK;
 }
 
 

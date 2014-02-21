@@ -1,4 +1,7 @@
 EXPORTS
+	DMInit
+	DMCleanup
+
 	DMOpen 
 	DMClose 
 	 

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Communication>
+  <HttpConnectioTimeoutMilliSeconds>500</HttpConnectioTimeoutMilliSeconds>
+</Communication>
+<Locale>
+  <RecycleBin>
+    <en-US>RecycleBin</en-US>
+    <zh-CN>回收站</zh-CN>
+    <zh-TW>廢舊中心</zh-TW>
+  </RecycleBin>
+  <SearchBin>
+    <en-US>SearchBin</en-US>
+    <zh-CN>搜索结果</zh-CN>
+    <zh-TW>搜羅結果</zh-TW>
+  </SearchBin>
+</Locale>

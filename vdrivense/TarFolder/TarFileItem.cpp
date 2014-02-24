@@ -97,7 +97,7 @@ HRESULT CTarFileItem::GetChild(LPCWSTR pwstrName, SHGNO ParseType, CNseItem** pI
    ::PathAppend(wszFilename, pwstrName);
    
    LocalId parentId;
-   HR( _GetViewIdQuick(m_pidlFolder, &parentId));
+   HR( _GetIdQuick(m_pidlItem, &parentId));
    VFS_FIND_DATA wfd = { 0 };
    RFS_FIND_DATA * childList = NULL; int childCount = 0;
    DMGetChildrenList(_GetTarArchivePtr(), *(RemoteId *)&parentId, &childList, &childCount);
@@ -106,11 +106,12 @@ HRESULT CTarFileItem::GetChild(LPCWSTR pwstrName, SHGNO ParseType, CNseItem** pI
 	   if (!wcsicmp(pwstrName, childList[i].cFileName)){
 		   wfd = *(VFS_FIND_DATA *)&childList[i];
 		   *pItem = GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, wfd);
-		   break;
+		   DMFree((LPBYTE)childList);
+		   return *pItem != NULL ? S_OK : E_OUTOFMEMORY;
 	   }
    }
    DMFree((LPBYTE)childList);
-   return *pItem != NULL ? S_OK : E_OUTOFMEMORY;
+   return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
 }
 
 /**
@@ -170,9 +171,13 @@ HRESULT CTarFileItem::CreateFolder()
 {
    LocalId parentId = {0,0};
    HR( _GetViewIdQuick(m_pidlFolder, &parentId));
+
    // Create new directory in archive
    WCHAR wszFilename[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
+
+   OUTPUTLOG("%s(), pidlFodler=%p, pidlItem=%p", __FUNCTION__, m_pidlFolder, m_pidlItem);
+
    HR( DMCreateFolder(_GetTarArchivePtr(), *(RemoteId *)&parentId, wszFilename, (RFS_FIND_DATA *)m_pWfd) );
    return S_OK;
 }

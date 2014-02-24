@@ -12,7 +12,7 @@ CTarFileStream::CTarFileStream(CTarFileSystem* pFS, LocalId parentId, LocalId it
 {
    m_spFS = pFS;
    wcscpy_s(m_wszFilename, lengthof(m_wszFilename), pstrFilename);
-
+   m_itemId = itemId; m_parentId = parentId;
 }
 
 CTarFileStream::~CTarFileStream()

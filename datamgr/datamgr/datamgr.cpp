@@ -168,7 +168,7 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive)
 HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA ** retList, int * nListCount)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   OUTPUTLOG("%s(), pwstrPath=[%d]", __FUNCTION__, (dwId));
+   OUTPUTLOG("%s(), RemoteId={%d, %d}", __FUNCTION__, dwId.category, dwId.id);
    *retList = NULL; *nListCount = 0;
    std::list<RFS_FIND_DATA> tmpList;
 
@@ -242,6 +242,8 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrNewName)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
+   OUTPUTLOG("%s(), RemoteId={%d,%d}, NewName=%s", __FUNCTION__, itemId.category, itemId.id, (const char *)CW2A(pwstrNewName));
+
    { // Rename File/Folder on remote
 
    }
@@ -254,7 +256,9 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrNewName)
 HRESULT DMDelete(TAR_ARCHIVE* pArchive, RemoteId itemId)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   
+
+   OUTPUTLOG("%s(), RemoteId={%d,%d}", __FUNCTION__, itemId.category, itemId.id);
+
    {// Delete remote File/Folder
 	   Utility::DeleteItem(pArchive, itemId);
    }
@@ -270,7 +274,7 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFi
    
    if (NULL == pwstrFilename ) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
+   OUTPUTLOG("%s(), ParentId={%d,%d}, pwstrFilename=[%s]", __FUNCTION__, parentId.category, parentId.id, WSTR2ASTR(pwstrFilename));
 
    {// Create Folder On remote
 
@@ -305,7 +309,7 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilen
    
    if (NULL == pwstrFilename || !pbBuffer || !dwFileSize) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), pwstrFilename=[%s], dwFileSize=[%d]", __FUNCTION__, WSTR2ASTR(pwstrFilename), dwFileSize);
+   OUTPUTLOG("%s(),ParentID={%d,%d}, pwstrFilename=[%s], dwFileSize=[%d]", __FUNCTION__, parentId.category, parentId.id, WSTR2ASTR(pwstrFilename), dwFileSize);
 
    // HarryWu, 2014.2.15
    // TODO: Post file content to server
@@ -327,7 +331,7 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 
 	if (NULL == pwstrFilename ) return E_INVALIDARG;
 
-	OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
+	OUTPUTLOG("%s(), ItemId={%d,%d}, pwstrFilename=[%s]", __FUNCTION__, itemId.category, itemId.id, WSTR2ASTR(pwstrFilename));
 
 	*ppbBuffer = NULL; *pdwFileSize = 0;
 

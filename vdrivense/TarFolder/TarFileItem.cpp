@@ -150,16 +150,11 @@ HRESULT CTarFileItem::GetStream(const VFS_STREAM_REASON& Reason, CNseFileStream*
 HRESULT CTarFileItem::CreateFolder()
 {
    // Create new directory in archive
-   LocalId pathId = {0, 0};
-   HR( _GetViewIdQuick(m_pidlFolder, &pathId) );
-   if (pathId.id == 0) return S_FALSE;
-
    WCHAR wszFilename[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
-
-   // HarryWu, 2014.2.24
-   // Create it and update the remote part.
-   HR( DMCreateFolder(_GetTarArchivePtr(), (RemoteId *)&pathId, wszFilename, (RFS_FIND_DATA *)m_pWfd));
+   HR( DMCreateFolder(_GetTarArchivePtr(), wszFilename) );
+   // Update properties of our NSE Item
+   DMGetFileAttr(_GetTarArchivePtr(), wszFilename, (RFS_FIND_DATA *)m_pWfd);
    return S_OK;
 }
 

@@ -32,6 +32,7 @@
 #include "datamgr.h"
 #include <tinystr.h>
 #include <tinyxml.h>
+#include "linkTree.h"
 #include <json/json.h>
 #include "Utility.h"
 

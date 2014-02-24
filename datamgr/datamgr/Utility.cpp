@@ -329,7 +329,7 @@ BOOL Utility::ConstructSearchFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & sear
 	return TRUE;
 }
 
-BOOL Utility::DeleteItem(TAR_ARCHIVE * pArchive, const RFS_FIND_DATA * pWfd)
+BOOL Utility::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
 {
 	Json::StyledWriter writer;
 	Json::Value  root;
@@ -337,7 +337,7 @@ BOOL Utility::DeleteItem(TAR_ARCHIVE * pArchive, const RFS_FIND_DATA * pWfd)
 	root ["Port"]   = 60684;
 	root ["Version"]= "1.0.0.1";
 	root ["Method"] = "DeleteItem";
-	Json::Value idlist; idlist.append((int)pWfd->dwId.id);
+	Json::Value idlist; idlist.append((int)itemId.id);
 	Json::Value parameters; parameters["idlist"] = idlist;
 	root ["Params"] = parameters;
 	std::string jsonString = writer.write(root);

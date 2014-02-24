@@ -7,11 +7,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // CTarFileStream
 
-CTarFileStream::CTarFileStream(CTarFileSystem* pFS, LPCWSTR pstrFilename, UINT uAccess) :
+CTarFileStream::CTarFileStream(CTarFileSystem* pFS, LocalId parentId, LocalId itemId, LPCWSTR pstrFilename, UINT uAccess) :
    m_uAccess(uAccess), m_pData(NULL), m_dwCurPos(0), m_dwFileSize(0), m_dwAllocSize(10L * 1024L)
 {
    m_spFS = pFS;
    wcscpy_s(m_wszFilename, lengthof(m_wszFilename), pstrFilename);
+
 }
 
 CTarFileStream::~CTarFileStream()
@@ -56,7 +57,7 @@ HRESULT CTarFileStream::Read(LPVOID pData, ULONG dwSize, ULONG& dwBytesRead)
    if( m_uAccess != GENERIC_READ ) return E_ACCESSDENIED;
    // Read the entire file now and keep the contents in a memory buffer
    if( m_pData == NULL ) {
-      HR( DMReadFile(m_spFS->m_pArchive, m_wszFilename, &m_pData, &m_dwFileSize) );
+      HR( DMReadFile(m_spFS->m_pArchive, *(RemoteId *)&m_itemId, m_wszFilename, &m_pData, &m_dwFileSize) );
    }
    // Transfer data from memory buffer
    dwBytesRead = dwSize;
@@ -99,7 +100,7 @@ HRESULT CTarFileStream::Commit()
    if( m_uAccess != GENERIC_WRITE ) return E_FAIL;
    // On file creation, we write file contents to memory first, then
    // commit everything to disk on file close. This is the commit phase.
-   HR( DMWriteFile(m_spFS->m_pArchive, m_wszFilename, m_pData, m_dwFileSize, FILE_ATTRIBUTE_NORMAL) );
+   HR( DMWriteFile(m_spFS->m_pArchive, *(RemoteId *)&m_parentId, m_wszFilename, m_pData, m_dwFileSize, FILE_ATTRIBUTE_NORMAL) );
    return S_OK;
 }
 

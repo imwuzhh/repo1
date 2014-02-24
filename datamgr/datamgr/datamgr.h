@@ -121,15 +121,14 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive);
 
 HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA ** aList, int * nListCount);
 
-HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, LPCWSTR pstrNewName);
-HRESULT DMDelete(TAR_ARCHIVE* pArchive, const RFS_FIND_DATA * pWfd);
-HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename);
+HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pstrNewName);
+HRESULT DMDelete(TAR_ARCHIVE* pArchive, RemoteId itemId);
+HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pstrFilename, RFS_FIND_DATA * pWfd);
 
 HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, DWORD dwAttributes);
 
-HRESULT DMGetFileInfo(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, RFS_FIND_DATA * pData);
-HRESULT DMReadFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD * dwFileSize);
-HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes);
+HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD * dwFileSize);
+HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes);
 
 HRESULT DMMalloc(LPBYTE * ppBuffer, DWORD dwBufSize);
 HRESULT DMRealloc(LPBYTE * ppBuffer, DWORD dwBufSize);

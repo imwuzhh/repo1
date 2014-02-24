@@ -20,7 +20,7 @@ public:
 	static BOOL GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<RFS_FIND_DATA> & childFiles);
 	static BOOL ConstructRecycleFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & recycleFolder);
 	static BOOL ConstructSearchFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & searchFolder);
-	static BOOL DeleteItem(TAR_ARCHIVE * pArchive, const RFS_FIND_DATA * pWfd);
+	static BOOL DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId);
 public:
 	static bool RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right);
 public:

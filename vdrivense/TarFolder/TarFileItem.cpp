@@ -95,9 +95,21 @@ HRESULT CTarFileItem::GetChild(LPCWSTR pwstrName, SHGNO ParseType, CNseItem** pI
    WCHAR wszFilename[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
    ::PathAppend(wszFilename, pwstrName);
+   
+   LocalId parentId;
+   HR( _GetViewIdQuick(m_pidlFolder, &parentId));
    VFS_FIND_DATA wfd = { 0 };
-   HR( DMGetFileInfo(_GetTarArchivePtr(), wszFilename, (RFS_FIND_DATA *)&wfd) );
-   *pItem = GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, wfd);
+   RFS_FIND_DATA * childList = NULL; int childCount = 0;
+   DMGetChildrenList(_GetTarArchivePtr(), *(RemoteId *)&parentId, &childList, &childCount);
+   for (int i = 0; i < childCount; i++)
+   {
+	   if (!wcsicmp(pwstrName, childList[i].cFileName)){
+		   wfd = *(VFS_FIND_DATA *)&childList[i];
+		   *pItem = GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, wfd);
+		   break;
+	   }
+   }
+   DMFree((LPBYTE)childList);
    return *pItem != NULL ? S_OK : E_OUTOFMEMORY;
 }
 
@@ -140,7 +152,14 @@ HRESULT CTarFileItem::GetStream(const VFS_STREAM_REASON& Reason, CNseFileStream*
 {
    WCHAR wszFilename[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
-   *ppFile = new CTarFileStream(static_cast<CTarFileSystem*>(m_pFolder->m_spFS.m_p), wszFilename, Reason.uAccess);
+   
+   LocalId parentId;
+   HR( _GetViewIdQuick(m_pidlFolder, &parentId));
+   
+   LocalId itemId;
+   HR(_GetIdQuick(m_pidlItem, &itemId));
+
+   *ppFile = new CTarFileStream(static_cast<CTarFileSystem*>(m_pFolder->m_spFS.m_p), parentId, itemId, wszFilename, Reason.uAccess);
    return *ppFile != NULL ? S_OK : E_OUTOFMEMORY;
 }
 
@@ -149,12 +168,12 @@ HRESULT CTarFileItem::GetStream(const VFS_STREAM_REASON& Reason, CNseFileStream*
  */
 HRESULT CTarFileItem::CreateFolder()
 {
+   LocalId parentId = {0,0};
+   HR( _GetViewIdQuick(m_pidlFolder, &parentId));
    // Create new directory in archive
    WCHAR wszFilename[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
-   HR( DMCreateFolder(_GetTarArchivePtr(), wszFilename) );
-   // Update properties of our NSE Item
-   DMGetFileInfo(_GetTarArchivePtr(), wszFilename, (RFS_FIND_DATA *)m_pWfd);
+   HR( DMCreateFolder(_GetTarArchivePtr(), *(RemoteId *)&parentId, wszFilename, (RFS_FIND_DATA *)m_pWfd) );
    return S_OK;
 }
 
@@ -163,18 +182,8 @@ HRESULT CTarFileItem::CreateFolder()
  */
 HRESULT CTarFileItem::Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName)
 {
-   WCHAR wszFilename[MAX_PATH] = { 0 };
-   HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
-   
-   //2014.1.23 Harry: No, Thanks, we do NOT need this feature! comment it.   
-   // ----
-   //// The Shell often doesn't include the filename extension in the
-   //// renamed filename, so we'll append it now.
-   //if( wcschr(pstrOutputName, '.') == NULL ) ::PathAddExtension(pstrOutputName, ::PathFindExtension(wszFilename));
-   // ++++
-
    // Rename the item in archive
-   HR( DMRename(_GetTarArchivePtr(), wszFilename, pstrOutputName) );
+   HR( DMRename(_GetTarArchivePtr(), *(RemoteId *)&m_pWfd->dwId, pstrOutputName) );
    return S_OK;
 }
 
@@ -183,9 +192,7 @@ HRESULT CTarFileItem::Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName)
  */
 HRESULT CTarFileItem::Delete()
 {
-   WCHAR wszFilename[MAX_PATH] = { 0 };
-   HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
-   HR( DMDelete(_GetTarArchivePtr(), (RFS_FIND_DATA *)m_pWfd) );
+   HR( DMDelete(_GetTarArchivePtr(), *(RemoteId *)(&m_pWfd->dwId)) );
    return S_OK;
 }
 

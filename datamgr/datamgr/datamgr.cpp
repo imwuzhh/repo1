@@ -238,13 +238,9 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
  * Rename a file or folder in the archive.
  * Notice that we do not support rename of a folder, which contains files, yet.
  */
-HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPCWSTR pwstrNewName)
+HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrNewName)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-
-   if (NULL == pwstrFilename || NULL == pwstrNewName) return E_INVALIDARG;
-
-   OUTPUTLOG("%s(), pwstrFilename=[%s], pwstrNewName=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename), WSTR2ASTR(pwstrNewName));
 
    { // Rename File/Folder on remote
 
@@ -255,18 +251,12 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPCWSTR pwstrNewN
 /**
  * Delete a file or folder.
  */
-HRESULT DMDelete(TAR_ARCHIVE* pArchive, const RFS_FIND_DATA * pWfd)
+HRESULT DMDelete(TAR_ARCHIVE* pArchive, RemoteId itemId)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-
-   LPCWSTR pwstrFilename = pWfd->cFileName;
-
-   if (NULL == pwstrFilename) return E_INVALIDARG;
-
-   OUTPUTLOG("%s(), pwstrFilename=[%s]", __FUNCTION__, WSTR2ASTR(pwstrFilename));
    
    {// Delete remote File/Folder
-	   Utility::DeleteItem(pArchive, pWfd);
+	   Utility::DeleteItem(pArchive, itemId);
    }
    return S_OK;
 }
@@ -274,7 +264,7 @@ HRESULT DMDelete(TAR_ARCHIVE* pArchive, const RFS_FIND_DATA * pWfd)
 /**
  * Create a new sub-folder in the archive.
  */
-HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
+HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilename, RFS_FIND_DATA * pWfd)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    
@@ -287,20 +277,6 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename)
    }
 
    return S_OK;
-}
-
-/**
-* Return file information.
-* Convert the archive file information to a Windows WIN32_FIND_DATA structure, which
-* contains the basic information we must know about a virtual file/folder.
-*/
-HRESULT DMGetFileInfo(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, RFS_FIND_DATA* pData)
-{
-	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-
-	if (NULL == pstrFilename) return E_INVALIDARG;
-
-	return S_OK;
 }
 
 /**
@@ -323,7 +299,7 @@ HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, DWORD dwAttr
  * HarryWu, 2014.2.2
  * Notice! an empty file can NOT be created here!
  */
-HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes)
+HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    
@@ -345,7 +321,7 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, const LPBYTE p
  * Reads a file from the archive.
  * The method returns the contents of the entire file in a memory buffer.
  */
-HRESULT DMReadFile(TAR_ARCHIVE* pArchive, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD* pdwFileSize)
+HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD* pdwFileSize)
 {
 	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 

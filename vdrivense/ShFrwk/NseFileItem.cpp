@@ -341,3 +341,14 @@ HRESULT CNseFileItem::_GetIdQuick(PCITEMID_CHILD pidlChild, LocalId * pdwID) con
 	}
 	return S_OK;
 }
+
+HRESULT CNseFileItem::_GetViewIdQuick(PCIDLIST_RELATIVE pidlPath, LocalId * pdwID) const
+{
+	ATLASSERT(ILIsAligned64(pidlPath));
+	while( !::ILIsEmpty(pidlPath) ) {
+		const VFS_FIND_DATA* pWfd = &(reinterpret_cast<const NSEFILEPIDLDATA*>(pidlPath))->wfd;
+		*pdwID = pWfd->dwId;
+		pidlPath = static_cast<PCIDLIST_RELATIVE>(::ILNext(pidlPath));
+	}
+	return S_OK;
+}

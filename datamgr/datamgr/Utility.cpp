@@ -333,7 +333,7 @@ BOOL Utility::DeleteItem(TAR_ARCHIVE * pArchive, const RFS_FIND_DATA * pWfd)
 {
 	Json::StyledWriter writer;
 	Json::Value  root;
-	root ["Server"] = pArchive->context->service;
+	root ["Server"] = (const char *)CW2A(pArchive->context->service);
 	root ["Port"]   = 60684;
 	root ["Version"]= "1.0.0.1";
 	root ["Method"] = "DeleteItem";

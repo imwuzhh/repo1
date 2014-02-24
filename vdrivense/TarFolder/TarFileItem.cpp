@@ -96,7 +96,7 @@ HRESULT CTarFileItem::GetChild(LPCWSTR pwstrName, SHGNO ParseType, CNseItem** pI
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
    ::PathAppend(wszFilename, pwstrName);
    VFS_FIND_DATA wfd = { 0 };
-   HR( DMGetFileAttr(_GetTarArchivePtr(), wszFilename, (RFS_FIND_DATA *)&wfd) );
+   HR( DMGetFileInfo(_GetTarArchivePtr(), wszFilename, (RFS_FIND_DATA *)&wfd) );
    *pItem = GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, wfd);
    return *pItem != NULL ? S_OK : E_OUTOFMEMORY;
 }
@@ -154,7 +154,7 @@ HRESULT CTarFileItem::CreateFolder()
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
    HR( DMCreateFolder(_GetTarArchivePtr(), wszFilename) );
    // Update properties of our NSE Item
-   DMGetFileAttr(_GetTarArchivePtr(), wszFilename, (RFS_FIND_DATA *)m_pWfd);
+   DMGetFileInfo(_GetTarArchivePtr(), wszFilename, (RFS_FIND_DATA *)m_pWfd);
    return S_OK;
 }
 

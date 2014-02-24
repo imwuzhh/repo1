@@ -12,7 +12,7 @@ EXPORTS
 	DMCreateFolder
 	
 	DMSetFileAttr 
-	DMGetFileAttr
+	DMGetFileInfo
 	
 	DMReadFile 
 	DMWriteFile

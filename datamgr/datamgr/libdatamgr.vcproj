@@ -361,10 +361,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\linkTree.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Utility.cpp"
 				>
 			</File>
@@ -384,10 +380,6 @@
 			>
 			<File
 				RelativePath=".\datamgr.h"
-				>
-			</File>
-			<File
-				RelativePath=".\linkTree.h"
 				>
 			</File>
 			<File

@@ -245,7 +245,7 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrNewName)
    OUTPUTLOG("%s(), RemoteId={%d,%d}, NewName=%s", __FUNCTION__, itemId.category, itemId.id, (const char *)CW2A(pwstrNewName));
 
    { // Rename File/Folder on remote
-
+	   Utility::RenameItem(pArchive, itemId, pwstrNewName);
    }
    return S_OK;
 }
@@ -277,7 +277,9 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFi
    OUTPUTLOG("%s(), ParentId={%d,%d}, pwstrFilename=[%s]", __FUNCTION__, parentId.category, parentId.id, WSTR2ASTR(pwstrFilename));
 
    {// Create Folder On remote
-
+	   RemoteId folderId = {PublicCat, 0};
+	   Utility::CreateFolder(pArchive, parentId, pwstrFilename, &folderId);
+	   pWfd->dwId = folderId;
    }
 
    return S_OK;
@@ -315,7 +317,21 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilen
    // TODO: Post file content to server
    // pbBuffer, dwFileSize
    {
+		wchar_t szTempFile [MAX_PATH] = _T("");
+		GetTempPath(lengthof(szTempFile), szTempFile);
+		wcscat_s(szTempFile, lengthof(szTempFile), _T("\\"));
+		wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
+		
+		// Write content to temp file, 
+		// and then upload this temp file.
+		FILE * fout = _wfopen(szTempFile, _T("wb"));
+		fwrite(pbBuffer, 1, dwFileSize, fout);
+		fclose(fout);
 
+		OUTPUTLOG("%s(), write [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), dwFileSize);
+
+		// Upload Temporary file to server.
+		Utility::UploadFile(pArchive, parentId, szTempFile);
    }
 
    return S_OK;
@@ -339,6 +355,28 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 	// TODO: Read file contents from remote.
 	// ...
 	{
+		wchar_t szTempFile [MAX_PATH] = _T("");
+		GetTempPath(lengthof(szTempFile), szTempFile);
+		wcscat_s(szTempFile, lengthof(szTempFile), _T("\\"));
+		wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
+
+		// Download remote file to local temp file,
+		// and then read content from this file.
+		Utility::DownloadFile(pArchive, itemId, szTempFile);
+
+		// Write content to temp file, 
+		// and then upload this temp file.
+		FILE * fin = _wfopen(szTempFile, _T("rb"));
+		if (fin != NULL){
+			fseek(fin, 0, SEEK_END);
+			*pdwFileSize = ftell(fin);
+		}
+		OUTPUTLOG("%s(), read [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), *pdwFileSize);
+		DMMalloc((LPBYTE*)ppbBuffer, *pdwFileSize);
+		if (*ppbBuffer && fin){
+			fread(*ppbBuffer, 1, *pdwFileSize, fin);
+		}
+		if (fin) fclose(fin);
 	}
 	return S_OK;
 }

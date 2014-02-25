@@ -347,6 +347,87 @@ BOOL Utility::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
 	return TRUE;
 }
 
+BOOL Utility::RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * newName)
+{
+	Json::StyledWriter writer;
+	Json::Value  root;
+	root ["Server"] = (const char *)CW2A(pArchive->context->service);
+	root ["Port"]   = 60684;
+	root ["Version"]= "1.0.0.1";
+	root ["Method"] = "Rename";
+	Json::Value parameters; 
+	parameters["id"] = (int)itemId.id;
+	parameters["newName"] = (const char *)CW2A(newName);
+	root ["Params"] = parameters;
+	std::string jsonString = writer.write(root);
+
+	std::wstring response;
+	Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+	return TRUE;
+}
+
+BOOL Utility::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * folderName, RemoteId * retId)
+{
+	Json::StyledWriter writer;
+	Json::Value  root;
+	root ["Server"] = (const char *)CW2A(pArchive->context->service);
+	root ["Port"]   = 60684;
+	root ["Version"]= "1.0.0.1";
+	root ["Method"] = "CreateFolder";
+	Json::Value parameters; 
+	parameters["ParentId"] = (int)parentId.id;
+	parameters["FolderName"] = (const char *)CW2A(folderName);
+	root ["Params"] = parameters;
+	std::string jsonString = writer.write(root);
+
+	std::wstring response;
+	Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+
+	retId->id = rand(); // Parse it from response.
+
+	return TRUE;
+}
+
+BOOL Utility::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile)
+{
+	Json::StyledWriter writer;
+	Json::Value  root;
+	root ["Server"] = (const char *)CW2A(pArchive->context->service);
+	root ["Port"]   = 60684;
+	root ["Version"]= "1.0.0.1";
+	root ["Method"] = "UploadFile";
+	Json::Value parameters; 
+	parameters["ParentId"] = (int)parentId.id;
+	parameters["FileName"] = (const char *)CW2A(tempFile);
+	root ["Params"] = parameters;
+	std::string jsonString = writer.write(root);
+
+	std::wstring response;
+	Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+
+	return TRUE;
+}
+
+BOOL Utility::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile)
+{
+	Json::StyledWriter writer;
+	Json::Value  root;
+	root ["Server"] = (const char *)CW2A(pArchive->context->service);
+	root ["Port"]   = 60684;
+	root ["Version"]= "1.0.0.1";
+	root ["Method"] = "DownloadFile";
+	Json::Value parameters; 
+	parameters["ItemId"] = (int)itemId.id;
+	parameters["FileName"] = (const char *)CW2A(tempFile);
+	root ["Params"] = parameters;
+	std::string jsonString = writer.write(root);
+
+	std::wstring response;
+	Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+
+	return TRUE;
+}
+
 bool Utility::RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right)
 {
 	return (left.dwId.category - right.dwId.category);

@@ -21,6 +21,10 @@ public:
 	static BOOL ConstructRecycleFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & recycleFolder);
 	static BOOL ConstructSearchFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & searchFolder);
 	static BOOL DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId);
+	static BOOL RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * newName);
+	static BOOL CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * folderName, RemoteId * retId);
+	static BOOL UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile);
+	static BOOL DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile);
 public:
 	static bool RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right);
 public:

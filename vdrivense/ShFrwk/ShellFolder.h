@@ -74,7 +74,8 @@ public:
 
    BEGIN_MSG_MAP(CShellFolder)
       MESSAGE_HANDLER(SFVM_WINDOWCREATED, OnWindowCreated)
-      MESSAGE_HANDLER(SFVM_LISTREFRESHED, OnListRefreshed)
+	  MESSAGE_HANDLER(SFVM_LISTREFRESHED, OnListRefreshed)
+	  MESSAGE_HANDLER(SFVM_SELECTIONCHANGED, OnSelectionChanged)
 	  MESSAGE_HANDLER(SFVM_GETNOTIFY, OnGetNotify)
 	  MESSAGE_HANDLER(SFVM_SIZE, OnSize)
    END_MSG_MAP()
@@ -194,6 +195,7 @@ public:
    LRESULT OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
    LRESULT OnGetNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
    LRESULT OnListRefreshed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+   LRESULT OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);   
    LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
    // Operations

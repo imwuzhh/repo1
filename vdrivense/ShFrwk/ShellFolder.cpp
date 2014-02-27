@@ -1190,6 +1190,24 @@ LRESULT CShellFolder::OnListRefreshed(UINT uMsg, WPARAM wParam, LPARAM lParam, B
    return 0;
 }
 
+LRESULT CShellFolder::OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	struct SFVCB_SELECTINFO{
+		UINT uOldState; // 0
+		UINT uNewState; //LVIS_SELECTED, LVIS_FOCUSED,...
+		LPITEMIDLIST pidl;
+	};
+	SFVCB_SELECTINFO * pSelectInfo = (SFVCB_SELECTINFO *)lParam;
+	if (pSelectInfo && (pSelectInfo->uNewState & LVIS_SELECTED) == LVIS_SELECTED){
+		if (pSelectInfo->pidl && (pSelectInfo->pidl->mkid.cb)){
+			NSEFILEPIDLDATA * pNseInfo = (NSEFILEPIDLDATA *)pSelectInfo->pidl;
+			OUTPUTLOG("%s(), id=[%d], FileName=%s", __FUNCTION__, pNseInfo->wfd.dwId.id, (const char *)CW2A(pNseInfo->wfd.cFileName));
+		}
+		OUTPUTLOG("%s(), wParam=%p, lParam=%p", __FUNCTION__, wParam, lParam);
+	}
+	return 0;
+}
+
 LRESULT CShellFolder::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	return S_FALSE;

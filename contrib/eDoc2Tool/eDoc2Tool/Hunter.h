@@ -17,9 +17,9 @@ public:
 	~Hunter(void);
 public:
 
-	static void ResizeChild(HWND hParent, HWND hChild);
+	static void ResizeChild(HWND hParent, HWND hView, HWND hChild);
 
-	static void EmbedWindow(HWND hParent, HWND hChild);
+	static void EmbedWindow(HWND hParent, HWND hView, HWND hChild);
 
 	static void ReleaseChild(HWND hParent, HWND hChild);
 

@@ -27,10 +27,18 @@ HWND Hunter::FindChildWindow(const char * classname, const char * title, DWORD u
 }
 
 
-void Hunter::ResizeChild(HWND hParent, HWND hChild){
-	RECT ParentRect;
+void Hunter::ResizeChild(HWND hParent, HWND hView, HWND hChild){
+	RECT ViewRect, wvRect;
+	GetClientRect(hView, &ViewRect);
+	GetWindowRect(hView, &wvRect);
+	RECT ParentRect, wpRect;
 	GetClientRect(hParent, &ParentRect);
-	SetWindowPos(hChild, HWND_TOP, (ParentRect.right - ParentRect.left)*0.75, 0, (ParentRect.right - ParentRect.left)/4, (ParentRect.bottom - ParentRect.top), 0);
+	GetWindowRect(hParent, &wpRect);
+	SetWindowPos(hChild, HWND_TOP
+		, (ParentRect.right - ParentRect.left)*0.75
+		, (wvRect.top - wpRect.top)
+		, (ParentRect.right - ParentRect.left)/4
+		, (ViewRect.bottom - ViewRect.top), 0);
 }
 
 void Hunter::ReleaseChild(HWND hParent, HWND hChild){
@@ -53,7 +61,7 @@ void Hunter::ReleaseChild(HWND hParent, HWND hChild){
 	SetParent(hChild, NULL);
 }
 
-void Hunter::EmbedWindow(HWND hParent, HWND hChild){
+void Hunter::EmbedWindow(HWND hParent, HWND hView, HWND hChild){
 	SetWindowLongA(hChild, GWL_STYLE, 0
 		| WS_CHILDWINDOW 
 		| WS_CLIPSIBLINGS 
@@ -74,7 +82,7 @@ void Hunter::EmbedWindow(HWND hParent, HWND hChild){
 	parentStyle |= WS_CLIPCHILDREN;
 	SetWindowLongA(hParent, GWL_STYLE, parentStyle);
 
-	ResizeChild(hParent, hChild);
+	ResizeChild(hParent, hView, hChild);
 }
 
 void CALLBACK Hunter::TimerProc(HWND hWnd, UINT, UINT_PTR, DWORD){
@@ -87,20 +95,18 @@ void CALLBACK Hunter::TimerProc(HWND hWnd, UINT, UINT_PTR, DWORD){
 	if (hDlg == NULL) return ;
 	s_ChildWindow = hDlg;
 
-	HWND hParent = FindChildWindow("SHELLDLL_DefView", "ShellView", 0x00000000 /*SHOULDBE 0xED0CED0C*/);
-	if (hParent == NULL) return ;
+	HWND hView = FindChildWindow("SHELLDLL_DefView", "ShellView", 0x00000000 /*SHOULDBE 0xED0CED0C*/);
+	if (hView == NULL) return ;
 
-	hParent = GetParent(GetParent(hParent));
+	s_ParentWindow = GetParent(GetParent(hView));
 
-	if (s_ParentWindow == hParent && s_ParentWindow != NULL
-		&& GetParent(s_ChildWindow) == s_ParentWindow){
+	if (GetParent(s_ChildWindow) == s_ParentWindow){
 		// If Already embedded, resize it, 
-		ResizeChild(s_ParentWindow, s_ChildWindow);
+		ResizeChild(s_ParentWindow, hView, s_ChildWindow);
 		return ;
 	}
 
-	s_ParentWindow = hParent;
-	EmbedWindow(hParent, hDlg);
+	EmbedWindow(s_ParentWindow, hView, hDlg);
 }
 
 BOOL CALLBACK Hunter::ChildWindowEnumProc(HWND hWnd, LPARAM lParam)

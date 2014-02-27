@@ -5,6 +5,8 @@
 #include "eDoc2Tool.h"
 #include <stdio.h>
 #include <time.h>
+#include <string>
+#include "Hunter.h"
 
 #define MAX_LOADSTRING 100
 
@@ -57,8 +59,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	return (int) msg.wParam;
 }
 
-
-
 //
 //  函数: MyRegisterClass()
 //
@@ -93,7 +93,7 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 	return RegisterClassEx(&wcex);
 }
 UINT EMBEDDED_TIMER_ID = 0x1000;
-VOID CALLBACK EmbeddedWindow(HWND, UINT, UINT_PTR, DWORD);
+VOID CALLBACK EmbeddedWindowProc(HWND, UINT, UINT_PTR, DWORD);
 
 //
 //   函数: InitInstance(HINSTANCE, int)
@@ -119,42 +119,15 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
       return FALSE;
    }
 
-   SetTimer(hWnd, EMBEDDED_TIMER_ID, 3000/* 3 Seconds */, EmbeddedWindow);
+   // HarryWu, 2014.2.27
+   // First setup a timer to hunt.
+   SetTimer(hWnd, EMBEDDED_TIMER_ID, 1000/* 1 Second */, Hunter::TimerProc);
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
    return TRUE;
 }
-
-static HWND hChildWindow = NULL;
-
-void CALLBACK EmbeddedWindow(HWND hWnd, UINT, UINT_PTR, DWORD){
-	
-	HWND hDlg = FindWindowA("Qt5QWindowIcon", "untitled");
-	if (hDlg == NULL) return ;
-
-	hChildWindow = hDlg;
-
-	SetWindowLongA(hDlg, GWL_STYLE, 0
-		| WS_CHILDWINDOW 
-		| WS_CLIPSIBLINGS 
-		| WS_VISIBLE
-		//| WS_BORDER 
-		//| WS_THICKFRAME
-		//| WS_CLIPCHILDREN
-		);
-
-	SetWindowLongA(hDlg, GWL_EXSTYLE, 0
-		| WS_EX_LEFT
-		| WS_EX_LTRREADING
-		| WS_EX_RIGHTSCROLLBAR);
-
-	SetWindowPos(hDlg, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-
-	SetParent(hDlg, hWnd);
-}
-
 
 //
 //  函数: WndProc(HWND, UINT, WPARAM, LPARAM)
@@ -180,9 +153,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		// 分析菜单选择:
 		switch (wmId)
 		{
-		case IDM_ABOUT:
-			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-			break;
 		case IDM_EXIT:
 			DestroyWindow(hWnd);
 			break;
@@ -203,57 +173,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			// Just Hide it if required.
 			// ...
 			KillTimer(hWnd, EMBEDDED_TIMER_ID);
-			SetWindowLongA(hChildWindow, GWL_STYLE, WS_CAPTION
-				| WS_POPUP
-				| WS_VISIBLE
-				| WS_CLIPSIBLINGS
-				| WS_CLIPCHILDREN
-				| WS_SYSMENU
-				| WS_THICKFRAME
-				| WS_MINIMIZEBOX | WS_MAXIMIZEBOX
-				);
-			SetWindowLongA(hChildWindow, GWL_EXSTYLE, WS_EX_LEFT
-				| WS_EX_LTRREADING
-				| WS_EX_RIGHTSCROLLBAR
-				| WS_EX_WINDOWEDGE);
-			
-			SetParent(hChildWindow, NULL);
+			Hunter::ReleaseChild(hWnd, Hunter::s_ChildWindow);
 		}
 		PostQuitMessage(0);
 		break;
-	case WM_SIZE:
-		{
-			// HarryWu, 2014.2.26
-			// Embedded the child, now 
-			// setup the position of child, relative to parent.
-			RECT ParentRect;
-			GetWindowRect(hWnd, &ParentRect);
-			SetWindowPos(hChildWindow, HWND_TOP, (ParentRect.right - ParentRect.left)/2, 0, (ParentRect.right - ParentRect.left)/2, (ParentRect.bottom - ParentRect.top), 0);
-		}break;
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}
 	return 0;
-}
-
-// “关于”框的消息处理程序。
-INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(lParam);
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		{
-			return (INT_PTR)TRUE;
-		}
-
-	case WM_COMMAND:
-		if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
-		{
-			EndDialog(hDlg, LOWORD(wParam));
-			return (INT_PTR)TRUE;
-		}
-		break;
-	}
-	return (INT_PTR)FALSE;
 }

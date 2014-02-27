@@ -92,8 +92,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 	return RegisterClassEx(&wcex);
 }
+
 UINT EMBEDDED_TIMER_ID = 0x1000;
-VOID CALLBACK EmbeddedWindowProc(HWND, UINT, UINT_PTR, DWORD);
 
 //
 //   函数: InitInstance(HINSTANCE, int)
@@ -112,7 +112,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // 将实例句柄存储在全局变量中
 
    hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
+      CW_USEDEFAULT, 0, 400, 80, NULL, NULL, hInstance, NULL);
 
    if (!hWnd)
    {
@@ -144,6 +144,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
+	RECT rc; 
+	char szHelp [] = "Looking up for window to embedded.";
 
 	switch (message)
 	{
@@ -163,6 +165,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_PAINT:
 		hdc = BeginPaint(hWnd, &ps);
 		// TODO: 在此添加任意绘图代码...
+		GetClientRect(hWnd, &rc);
+		DrawTextA(hdc, szHelp, strlen(szHelp), &rc, DT_CENTER);
 		EndPaint(hWnd, &ps);
 		break;
 	case WM_DESTROY:

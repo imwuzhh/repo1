@@ -88,6 +88,8 @@ void CALLBACK Hunter::TimerProc(HWND hWnd, UINT, UINT_PTR, DWORD){
 	s_ChildWindow = hDlg;
 
 	HWND hParent = FindChildWindow("SHELLDLL_DefView", "ShellView", 0x00000000 /*SHOULDBE 0xED0CED0C*/);
+	if (hParent == NULL) return ;
+
 	hParent = GetParent(GetParent(hParent));
 
 	if (s_ParentWindow == hParent && s_ParentWindow != NULL

@@ -68,6 +68,30 @@ Utility::~Utility(void)
 
 BOOL Utility::Login(TAR_ARCHIVE * pArchive)
 {
+	// HarryWu, 2014.2.28
+	// Json Format request, not in use now, 
+	{
+		Json::StyledWriter writer;
+		Json::Value  root;
+		root ["Server"] = (const char *)CW2A(pArchive->context->service);
+		root ["Port"]   = 60684;
+		root ["Version"]= "1.0.0.1";
+		root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+		root ["Method"] = "Login";
+		// Now, you use this pair to login in remote server for me, and
+		// return the AccessToken to me.
+		Json::Value parameters; 
+		parameters["username"] = (const char * )CW2A(pArchive->context->username);
+		parameters["password"] = (const char * )CW2A(pArchive->context->password);
+		root ["Params"] = parameters;
+		std::string jsonString = writer.write(root);
+
+		// Do Json Request
+		std::wstring jsonResp;
+		JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), jsonResp);
+	}
+	// HarryWu, 2014.2.28
+	// Here begin of HttpRequest, directly to remote server
 	const wchar_t * svcaddr = pArchive->context->service;
 	const wchar_t * user = pArchive->context->username;
 	const wchar_t * pass = pArchive->context->password;
@@ -102,6 +126,26 @@ BOOL Utility::Login(TAR_ARCHIVE * pArchive)
 
 BOOL Utility::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPublic)
 {
+	// HarryWu, 2014.2.28
+	// Json Format request, not in use now, 
+	{
+		Json::StyledWriter writer;
+		Json::Value  root;
+		root ["Server"] = (const char *)CW2A(pArchive->context->service);
+		root ["Port"]   = 60684;
+		root ["Version"]= "1.0.0.1";
+		root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+		root ["Method"] = "GetTopPublic";
+		Json::Value parameters; parameters["userParam"] = (int)0;// just for test, useless.
+		root ["Params"] = parameters;
+		std::string jsonString = writer.write(root);
+
+		// Do Json Request
+		std::wstring jsonResp;
+		JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), jsonResp);
+	}
+	// HarryWu, 2014.2.28
+	// Here begin of HttpRequest, directly to remote server
 	if (pArchive->context->AccessToken[0] == _T('\0')){
 		if (!Login(pArchive)){
 			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
@@ -151,6 +195,26 @@ BOOL Utility::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & to
 
 BOOL Utility::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPersonal)
 {
+	// HarryWu, 2014.2.28
+	// Json Format request, not in use now, 
+	{
+		Json::StyledWriter writer;
+		Json::Value  root;
+		root ["Server"] = (const char *)CW2A(pArchive->context->service);
+		root ["Port"]   = 60684;
+		root ["Version"]= "1.0.0.1";
+		root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+		root ["Method"] = "GetTopPersonal";
+		Json::Value parameters; parameters["userParam"] = (int)0;// just for test, useless.
+		root ["Params"] = parameters;
+		std::string jsonString = writer.write(root);
+
+		// Do Json Request
+		std::wstring jsonResp;
+		JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), jsonResp);
+	}
+	// HarryWu, 2014.2.28
+	// Here begin of HttpRequest, directly to remote server
 	if (pArchive->context->AccessToken[0] == _T('\0')){
 		if (!Login(pArchive)){
 			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
@@ -199,6 +263,26 @@ BOOL Utility::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & 
 
 BOOL Utility::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & childFolders)
 {
+	// HarryWu, 2014.2.28
+	// Json Format request, not in use now, 
+	{
+		Json::StyledWriter writer;
+		Json::Value  root;
+		root ["Server"] = (const char *)CW2A(pArchive->context->service);
+		root ["Port"]   = 60684;
+		root ["Version"]= "1.0.0.1";
+		root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+		root ["Method"] = "GetChildFolders";
+		Json::Value parameters; parameters["ParentId"] = (int)remoteId.id;
+		root ["Params"] = parameters;
+		std::string jsonString = writer.write(root);
+
+		// Do Json Request
+		std::wstring jsonResp;
+		JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), jsonResp);
+	}
+	// HarryWu, 2014.2.28
+	// Here begin of HttpRequest, directly to remote server
 	if (pArchive->context->AccessToken[0] == _T('\0')){
 		if (!Login(pArchive)){
 			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
@@ -249,6 +333,26 @@ BOOL Utility::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId,
 
 BOOL Utility::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & childFiles)
 {
+	// HarryWu, 2014.2.28
+	// Json Format request, not in use now, 
+	{
+		Json::StyledWriter writer;
+		Json::Value  root;
+		root ["Server"] = (const char *)CW2A(pArchive->context->service);
+		root ["Port"]   = 60684;
+		root ["Version"]= "1.0.0.1";
+		root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+		root ["Method"] = "GetChildFiles";
+		Json::Value parameters; parameters["ParentId"] = (int)remoteId.id;
+		root ["Params"] = parameters;
+		std::string jsonString = writer.write(root);
+
+		// Do Json Request
+		std::wstring jsonResp;
+		JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), jsonResp);
+	}
+	// HarryWu, 2014.2.28
+	// Here begin of HttpRequest, directly to remote server
 	if (pArchive->context->AccessToken[0] == _T('\0')){
 		if (!Login(pArchive)){
 			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
@@ -336,6 +440,7 @@ BOOL Utility::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
 	root ["Server"] = (const char *)CW2A(pArchive->context->service);
 	root ["Port"]   = 60684;
 	root ["Version"]= "1.0.0.1";
+	root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
 	root ["Method"] = "DeleteItem";
 	Json::Value idlist; idlist.append((int)itemId.id);
 	Json::Value parameters; parameters["idlist"] = idlist;
@@ -354,6 +459,7 @@ BOOL Utility::RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const 
 	root ["Server"] = (const char *)CW2A(pArchive->context->service);
 	root ["Port"]   = 60684;
 	root ["Version"]= "1.0.0.1";
+	root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
 	root ["Method"] = "Rename";
 	Json::Value parameters; 
 	parameters["id"] = (int)itemId.id;
@@ -373,6 +479,7 @@ BOOL Utility::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, co
 	root ["Server"] = (const char *)CW2A(pArchive->context->service);
 	root ["Port"]   = 60684;
 	root ["Version"]= "1.0.0.1";
+	root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
 	root ["Method"] = "CreateFolder";
 	Json::Value parameters; 
 	parameters["ParentId"] = (int)parentId.id;
@@ -395,6 +502,7 @@ BOOL Utility::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, cons
 	root ["Server"] = (const char *)CW2A(pArchive->context->service);
 	root ["Port"]   = 60684;
 	root ["Version"]= "1.0.0.1";
+	root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
 	root ["Method"] = "UploadFile";
 	Json::Value parameters; 
 	parameters["ParentId"] = (int)parentId.id;
@@ -415,6 +523,7 @@ BOOL Utility::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, cons
 	root ["Server"] = (const char *)CW2A(pArchive->context->service);
 	root ["Port"]   = 60684;
 	root ["Version"]= "1.0.0.1";
+	root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
 	root ["Method"] = "DownloadFile";
 	Json::Value parameters; 
 	parameters["ItemId"] = (int)itemId.id;

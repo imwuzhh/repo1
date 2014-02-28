@@ -28,7 +28,7 @@ LANGUAGE 4, 2
 // ID 值最低的图标放在最前面，以确保应用程序图标
 // 在所有系统中保持一致。
 
-IDI_EDOC2TOOL       ICON         "eDoc2Tool.ico"
+IDI_EDOC2TOOL       ICON         "wndHunter.ico"
 IDI_SMALL               ICON         "small.ico"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -68,11 +68,11 @@ END
 
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "关于 eDoc2Tool"
+CAPTION "关于 wndHunter"
 FONT 9, "MS Shell Dlg"
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
-    LTEXT           "eDoc2Tool，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
+    LTEXT           "wndHunter，1.0 版",IDC_STATIC,42,14,114,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2014",IDC_STATIC,42,26,114,8
     DEFPUSHBUTTON   "确定",IDOK,113,41,50,14,WS_GROUP
 END
@@ -131,8 +131,8 @@ END
 
 STRINGTABLE
 BEGIN
-   IDC_EDOC2TOOL   "EDOC2TOOL"
-   IDS_APP_TITLE       "eDoc2Tool"
+   IDC_EDOC2TOOL   "wndHunter"
+   IDS_APP_TITLE       "wndHunter"
 END
 
 #endif

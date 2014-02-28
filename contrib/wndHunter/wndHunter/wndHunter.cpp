@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "eDoc2Tool.h"
+#include "wndHunter.h"
 #include <stdio.h>
 #include <time.h>
 #include <string>

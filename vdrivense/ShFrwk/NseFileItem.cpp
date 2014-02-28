@@ -104,6 +104,10 @@ HRESULT CNseFileItem::GetColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column)
       { PKEY_PropList_PreviewDetails,     SHCOLSTATE_TYPE_STR  | SHCOLSTATE_HIDDEN,                         VFS_COLF_NOTCOLUMN },
       { PKEY_PropList_ExtendedTileInfo,   SHCOLSTATE_TYPE_STR  | SHCOLSTATE_HIDDEN,                         VFS_COLF_NOTCOLUMN },
    };
+   // HarryWu, 2014.2.28
+   // to customize the columns set,
+   // implement a GetColumnSet() interface in CTarFileItem,
+   // and return an array as above, 
    if( iColumn >= lengthof(aColumns) ) return E_FAIL;
    Column = aColumns[iColumn];
    return S_OK;

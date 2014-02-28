@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WndHunter", "eDoc2Tool\eDoc2Tool.vcproj", "{E42242D0-D298-455F-ABFD-26CCDE0EDB94}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WndHunter", "wndHunter\wndHunter.vcproj", "{E42242D0-D298-455F-ABFD-26CCDE0EDB94}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

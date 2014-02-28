@@ -285,6 +285,16 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFi
    return S_OK;
 }
 
+HRESULT DMUpload(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR localRes)
+{
+	return S_OK;
+}
+
+HRESULT DMDownload(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR localTarget)
+{
+	return S_OK;
+}
+
 /**
  * Change the file-attributes of a file.
  */

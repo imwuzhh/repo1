@@ -11,6 +11,9 @@ EXPORTS
 	DMDelete
 	DMCreateFolder
 	
+	DMDownload
+	DMUpload
+	
 	DMSetFileAttr 
 	
 	DMReadFile 

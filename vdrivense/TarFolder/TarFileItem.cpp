@@ -265,12 +265,18 @@ HRESULT CTarFileItem::_ExtractToFolder(VFS_MENUCOMMAND& Cmd)
       HR( ::SHCreateFileOperation(Cmd.hWnd, FOF_NOCOPYSECURITYATTRIBS | FOFX_NOSKIPJUNCTIONS | FOF_NOCONFIRMMKDIR, &Cmd.pFO) );
    }
    if( IsRoot() ) {
-      // Item is the archive itself; copy its immediate children
-      CNseItemArray aList;
-      HR( EnumChildren(Cmd.hWnd, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, aList) );
-      for( int i = 0; i < aList.GetSize(); i++ ) HR( aList[i]->ExecuteMenuCommand(Cmd) );
+	   // HarryWu, 2014.2.28
+	   // Do not support of downloading entire tree.
+	   return E_NOTIMPL;
    }
-   else {
+   // HarryWu, 2014.2.28
+   // If use external assistant, 
+   // post task to it, and have a rest.
+   bool fEnableExtAssistant = false;
+   if (fEnableExtAssistant){
+	   HR ( DMDownload(_GetTarArchivePtr(), *(RemoteId *)&m_pWfd->dwId, static_cast<LPCTSTR>(Cmd.pUserData)));
+	   return S_OK;
+   }else {
       // Item is a file/folder inside the archive
       CComPtr<IShellItem> spSourceFile, spTargetFolder;
       CPidl pidlFile(m_pFolder->m_pidlRoot, m_pidlFolder, m_pidlItem);

@@ -125,6 +125,9 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pstrNewName);
 HRESULT DMDelete(TAR_ARCHIVE* pArchive, RemoteId itemId);
 HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pstrFilename, RFS_FIND_DATA * pWfd);
 
+HRESULT DMUpload(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR localRes);
+HRESULT DMDownload(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR localTarget);
+
 HRESULT DMSetFileAttr(TAR_ARCHIVE* pArchive, LPCWSTR pstrFilename, DWORD dwAttributes);
 
 HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename, LPBYTE* ppbBuffer, DWORD * dwFileSize);

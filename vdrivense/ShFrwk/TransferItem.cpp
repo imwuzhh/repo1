@@ -163,6 +163,10 @@ STDMETHODIMP CTransferSource::EnterFolder(IShellItem* psiChildFolderDest)
 STDMETHODIMP CTransferSource::LeaveFolder(IShellItem* psiChildFolderDest)
 {
    ATLTRACE(L"CTransferSource::LeaveFolder\n");
+   // HarryWu, 2014.3.1
+   // possilbe to process drag Items from vdrive, here.
+   // ...
+   //http://msdn.microsoft.com/en-us/library/bb776905.aspx
    return S_OK;
 }
 

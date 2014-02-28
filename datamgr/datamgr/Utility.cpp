@@ -539,7 +539,7 @@ BOOL Utility::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, cons
 
 bool Utility::RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right)
 {
-	return (left.dwId.category - right.dwId.category);
+	return (left.dwId.category - right.dwId.category)<0;
 	//return wcscmp(left.cFileName, right.cFileName);
 }
 

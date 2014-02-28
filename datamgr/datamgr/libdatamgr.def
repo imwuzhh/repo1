@@ -10,12 +10,7 @@ EXPORTS
 	DMRename 
 	DMDelete
 	DMCreateFolder
-	
-	DMDownload
-	DMUpload
-	
-	DMSetFileAttr 
-	
+
 	DMReadFile 
 	DMWriteFile
 	

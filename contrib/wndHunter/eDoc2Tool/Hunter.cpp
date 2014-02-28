@@ -91,7 +91,16 @@ void CALLBACK Hunter::TimerProc(HWND hWnd, UINT, UINT_PTR, DWORD){
 	// You should always Know where it is.
 	// And, this child window is under your full control.
 	// so that, you can ignore WM_DESTROY Message.
-	HWND hDlg = FindChildWindow("Chrome_WidgetWin_0", "Эјвз", 0x00000000);
+	// ...
+	// A story, i used chrome to test embed, 
+	// but, 2014.2.28, chrome auto-updated to v33 from v27.
+	// and on v33, these is not title for Chrome_WidgetWin_0,
+	// it is very very accident event!
+	//HWND hDlg = FindChildWindow("Chrome_WidgetWin_0", "Эјвз", 0x00000000);
+	// And aslo, Windows ie7 diffs with ie11 on titile,
+	// "Internet Explorer", "Windows Internet Explorer"
+	// :(
+	HWND hDlg = FindChildWindow("TabWindowClass", "Эјвз - Windows Internet Explorer", 0x00000000);
 	if (hDlg == NULL) return ;
 	s_ChildWindow = hDlg;
 
@@ -117,7 +126,15 @@ BOOL CALLBACK Hunter::ChildWindowEnumProc(HWND hWnd, LPARAM lParam)
 	char szTitle [100] = "";
 	GetClassNameA(hWnd, szClassName, 100);
 	GetWindowTextA(hWnd, szTitle, 100);
-	DWORD userdata = GetWindowLongA(hWnd, GWL_USERDATA);
+	DWORD userdata = GetWindowLongPtrA(hWnd, GWLP_USERDATA);
+
+	if (0){
+		std::string debugstr = szClassName;
+		debugstr += szTitle;
+		debugstr += "\n";
+		OutputDebugStringA(debugstr.c_str());
+	}
+
 	if (!stricmp(szTitle, ep->title) && !stricmp(szClassName, ep->className)
 		&& (ep->userdata && ep->userdata == userdata || ep->userdata == 0)){
 			ep->returnValue = (DWORD)hWnd;
@@ -134,7 +151,15 @@ BOOL CALLBACK Hunter::TopWindowEnumProc(HWND hWnd, LPARAM lParam)
 	char szTitle [100] = "";
 	GetClassNameA(hWnd, szClassName, 100);
 	GetWindowTextA(hWnd, szTitle, 100);
-	DWORD userdata = GetWindowLongA(hWnd, GWL_USERDATA);
+	DWORD userdata = GetWindowLongPtrA(hWnd, GWLP_USERDATA);
+	
+	if (0){
+		std::string debugstr = szClassName;
+		debugstr += szTitle;
+		debugstr += "\n";
+		OutputDebugStringA(debugstr.c_str());
+	}
+
 	if (!stricmp(szTitle, ep->title) && !stricmp(szClassName, ep->className)
 		&& (ep->userdata && ep->userdata == userdata || ep->userdata == 0)){
 			ep->returnValue = (DWORD)hWnd;

@@ -26,6 +26,9 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
                      LPTSTR    lpCmdLine,
                      int       nCmdShow)
 {
+	// HarryWu, 2014.2.28
+	// Remote debugger agent only process x64 target,
+	// if you build a x86 programe, pdb server may not work while remote debugging.
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
 

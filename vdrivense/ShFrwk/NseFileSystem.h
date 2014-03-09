@@ -299,6 +299,7 @@ public:
    // Folder Item support
 
    virtual HRESULT GetColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column) = 0;
+   virtual HRESULT GetExtColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column) = 0;
    virtual HRESULT GetPaneState(REFEXPLORERPANE ep, EXPLORERPANESTATE* peps) = 0;
    virtual VFS_FOLDERSETTINGS GetFolderSettings() = 0;
 
@@ -388,6 +389,8 @@ public:
    HRESULT TransferDone();
 
    HRESULT GetColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column);
+   HRESULT GetExtColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column);
+   
    HRESULT GetPaneState(REFEXPLORERPANE ep, EXPLORERPANESTATE* peps);
    VFS_FOLDERSETTINGS GetFolderSettings();
 
@@ -476,6 +479,7 @@ public:
 
    HRESULT IsDropDataAvailable(IDataObject* pDataObj);
    HRESULT GetColumnInfo(UINT iColumn, VFS_COLUMNINFO &Column);
+   HRESULT GetExtColumnInfo(UINT iColumn, VFS_COLUMNINFO &Column);
    VFS_FOLDERSETTINGS GetFolderSettings();
 
    SFGAOF GetSFGAOF(SFGAOF dwMask);

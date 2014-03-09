@@ -108,9 +108,22 @@ HRESULT CNseFileItem::GetColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column)
    // to customize the columns set,
    // implement a GetColumnSet() interface in CTarFileItem,
    // and return an array as above, 
-   if( iColumn >= lengthof(aColumns) ) return E_FAIL;
+   if( iColumn >= lengthof(aColumns) ) {
+	   return E_FAIL;
+   }
    Column = aColumns[iColumn];
    return S_OK;
+}
+
+/**
+* Get information about column definition.
+* We return details of a column requested, plus several additional 
+* information bits that the property system can support. We decide which
+* columns to show by default here too.
+*/
+HRESULT CNseFileItem::GetExtColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column)
+{
+	return S_OK;
 }
 
 /**
@@ -224,7 +237,7 @@ HRESULT CNseFileItem::GetProperty(REFPROPERTYKEY pkey, CComPropVariant& v)
       }      
    }
    if( pkey == PKEY_FindData ) {
-      ATLASSERT(sizeof(*m_pWfd)==sizeof(WIN32_FIND_DATAW));
+      ATLASSERT(sizeof(*m_pWfd)==sizeof(VFS_FIND_DATA));
       return ::InitPropVariantFromBuffer(m_pWfd, sizeof(WIN32_FIND_DATAW), &v);
    }
    if( pkey == PKEY_DescriptionID ) {

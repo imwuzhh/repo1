@@ -164,6 +164,18 @@ HRESULT CNseBaseItem::GetColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column)
 }
 
 /**
+* Return column information for the folder columns.
+* A folder item contains a list of columns that is to be displayed for the contained
+* child items.
+*/
+HRESULT CNseBaseItem::GetExtColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column)
+{
+	// TODO: You're a folder; override and implement this...
+	ATLASSERT(false);
+	return E_NOTIMPL;
+}
+
+/**
  * Return property information.
  */
 HRESULT CNseBaseItem::GetProperty(REFPROPERTYKEY pkey, CComPropVariant& v)

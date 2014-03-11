@@ -468,8 +468,7 @@ BOOL Utility::RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const 
 	std::string jsonString = writer.write(root);
 
 	std::wstring response;
-	Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
-	return TRUE;
+	return Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
 }
 
 BOOL Utility::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * folderName, RemoteId * retId)
@@ -686,7 +685,7 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 BOOL Utility::JsonRequest(const wchar_t * reqJson, std::wstring & response)
 {
 	OUTPUTLOG("%s(), JsonRequest: %s", __FUNCTION__, (const char *)CW2A(reqJson));
-	return TRUE;
+	return FALSE;
 }
 
 BOOL Utility::LoadLocalizedName(const wchar_t * localeName, const wchar_t * key, wchar_t * retVaule, int cchMax)

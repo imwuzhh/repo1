@@ -245,7 +245,10 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrNewName)
    OUTPUTLOG("%s(), RemoteId={%d,%d}, NewName=%s", __FUNCTION__, itemId.category, itemId.id, (const char *)CW2A(pwstrNewName));
 
    { // Rename File/Folder on remote
-	   Utility::RenameItem(pArchive, itemId, pwstrNewName);
+	   if (!Utility::RenameItem(pArchive, itemId, pwstrNewName)){
+		   OUTPUTLOG("%s(), Failed to rename item on server.", __FUNCTION__);
+		   return E_FAIL;
+	   }
    }
    return S_OK;
 }

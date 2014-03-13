@@ -34,21 +34,20 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 // Debug helper functions
-static std::string WideStringToAnsi(const wchar_t * wstr){
+std::string WideStringToAnsi(const wchar_t * wstr){
 	if (!wstr) return "";
 	char szAnsi [MAX_PATH] = "";
 	WideCharToMultiByte(CP_ACP, 0, wstr, wcslen(wstr), szAnsi, lengthof(szAnsi), NULL, NULL);
 	return szAnsi;
 }
-static void OutputLog(const char * format, ...){
+void OutputLog(const char * format, ...){
 	va_list va;
 	va_start(va, format);
-	char szMsg [0x400] = "";
-	_vsnprintf_s(szMsg, lengthof(szMsg), format, va);
+	char * szMsg = (char *) malloc(0x100000);
+	vsnprintf_s(szMsg, 0x100000, 0xffffe, format, va);
 	OutputDebugStringA(szMsg); OutputDebugStringA("\n");
+	free(szMsg);
 }
-#define WSTR2ASTR(w) (WideStringToAnsi(w).c_str())
-#define OUTPUTLOG OutputLog
 
 #include "datamgr.h"
 #include "Utility.h"
@@ -167,10 +166,11 @@ BOOL Utility::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & to
 	if (response.empty())
 		return FALSE;
 
+	OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
 	Json::Value root;
 	Json::Reader reader; 
 	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
-		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
 		RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
 		Json::Value folderId = root.get("FolderId", 0);
@@ -235,10 +235,11 @@ BOOL Utility::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & 
 	if (response.empty())
 		return FALSE;
 
+	OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
 	Json::Value root;
 	Json::Reader reader; 
 	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
-		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
 		RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
 		Json::Value folderId = root.get("FolderId", 0);
@@ -303,10 +304,11 @@ BOOL Utility::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId,
 	if (response.empty())
 		return FALSE;
 
+	OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
 	Json::Value root;
 	Json::Reader reader; 
 	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
-		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
 		for (size_t index = 0; index < root.size(); index ++){
 			RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
@@ -373,10 +375,11 @@ BOOL Utility::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, s
 	if (response.empty())
 		return FALSE;
 
+	OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
 	Json::Value root;
 	Json::Reader reader; 
 	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
-		OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
 		for (size_t index = 0; index < root.size(); index ++){
 			RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
@@ -433,66 +436,174 @@ BOOL Utility::ConstructSearchFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & sear
 	return TRUE;
 }
 
-BOOL Utility::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
+BOOL Utility::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder)
 {
-	Json::StyledWriter writer;
-	Json::Value  root;
-	root ["Server"] = (const char *)CW2A(pArchive->context->service);
-	root ["Port"]   = 60684;
-	root ["Version"]= "1.0.0.1";
-	root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
-	root ["Method"] = "DeleteItem";
-	Json::Value idlist; idlist.append((int)itemId.id);
-	Json::Value parameters; parameters["idlist"] = idlist;
-	root ["Params"] = parameters;
-	std::string jsonString = writer.write(root);
+	{
+		Json::StyledWriter writer;
+		Json::Value  root;
+		root ["Server"] = (const char *)CW2A(pArchive->context->service);
+		root ["Port"]   = 60684;
+		root ["Version"]= "1.0.0.1";
+		root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+		root ["Method"] = "DeleteItem";
+		Json::Value idlist; idlist.append((int)itemId.id);
+		Json::Value parameters; 
+		parameters["idlist"] = idlist;
+		parameters["isFolder"] = isFolder ? "True" : "False";
 
+		root ["Params"] = parameters;
+		std::string jsonString = writer.write(root);
+
+		std::wstring response;
+		Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+	}
+	// HarryWu, 2014.2.28
+	// Here begin of HttpRequest, directly to remote server
+	if (pArchive->context->AccessToken[0] == _T('\0')){
+		if (!Login(pArchive)){
+			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
+			return FALSE;
+		}
+	}
+	// "http://localhost/EDoc2WebApi/api/Doc/FolderRead/DeleteFolderList?token=7c370032-078b-41df-bd1e-0ba5cdeb9976&intoRecycleBin=true&folderIds=562296484"
+	// "http://localhost/EDoc2WebApi/api/Doc/FileRead/DeleteFileList?token=7c370032-078b-41df-bd1e-0ba5cdeb9976&intoRecycleBin=true&fileIds=562296484"
+	wchar_t url [MaxUrlLength] = _T("");
+	wsprintf(url
+		, isFolder 
+			?  _T("%s/EDoc2WebApi/api/Doc/FolderRead/DeleteFolderList?token=%s&intoRecycleBin=true&folderIds=%d")
+			:  _T("%s/EDoc2WebApi/api/Doc/FileRead/DeleteFileList?token=%s&intoRecycleBin=true&fileIds=%d")
+		, pArchive->context->service, pArchive->context->AccessToken, itemId.id);
+
+	// {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
 	std::wstring response;
-	Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
-	return TRUE;
+	if (!HttpRequest(url, response))
+		return FALSE;
+
+	if (response.empty())
+		return FALSE;
+
+	OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
+	if (response.compare(_T("0")) == 0)
+		return TRUE;
+
+	return FALSE;
 }
 
-BOOL Utility::RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * newName)
+BOOL Utility::RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * newName, BOOL isFolder)
 {
-	Json::StyledWriter writer;
-	Json::Value  root;
-	root ["Server"] = (const char *)CW2A(pArchive->context->service);
-	root ["Port"]   = 60684;
-	root ["Version"]= "1.0.0.1";
-	root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
-	root ["Method"] = "Rename";
-	Json::Value parameters; 
-	parameters["id"] = (int)itemId.id;
-	parameters["newName"] = (const char *)CW2A(newName);
-	root ["Params"] = parameters;
-	std::string jsonString = writer.write(root);
+	{
+		Json::StyledWriter writer;
+		Json::Value  root;
+		root ["Server"] = (const char *)CW2A(pArchive->context->service);
+		root ["Port"]   = 60684;
+		root ["Version"]= "1.0.0.1";
+		root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+		root ["Method"] = "Rename";
+		Json::Value parameters; 
+		parameters["id"] = (int)itemId.id;
+		parameters["newName"] = (const char *)CW2A(newName);
+		parameters["isFolder"] = isFolder ? "True" : "False";
 
+		root ["Params"] = parameters;
+		std::string jsonString = writer.write(root);
+
+		std::wstring response;
+		Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+	}
+	// HarryWu, 2014.2.28
+	// Here begin of HttpRequest, directly to remote server
+	if (pArchive->context->AccessToken[0] == _T('\0')){
+		if (!Login(pArchive)){
+			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
+			return FALSE;
+		}
+	}
+	// "http://localhost/EDoc2WebApi/api/Doc/FolderRead/ChangeFolderName?token=7c370032-078b-41df-bd1e-0ba5cdeb9976&folderId=562296484&newName=newFolderName"
+	// "http://localhost/EDoc2WebApi/api/Doc/FileRead/ChanageFileName?token=7c370032-078b-41df-bd1e-0ba5cdeb9976&fileId=1023596&newFileName=newFilename&newRemark="
+	wchar_t url [MaxUrlLength] = _T("");
+	std::string strNewName = UrlEncode((const char *)CW2A(newName));
+	wsprintf(url
+		, isFolder 
+			?  _T("%s/EDoc2WebApi/api/Doc/FolderRead/ChangeFolderName?token=%s&folderId=%d&newName=%s")
+			:  _T("%s/EDoc2WebApi/api/Doc/FileRead/ChanageFileName?token=%s&fileId=%d&newFileName=%s&newRemark=NAN")
+		, pArchive->context->service, pArchive->context->AccessToken, itemId.id, (const wchar_t *)CA2W(strNewName.c_str()));
+
+	// {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
 	std::wstring response;
-	Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
-	return TRUE;
+	if (!HttpRequest(url, response))
+		return FALSE;
+
+	if (response.empty())
+		return FALSE;
+
+	OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
+	if (response.compare(_T("0")) == 0)
+		return TRUE;
+
+	return FALSE;
 }
 
 BOOL Utility::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * folderName, RemoteId * retId)
 {
-	Json::StyledWriter writer;
-	Json::Value  root;
-	root ["Server"] = (const char *)CW2A(pArchive->context->service);
-	root ["Port"]   = 60684;
-	root ["Version"]= "1.0.0.1";
-	root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
-	root ["Method"] = "CreateFolder";
-	Json::Value parameters; 
-	parameters["ParentId"] = (int)parentId.id;
-	parameters["FolderName"] = (const char *)CW2A(folderName);
-	root ["Params"] = parameters;
-	std::string jsonString = writer.write(root);
+	{
+		Json::StyledWriter writer;
+		Json::Value  root;
+		root ["Server"] = (const char *)CW2A(pArchive->context->service);
+		root ["Port"]   = 60684;
+		root ["Version"]= "1.0.0.1";
+		root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+		root ["Method"] = "CreateFolder";
+		Json::Value parameters; 
+		parameters["ParentId"] = (int)parentId.id;
+		parameters["FolderName"] = (const char *)CW2A(folderName);
+		root ["Params"] = parameters;
+		std::string jsonString = writer.write(root);
 
+		std::wstring response;
+		Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+
+		retId->id = 0; // Parse it from response.
+	}
+
+	// HarryWu, 2014.2.28
+	// Here begin of HttpRequest, directly to remote server
+	if (pArchive->context->AccessToken[0] == _T('\0')){
+		if (!Login(pArchive)){
+			OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
+			return FALSE;
+		}
+	}
+	// "http://kb.edoc2.com/EDoc2WebApi/api/Doc/FolderRead/CreateFolder?token=52d98bfa-94df-4283-b930-ff84e10bb4e8&folderName={}&parentFolderId={}&folderCode={}&folderRemark={}"
+	wchar_t url [MaxUrlLength] = _T("");
+	std::string strFolderName = UrlEncode((const char *)CW2AEX<>(folderName, CP_UTF8));// UTF-8 and then URL encoded.
+	wsprintf(url
+		, _T("%s/EDoc2WebApi/api/Doc/FolderRead/CreateFolder?token=%s&folderName=%s&parentFolderId=%d&folderCode=0&folderRemark=NAN")
+		, pArchive->context->service, pArchive->context->AccessToken, (const wchar_t *)CA2W(strFolderName.c_str()), parentId.id);
+
+	// {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
 	std::wstring response;
-	Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+	if (!HttpRequest(url, response))
+		return FALSE;
 
-	retId->id = rand(); // Parse it from response.
+	if (response.empty())
+		return FALSE;
 
-	return TRUE;
+	OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
+	Json::Value root;
+	Json::Reader reader; 
+	if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
+		retId->category = parentId.category;
+		int index = 0;
+		Json::Value newFolderId = root[index].get("FolderId", -1);
+		if (newFolderId.empty()) return FALSE;
+		retId->id = newFolderId.asInt();
+		if (retId->id != -1) return TRUE;
+	}
+
+	return FALSE;
 }
 
 BOOL Utility::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile)
@@ -599,7 +710,7 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 	if(curl) {
 		// HarryWu, 2014.2.20
 		// Carefully use CW2A() utility, type convertion.
-		curl_easy_setopt(curl, CURLOPT_URL, (char *)CW2A(requestUrl));
+		curl_easy_setopt(curl, CURLOPT_URL, (char *)CW2AEX<128>(requestUrl, CP_ACP));
 
 #ifdef SKIP_PEER_VERIFICATION
 		/*
@@ -686,7 +797,7 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 BOOL Utility::JsonRequest(const wchar_t * reqJson, std::wstring & response)
 {
 	OUTPUTLOG("%s(), JsonRequest: %s", __FUNCTION__, (const char *)CW2A(reqJson));
-	return TRUE;
+	return FALSE;
 }
 
 BOOL Utility::LoadLocalizedName(const wchar_t * localeName, const wchar_t * key, wchar_t * retVaule, int cchMax)
@@ -696,4 +807,62 @@ BOOL Utility::LoadLocalizedName(const wchar_t * localeName, const wchar_t * key,
 	if (!xdoc) return FALSE;
 	delete xdoc;
 	return TRUE;
+}
+
+unsigned char Utility::ToHex(unsigned char x) 
+{ 
+	return  x > 9 ? x + 55 : x + 48; 
+}
+
+unsigned char Utility::FromHex(unsigned char x) 
+{ 
+	unsigned char y;
+	if (x >= 'A' && x <= 'Z') y = x - 'A' + 10;
+	else if (x >= 'a' && x <= 'z') y = x - 'a' + 10;
+	else if (x >= '0' && x <= '9') y = x - '0';
+	else assert(0);
+	return y;
+}
+
+std::string Utility::UrlEncode(const std::string& str)
+{
+	std::string strTemp = "";
+	size_t length = str.length();
+	for (size_t i = 0; i < length; i++)
+	{
+		if (isalnum((unsigned char)str[i]) || 
+			(str[i] == '-') ||
+			(str[i] == '_') || 
+			(str[i] == '.') || 
+			(str[i] == '~'))
+			strTemp += str[i];
+		else if (str[i] == ' ')
+			strTemp += "+";
+		else
+		{
+			strTemp += '%';
+			strTemp += ToHex((unsigned char)str[i] >> 4);
+			strTemp += ToHex((unsigned char)str[i] % 16);
+		}
+	}
+	return strTemp;
+}
+
+std::string Utility::UrlDecode(const std::string& str)
+{
+	std::string strTemp = "";
+	size_t length = str.length();
+	for (size_t i = 0; i < length; i++)
+	{
+		if (str[i] == '+') strTemp += ' ';
+		else if (str[i] == '%')
+		{
+			assert(i + 2 < length);
+			unsigned char high = FromHex((unsigned char)str[++i]);
+			unsigned char low = FromHex((unsigned char)str[++i]);
+			strTemp += high*16 + low;
+		}
+		else strTemp += str[i];
+	}
+	return strTemp;
 }

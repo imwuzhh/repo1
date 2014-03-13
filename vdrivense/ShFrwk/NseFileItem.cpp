@@ -230,7 +230,7 @@ HRESULT CNseFileItem::GetProperty(REFPROPERTYKEY pkey, CComPropVariant& v)
       }      
    }
    if( pkey == PKEY_FindData ) {
-      ATLASSERT(sizeof(*m_pWfd)==sizeof(VFS_FIND_DATA));
+      ATLASSERT(sizeof(*m_pWfd)==sizeof(VFS_FIND_DATAW));
       return ::InitPropVariantFromBuffer(m_pWfd, sizeof(WIN32_FIND_DATAW), &v);
    }
    if( pkey == PKEY_DescriptionID ) {

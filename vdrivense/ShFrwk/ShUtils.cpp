@@ -660,8 +660,8 @@ std::string WideStringToAnsi(const wchar_t * wstr){
 void OutputLog(const char * format, ...){
 	va_list va;
 	va_start(va, format);
-	char szMsg [0x400] = "";
-	_vsnprintf_s(szMsg, lengthof(szMsg), format, va);
-	OutputDebugStringA(szMsg);
-	OutputDebugStringA("\n");
+	char * szMsg = (char *) malloc(0x100000);
+	vsnprintf_s(szMsg, 0x100000, 0xffffe, format, va);
+	OutputDebugStringA(szMsg); OutputDebugStringA("\n");
+	free(szMsg);
 }

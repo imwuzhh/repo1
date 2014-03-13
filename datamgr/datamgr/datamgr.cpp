@@ -290,7 +290,7 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilen
    
    if (NULL == pwstrFilename || !pbBuffer || !dwFileSize) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(),ParentID={%d,%d}, pwstrFilename=[%s], dwFileSize=[%d]", __FUNCTION__, parentId.category, parentId.id, WSTR2ASTR(pwstrFilename), dwFileSize);
+   OUTPUTLOG("%s(),ParentID={%d,%d}, pwstrFilename=[%s], dwFileSize=[%d]", __FUNCTION__, parentId.category, parentId.id, (const char *)CW2A(pwstrFilename), dwFileSize);
 
    // HarryWu, 2014.2.15
    // TODO: Post file content to server
@@ -310,7 +310,8 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilen
 		OUTPUTLOG("%s(), write [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), dwFileSize);
 
 		// Upload Temporary file to server.
-		Utility::UploadFile(pArchive, parentId, szTempFile);
+		if (!Utility::UploadFile(pArchive, parentId, szTempFile))
+            return S_FALSE;
    }
 
    return S_OK;

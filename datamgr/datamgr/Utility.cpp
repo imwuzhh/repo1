@@ -608,43 +608,46 @@ BOOL Utility::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, co
 
 BOOL Utility::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile)
 {
-	Json::StyledWriter writer;
-	Json::Value  root;
-	root ["Server"] = (const char *)CW2A(pArchive->context->service);
-	root ["Port"]   = 60684;
-	root ["Version"]= "1.0.0.1";
-	root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
-	root ["Method"] = "UploadFile";
-	Json::Value parameters; 
-	parameters["ParentId"] = (int)parentId.id;
-	parameters["FileName"] = (const char *)CW2A(tempFile);
-	root ["Params"] = parameters;
-	std::string jsonString = writer.write(root);
+    {
+	    Json::StyledWriter writer;
+	    Json::Value  root;
+	    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+	    root ["Port"]   = 60684;
+	    root ["Version"]= "1.0.0.1";
+	    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+	    root ["Method"] = "UploadFile";
+	    Json::Value parameters; 
+	    parameters["ParentId"] = (int)parentId.id;
+	    parameters["FileName"] = (const char *)CW2A(tempFile);
+	    root ["Params"] = parameters;
+	    std::string jsonString = writer.write(root);
 
-	std::wstring response;
-	Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+	    std::wstring response;
+	    Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+    }
 
 	return TRUE;
 }
 
 BOOL Utility::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile)
 {
-	Json::StyledWriter writer;
-	Json::Value  root;
-	root ["Server"] = (const char *)CW2A(pArchive->context->service);
-	root ["Port"]   = 60684;
-	root ["Version"]= "1.0.0.1";
-	root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
-	root ["Method"] = "DownloadFile";
-	Json::Value parameters; 
-	parameters["ItemId"] = (int)itemId.id;
-	parameters["FileName"] = (const char *)CW2A(tempFile);
-	root ["Params"] = parameters;
-	std::string jsonString = writer.write(root);
+    {
+        Json::StyledWriter writer;
+        Json::Value  root;
+        root ["Server"] = (const char *)CW2A(pArchive->context->service);
+        root ["Port"]   = 60684;
+        root ["Version"]= "1.0.0.1";
+        root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+        root ["Method"] = "DownloadFile";
+        Json::Value parameters; 
+        parameters["ItemId"] = (int)itemId.id;
+        parameters["FileName"] = (const char *)CW2A(tempFile);
+        root ["Params"] = parameters;
+        std::string jsonString = writer.write(root);
 
-	std::wstring response;
-	Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
-
+        std::wstring response;
+        Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+    }
 	return TRUE;
 }
 

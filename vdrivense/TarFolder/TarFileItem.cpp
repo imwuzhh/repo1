@@ -180,6 +180,13 @@ HRESULT CTarFileItem::CreateFolder()
  */
 HRESULT CTarFileItem::Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName)
 {
+   WCHAR wszFilename[MAX_PATH] = { 0 };
+   HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
+
+   // The Shell often doesn't include the filename extension in the
+   // renamed filename, so we'll append it now.
+   if( wcschr(pstrOutputName, '.') == NULL ) ::PathAddExtension(pstrOutputName, ::PathFindExtension(wszFilename));
+
    // Rename the item in archive
    HR( DMRename(_GetTarArchivePtr(), *(RemoteId *)&m_pWfd->dwId, pstrOutputName, IsFolder()) );
    return S_OK;

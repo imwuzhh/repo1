@@ -181,7 +181,7 @@ HRESULT CTarFileItem::CreateFolder()
 HRESULT CTarFileItem::Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName)
 {
    // Rename the item in archive
-   HR( DMRename(_GetTarArchivePtr(), *(RemoteId *)&m_pWfd->dwId, pstrOutputName) );
+   HR( DMRename(_GetTarArchivePtr(), *(RemoteId *)&m_pWfd->dwId, pstrOutputName, IsFolder()) );
    return S_OK;
 }
 
@@ -190,7 +190,7 @@ HRESULT CTarFileItem::Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName)
  */
 HRESULT CTarFileItem::Delete()
 {
-   HR( DMDelete(_GetTarArchivePtr(), *(RemoteId *)(&m_pWfd->dwId)) );
+   HR( DMDelete(_GetTarArchivePtr(), *(RemoteId *)(&m_pWfd->dwId), IsFolder()) );
    return S_OK;
 }
 

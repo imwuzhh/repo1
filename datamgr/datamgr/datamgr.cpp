@@ -55,24 +55,6 @@
 */
 
 ///////////////////////////////////////////////////////////////////////////////
-// Debug helper functions
-static std::string WideStringToAnsi(const wchar_t * wstr){
-	if (!wstr) return "";
-	char szAnsi [MAX_PATH] = "";
-	WideCharToMultiByte(CP_ACP, 0, wstr, wcslen(wstr), szAnsi, lengthof(szAnsi), NULL, NULL);
-	return szAnsi;
-}
-static void OutputLog(const char * format, ...){
-	va_list va;
-	va_start(va, format);
-	char szMsg [0x400] = "";
-	_vsnprintf_s(szMsg, lengthof(szMsg), format, va);
-	OutputDebugStringA(szMsg); OutputDebugStringA("\n");
-}
-#define WSTR2ASTR(w) (WideStringToAnsi(w).c_str())
-#define OUTPUTLOG OutputLog
-
-///////////////////////////////////////////////////////////////////////////////
 // cache directory
 #define VDRIVE_LOCAL_CACHE_ROOT ((pArchive && pArchive->context) \
 								? (pArchive->context->cachedir) \
@@ -238,14 +220,14 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
  * Rename a file or folder in the archive.
  * Notice that we do not support rename of a folder, which contains files, yet.
  */
-HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrNewName)
+HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrNewName, BOOL isFolder)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
    OUTPUTLOG("%s(), RemoteId={%d,%d}, NewName=%s", __FUNCTION__, itemId.category, itemId.id, (const char *)CW2A(pwstrNewName));
 
    { // Rename File/Folder on remote
-	   if (!Utility::RenameItem(pArchive, itemId, pwstrNewName)){
+	   if (!Utility::RenameItem(pArchive, itemId, pwstrNewName, isFolder)){
 		   OUTPUTLOG("%s(), Failed to rename item on server.", __FUNCTION__);
 		   return E_FAIL;
 	   }
@@ -256,14 +238,17 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrNewName)
 /**
  * Delete a file or folder.
  */
-HRESULT DMDelete(TAR_ARCHIVE* pArchive, RemoteId itemId)
+HRESULT DMDelete(TAR_ARCHIVE* pArchive, RemoteId itemId, BOOL isFolder)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
    OUTPUTLOG("%s(), RemoteId={%d,%d}", __FUNCTION__, itemId.category, itemId.id);
 
    {// Delete remote File/Folder
-	   Utility::DeleteItem(pArchive, itemId);
+	   if (!Utility::DeleteItem(pArchive, itemId, isFolder))
+	   {
+		   return E_FAIL;
+	   }
    }
    return S_OK;
 }
@@ -277,15 +262,20 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFi
    
    if (NULL == pwstrFilename ) return E_INVALIDARG;
 
-   OUTPUTLOG("%s(), ParentId={%d,%d}, pwstrFilename=[%s]", __FUNCTION__, parentId.category, parentId.id, WSTR2ASTR(pwstrFilename));
+   OUTPUTLOG("%s(), ParentId={%d,%d}, pwstrFilename=[%s]", __FUNCTION__, parentId.category, parentId.id, (const char *)CW2A(pwstrFilename));
 
    {// Create Folder On remote
+	   if (wcsrchr(pwstrFilename, _T('\\'))){
+		   pwstrFilename = wcsrchr(pwstrFilename, _T('\\')) + 1;
+	   }
 	   RemoteId folderId = {PublicCat, 0};
-	   Utility::CreateFolder(pArchive, parentId, pwstrFilename, &folderId);
-	   pWfd->dwId = folderId;
+	   if (Utility::CreateFolder(pArchive, parentId, pwstrFilename, &folderId)){
+		   pWfd->dwId = folderId;
+		   OUTPUTLOG("%s(`%s\') return Id=[%d:%d]", __FUNCTION__, (const char *)CW2A(pwstrFilename), folderId.category, folderId.id);
+		   return S_OK;
+	   }
    }
-
-   return S_OK;
+   return E_FAIL;
 }
 
 /**

@@ -1198,12 +1198,22 @@ LRESULT CShellFolder::OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam
 		LPITEMIDLIST pidl;
 	};
 	SFVCB_SELECTINFO * pSelectInfo = (SFVCB_SELECTINFO *)lParam;
-	if (pSelectInfo && (pSelectInfo->uNewState & LVIS_SELECTED) == LVIS_SELECTED){
-		if (pSelectInfo->pidl && (pSelectInfo->pidl->mkid.cb)){
-			NSEFILEPIDLDATA * pNseInfo = (NSEFILEPIDLDATA *)pSelectInfo->pidl;
-			OUTPUTLOG("%s(), id=[%d], FileName=%s", __FUNCTION__, pNseInfo->wfd.dwId.id, (const char *)CW2A(pNseInfo->wfd.cFileName));
+	if (pSelectInfo ){
+		// HarryWu, 2014.3.13
+		// This is the selected signal.
+		if ((pSelectInfo->uNewState & LVIS_SELECTED) == LVIS_SELECTED ) {
+			if ( pSelectInfo->pidl && (pSelectInfo->pidl->mkid.cb)){
+				NSEFILEPIDLDATA * pNseInfo = (NSEFILEPIDLDATA *)pSelectInfo->pidl;
+				OUTPUTLOG("%s(), [Event.Selected] id=[%d], FileName=%s", __FUNCTION__, pNseInfo->wfd.dwId.id, (const char *)CW2A(pNseInfo->wfd.cFileName));
+			}
+		}else{
+			// HarryWu, 2014.3.13
+			// This is the un-selected signal
+			if ( pSelectInfo->pidl && (pSelectInfo->pidl->mkid.cb)){
+				NSEFILEPIDLDATA * pNseInfo = (NSEFILEPIDLDATA *)pSelectInfo->pidl;
+				OUTPUTLOG("%s(), [Event.CancelSelcted] id=[%d], FileName=%s", __FUNCTION__, pNseInfo->wfd.dwId.id, (const char *)CW2A(pNseInfo->wfd.cFileName));
+			}
 		}
-		OUTPUTLOG("%s(), wParam=%p, lParam=%p", __FUNCTION__, wParam, lParam);
 	}
 	return 0;
 }

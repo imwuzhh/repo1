@@ -361,6 +361,25 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 	return S_OK;
 }
 
+HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemId)
+{
+	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+	OUTPUTLOG("%s(), local=`%s\' remote=[%d:%d]", __FUNCTION__, (const char *)CW2A(pwstrLocalDir), itemId.category, itemId.id);
+
+	return S_OK;
+}
+
+HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId)
+{
+	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+	OUTPUTLOG("%s(), local=`%s\' remote=[%d:%d]", __FUNCTION__, (const char *)CW2A(pwstrLocalPath), viewId.category, viewId.id);
+	
+	return S_OK;
+}
+
+
 HRESULT DMMalloc(LPBYTE * ppBuffer, DWORD dwBufSize)
 {
 	*ppBuffer = (LPBYTE)malloc(dwBufSize);

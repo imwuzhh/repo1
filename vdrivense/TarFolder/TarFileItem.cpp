@@ -263,12 +263,23 @@ HRESULT CTarFileItem::_ExtractToFolder(VFS_MENUCOMMAND& Cmd)
    {
        // HarryWu, 2014.3.14
        // Task: here is a chance to post the task to external tool.
-       LocalId ItemId = {0, 0};
-       _GetIdQuick(m_pidlItem, &ItemId);
-       OUTPUTLOG("%s(), copying [%d:%d] to `%s\' with Title `%s\'", __FUNCTION__
-           , ItemId.category, ItemId.id
-           , (const char *)CW2A((LPCTSTR)Cmd.pUserData)
-           , (const char *)CW2A(m_pWfd->cFileName));
+
+   	   DWORD dwCount = 0;
+	   if (Cmd.pShellItems) Cmd.pShellItems->GetCount(&dwCount);
+
+	   {
+		   LocalId ItemId = {0, 0};
+		   _GetIdQuick(m_pidlItem, &ItemId);
+
+		   OUTPUTLOG("%s(), copying [%d:%d] to `%s\' with Title `%s\' [%d]", __FUNCTION__
+											   , ItemId.category, ItemId.id
+											   , (const char *)CW2A((LPCTSTR)Cmd.pUserData)
+											   , (const char *)CW2A(m_pWfd->cFileName)
+											   , dwCount
+											   );
+		   HR( DMDownload(_GetTarArchivePtr(), (LPCTSTR)Cmd.pUserData, *(RemoteId *)&ItemId));
+	   }
+
        return S_OK;
    } 
 
@@ -309,7 +320,48 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
     // http://msdn.microsoft.com/en-us/library/windows/desktop/dd318066(v=vs.85).aspx
     {
         LocalId ItemId; _GetIdQuick(m_pidlItem, &ItemId);
-        OUTPUTLOG("%s(), Copying Something to [%d:%d]", __FUNCTION__, ItemId.category, ItemId.id);
+
+		FORMATETC fmtec; 
+		fmtec.cfFormat = CF_HDROP;
+		fmtec.dwAspect = DVASPECT_CONTENT;
+		fmtec.lindex   = -1;
+		fmtec.ptd      = NULL;
+		fmtec.tymed    = TYMED_HGLOBAL;
+
+		STGMEDIUM medium;
+		HR( Cmd.pDataObject->GetData(&fmtec, &medium) );
+		
+		if (medium.hGlobal == NULL) return S_FALSE;
+
+		int fileCount = DragQueryFile((HDROP)medium.hGlobal, -1, NULL, 0);
+
+		std::wstring strFileList = _T("");
+
+		for (int i = 0; i < fileCount; i++){
+			int pathlen = DragQueryFile((HDROP)medium.hGlobal, i, NULL, 0);
+			if (pathlen <= 0) continue ;
+
+			TCHAR * szFullPath = (TCHAR *)malloc(sizeof(TCHAR) * (pathlen + 1));
+			szFullPath [pathlen ] = _T('\0');
+
+			pathlen = DragQueryFile((HDROP) medium.hGlobal, i, szFullPath, pathlen + 1);
+			if (pathlen <= 0) {
+				free(szFullPath);
+				continue ;
+			}
+
+			// HarryWu, 2014.3.14
+			// Post task to external tool
+			DMUpload(_GetTarArchivePtr(), szFullPath, *(RemoteId *)&ItemId);
+			OUTPUTLOG("%s(), Path: `%s\'", __FUNCTION__, (const char *)CW2A(szFullPath));
+			
+			strFileList += szFullPath;
+			strFileList += _T(";");
+			free(szFullPath);
+		}
+
+		//DMUpload(_GetTarArchivePtr(), strFileList.c_str(), *(RemoteId *)&ItemId);
+        OUTPUTLOG("%s(), Copying `%s\' to [%d:%d]", __FUNCTION__, (const char *)CW2A(strFileList.c_str()), ItemId.category, ItemId.id);
         return S_OK;
     }
 

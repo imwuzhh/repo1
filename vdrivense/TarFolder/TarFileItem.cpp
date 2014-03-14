@@ -258,6 +258,20 @@ HRESULT CTarFileItem::_ExtractToFolder(VFS_MENUCOMMAND& Cmd)
       HR( ::SHGetPathFromIDList(pidlFolder, pstrTarget) );
       Cmd.pUserData = pstrTarget;
    }
+   
+   BOOL EnableExtTool = TRUE; if (EnableExtTool)
+   {
+       // HarryWu, 2014.3.14
+       // Task: here is a chance to post the task to external tool.
+       LocalId ItemId = {0, 0};
+       _GetIdQuick(m_pidlItem, &ItemId);
+       OUTPUTLOG("%s(), copying [%d:%d] to `%s\' with Title `%s\'", __FUNCTION__
+           , ItemId.category, ItemId.id
+           , (const char *)CW2A((LPCTSTR)Cmd.pUserData)
+           , (const char *)CW2A(m_pWfd->cFileName));
+       return S_OK;
+   } 
+
    // Extract this item to target folder.
    // Let the Windows CopyEngine do the dirty work simply by copying the
    // file/folder out of this item.
@@ -277,6 +291,47 @@ HRESULT CTarFileItem::_ExtractToFolder(VFS_MENUCOMMAND& Cmd)
       HR( Cmd.pFO->CopyItem(spSourceFile, spTargetFolder, m_pWfd->cFileName, NULL) );
    }
    return S_OK;
+}
+
+/**
+* Paste a data-object as a buch of files.
+* Assumes that the passed IDataObject contains files to paste into
+* our virtual file-system.
+*/
+HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
+{
+    ATLASSERT(IsFolder());
+    ATLASSERT(Cmd.pDataObject);
+    if( Cmd.pDataObject == NULL ) return E_FAIL;
+
+    // HarryWu, 2014.3.14
+    // Task: Hook upload, EVENT_OBJECT_DRAGDROPPED
+    // http://msdn.microsoft.com/en-us/library/windows/desktop/dd318066(v=vs.85).aspx
+    {
+        LocalId ItemId; _GetIdQuick(m_pidlItem, &ItemId);
+        OUTPUTLOG("%s(), Copying Something to [%d:%d]", __FUNCTION__, ItemId.category, ItemId.id);
+        return S_OK;
+    }
+
+    // Do paste operation...
+    if( Cmd.pFO == NULL ) {
+        HR( ::SHCreateFileOperation(Cmd.hWnd
+            // HarryWu, 2014.2.4
+            // I try to skip the prompt, default to 'Yes'!
+            // by OR the flag FOF_NOCONFIRMATION.
+            , FOF_NOCOPYSECURITYATTRIBS | FOF_NOCONFIRMMKDIR | FOFX_NOSKIPJUNCTIONS | FOF_NOCONFIRMATION
+            , &Cmd.pFO) );
+    }
+    // FIX: The Shell complains about E_INVALIDARG on IFileOperation::MoveItems() so we'll
+    //      do the file-operation in two steps.
+    CComPtr<IShellItem> spTargetFolder;
+    HR( ::SHCreateItemFromIDList(_GetFullPidl(), IID_PPV_ARGS(&spTargetFolder)) );
+    Cmd.pFO->CopyItems(Cmd.pDataObject, spTargetFolder);
+    if( Cmd.dwDropEffect == DROPEFFECT_MOVE ) {
+        Cmd.pFO->DeleteItems(Cmd.pDataObject);
+    }
+    // We handled this operation successfully for all items in selection
+    return NSE_S_ALL_DONE;
 }
 
 HRESULT CTarFileItem::_PreviewFile( PCITEMID_CHILD pidl)

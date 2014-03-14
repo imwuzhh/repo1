@@ -535,37 +535,6 @@ HRESULT CNseBaseItem::_RefreshItemInView()
 }
 
 /**
- * Paste a data-object as a buch of files.
- * Assumes that the passed IDataObject contains files to paste into
- * our virtual file-system.
- */
-HRESULT CNseBaseItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
-{
-   ATLASSERT(IsFolder());
-   ATLASSERT(Cmd.pDataObject);
-   if( Cmd.pDataObject == NULL ) return E_FAIL;
-   // Do paste operation...
-   if( Cmd.pFO == NULL ) {
-      HR( ::SHCreateFileOperation(Cmd.hWnd
-		  // HarryWu, 2014.2.4
-		  // I try to skip the prompt, default to 'Yes'!
-		  // by OR the flag FOF_NOCONFIRMATION.
-		  , FOF_NOCOPYSECURITYATTRIBS | FOF_NOCONFIRMMKDIR | FOFX_NOSKIPJUNCTIONS | FOF_NOCONFIRMATION
-		  , &Cmd.pFO) );
-   }
-   // FIX: The Shell complains about E_INVALIDARG on IFileOperation::MoveItems() so we'll
-   //      do the file-operation in two steps.
-   CComPtr<IShellItem> spTargetFolder;
-   HR( ::SHCreateItemFromIDList(_GetFullPidl(), IID_PPV_ARGS(&spTargetFolder)) );
-   Cmd.pFO->CopyItems(Cmd.pDataObject, spTargetFolder);
-   if( Cmd.dwDropEffect == DROPEFFECT_MOVE ) {
-	   Cmd.pFO->DeleteItems(Cmd.pDataObject);
-   }
-   // We handled this operation successfully for all items in selection
-   return NSE_S_ALL_DONE;
-}
-
-/**
  * Show file properties.
  * Launches the default File Properties window for the selected item.
  * This method can only handle 1 item and will only show properties

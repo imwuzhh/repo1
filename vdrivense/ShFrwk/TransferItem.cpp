@@ -50,6 +50,14 @@ STDMETHODIMP CTransferSource::SetProperties(IPropertyChangeArray* pPropArray)
 
 STDMETHODIMP CTransferSource::OpenItem(IShellItem* psiSource, DWORD dwFlags, REFIID riid, LPVOID* ppv)
 {
+	if (psiSource){
+		LPTSTR pszName = NULL;
+		psiSource->GetDisplayName(SIGDN_NORMALDISPLAY, &pszName);
+		if (pszName){
+			OUTPUTLOG("%s() Source=`%s\'", __FUNCTION__, (const char *)CW2A(pszName));
+			CoTaskMemFree(pszName);
+		}
+	}
    ATLTRACE(L"CTransferSource::OpenItem  riid=%s flags=0x%X\n", DbgGetIID(riid), dwFlags);
    CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
    if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);

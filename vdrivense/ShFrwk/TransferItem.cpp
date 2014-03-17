@@ -149,6 +149,16 @@ STDMETHODIMP CTransferSource::ApplyPropertiesToItem(IShellItem* psiSource, IShel
 
 STDMETHODIMP CTransferSource::GetDefaultDestinationName(IShellItem* psiSource, IShellItem* psiParentDest, LPWSTR* ppszDestinationName)
 {
+	// HarryWu, 2014.3.17
+	// Catch you now!
+	if (psiParentDest){
+		LPTSTR pszName = NULL;
+		psiParentDest->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
+		if (pszName){
+			OUTPUTLOG("%s(), TargetParent=`%s\'", __FUNCTION__, (const char *)CW2A(pszName));
+			CoTaskMemFree(pszName);
+		}
+	}
    ATLTRACE(L"CTransferSource::GetDefaultDestinationName\n");
    // We need to return the name we eventually wish our file should have.
    // We'll start trying out if a filename is available, and if not, fall back to 

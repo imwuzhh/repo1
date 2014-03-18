@@ -379,6 +379,10 @@ HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId
 	return S_OK;
 }
 
+HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL isFolder)
+{
+    return S_OK;
+}
 
 HRESULT DMMalloc(LPBYTE * ppBuffer, DWORD dwBufSize)
 {

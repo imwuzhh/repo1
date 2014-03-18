@@ -17,6 +17,8 @@ EXPORTS
 	DMDownload	
 	DMUpload
 	
+	DMSelect
+	
 	DMMalloc
 	DMRealloc
 	DMFree

@@ -131,6 +131,8 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilen
 HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemId);
 HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId);
 
+HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL isFolder);
+
 HRESULT DMMalloc(LPBYTE * ppBuffer, DWORD dwBufSize);
 HRESULT DMRealloc(LPBYTE * ppBuffer, DWORD dwBufSize);
 HRESULT DMFree(LPBYTE pBuffer);

@@ -474,6 +474,12 @@ HRESULT CNseBaseItem::Refresh(VFS_REFRESH Reason)
    return E_NOTIMPL;
 }
 
+
+HRESULT CNseBaseItem::OnSelected(BOOL isSelected)
+{
+    return E_NOTIMPL;
+}
+
 // Static members
 
 /**

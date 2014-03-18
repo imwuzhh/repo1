@@ -202,6 +202,15 @@ HRESULT CTarFileItem::Delete()
 }
 
 /**
+* Select this item.
+*/
+HRESULT CTarFileItem::OnSelected(BOOL isSelected)
+{
+    HR (DMSelect(_GetTarArchivePtr(), *(RemoteId *)(&m_pWfd->dwId), isSelected, IsFolder()) );
+    return S_OK;
+}
+
+/**
  * Returns the menu-items for an item.
  */
 HMENU CTarFileItem::GetMenu()

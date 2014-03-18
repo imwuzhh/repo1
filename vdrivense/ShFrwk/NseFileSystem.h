@@ -327,6 +327,7 @@ public:
    virtual HRESULT Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName) = 0;
    virtual HRESULT Delete() = 0;
    virtual HRESULT Refresh(VFS_REFRESH Reason) = 0;
+   virtual HRESULT OnSelected(BOOL isSelected) = 0;
 };
 
 
@@ -414,6 +415,7 @@ public:
    HRESULT Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName);
    HRESULT Delete();
    HRESULT Refresh(VFS_REFRESH Reason);
+   HRESULT OnSelected(BOOL isSelected);
 
    // Implementation
 

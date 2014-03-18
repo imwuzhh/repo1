@@ -1201,11 +1201,13 @@ LRESULT CShellFolder::OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam
 	if (pSelectInfo ){
 		// HarryWu, 2014.3.13
 		// This is the selected signal.
+        CNseItemPtr spItem = GenerateChildItem(static_cast<PCUITEMID_CHILD>(pSelectInfo->pidl));
 		if ((pSelectInfo->uNewState & LVIS_SELECTED) == LVIS_SELECTED ) {
 			if ( pSelectInfo->pidl && (pSelectInfo->pidl->mkid.cb)){
 				NSEFILEPIDLDATA * pNseInfo = (NSEFILEPIDLDATA *)pSelectInfo->pidl;
 				OUTPUTLOG("%s(), [Event.Selected] id=[%d], FileName=%s", __FUNCTION__, pNseInfo->wfd.dwId.id, (const char *)CW2A(pNseInfo->wfd.cFileName));
 			}
+            spItem->OnSelected(TRUE);
 		}else{
 			// HarryWu, 2014.3.13
 			// This is the un-selected signal
@@ -1213,6 +1215,7 @@ LRESULT CShellFolder::OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam
 				NSEFILEPIDLDATA * pNseInfo = (NSEFILEPIDLDATA *)pSelectInfo->pidl;
 				OUTPUTLOG("%s(), [Event.CancelSelcted] id=[%d], FileName=%s", __FUNCTION__, pNseInfo->wfd.dwId.id, (const char *)CW2A(pNseInfo->wfd.cFileName));
 			}
+            spItem->OnSelected(FALSE);
 		}
 	}
 	return 0;

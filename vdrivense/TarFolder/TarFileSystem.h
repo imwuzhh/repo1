@@ -105,6 +105,7 @@ public:
    HRESULT CreateFolder();
    HRESULT Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName);
    HRESULT Delete();
+   HRESULT OnSelected(BOOL isSelected);
 
    HMENU GetMenu();
    HRESULT ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd);

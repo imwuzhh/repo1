@@ -381,6 +381,7 @@ HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId
 
 HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL isFolder)
 {
+    OUTPUTLOG("%s() [%s] [%d:%d]", __FUNCTION__, selected ? "Select" : "CancelSelect", itemId.category, itemId.id);
     return S_OK;
 }
 

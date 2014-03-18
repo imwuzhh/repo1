@@ -50,22 +50,19 @@ STDMETHODIMP CTransferSource::SetProperties(IPropertyChangeArray* pPropArray)
 
 STDMETHODIMP CTransferSource::OpenItem(IShellItem* psiSource, DWORD dwFlags, REFIID riid, LPVOID* ppv)
 {
-	if (psiSource){
-		LPTSTR pszName = NULL;
-		psiSource->GetDisplayName(SIGDN_NORMALDISPLAY, &pszName);
-		if (pszName){
-			OUTPUTLOG("%s() Source=`%s\'", __FUNCTION__, (const char *)CW2A(pszName));
-			CoTaskMemFree(pszName);
-		}
-	}
-   ATLTRACE(L"CTransferSource::OpenItem  riid=%s flags=0x%X\n", DbgGetIID(riid), dwFlags);
-   CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
-   if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
-   CComObject<CShellItemResources>* pItemResources = NULL;
-   HR( CComObject<CShellItemResources>::CreateInstance(&pItemResources) );
-   CComPtr<IUnknown> spKeepAlive = pItemResources->GetUnknown();
-   HR( pItemResources->Init(m_spFolder, spItem->GetITEMID()) );
-   return pItemResources->QueryInterface(riid, ppv);
+    // HarryWu, 2014.3.18
+    // TODO: pretend to cancel it.
+    return COPYENGINE_S_USER_IGNORED;
+
+    ATLTRACE(L"CTransferSource::OpenItem  riid=%s flags=0x%X\n", DbgGetIID(riid), dwFlags);
+    CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
+    if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
+    CComObject<CShellItemResources>* pItemResources = NULL;
+    HR( CComObject<CShellItemResources>::CreateInstance(&pItemResources) );
+    CComPtr<IUnknown> spKeepAlive = pItemResources->GetUnknown();
+    HR( pItemResources->Init(m_spFolder, spItem->GetITEMID()) );
+    HR( pItemResources->QueryInterface(riid, ppv));
+    return S_OK;
 }
 
 STDMETHODIMP CTransferSource::MoveItem(IShellItem* psiSource, IShellItem* psiParentDst, LPCWSTR pszNameDst, DWORD dwFlags, IShellItem** ppsiNew)
@@ -155,7 +152,17 @@ STDMETHODIMP CTransferSource::GetDefaultDestinationName(IShellItem* psiSource, I
 		LPTSTR pszName = NULL;
 		psiParentDest->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
 		if (pszName){
-			OUTPUTLOG("%s(), TargetParent=`%s\'", __FUNCTION__, (const char *)CW2A(pszName));
+			CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
+			if( spItem == NULL ) {
+				CoTaskMemFree(pszName);
+				return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
+			}
+			VFS_FIND_DATA vfd = spItem->GetFindData();
+            
+			OUTPUTLOG("%s(), copying [%d:%d] to TargetParent=`%s\'"
+				            , __FUNCTION__
+				            , vfd.dwId.category, vfd.dwId.id
+				            , (const char *)CW2A(pszName));
 			CoTaskMemFree(pszName);
 		}
 	}

@@ -361,20 +361,30 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 	return S_OK;
 }
 
-HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemId)
+HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemId, BOOL removeSource)
 {
 	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-	OUTPUTLOG("%s(), local=`%s\' remote=[%d:%d]", __FUNCTION__, (const char *)CW2A(pwstrLocalDir), itemId.category, itemId.id);
+	OUTPUTLOG("%s(), local=`%s\' remote=[%d:%d], flag[`%s\']"
+		, __FUNCTION__
+		, (const char *)CW2A(pwstrLocalDir)
+		, itemId.category
+		, itemId.id
+		, removeSource ? "RemoveSource" : "KeepSource");
 
 	return S_OK;
 }
 
-HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId)
+HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId, BOOL removeSource)
 {
 	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-	OUTPUTLOG("%s(), local=`%s\' remote=[%d:%d]", __FUNCTION__, (const char *)CW2A(pwstrLocalPath), viewId.category, viewId.id);
+	OUTPUTLOG("%s(), local=`%s\' remote=[%d:%d], flag[`%s\']"
+		, __FUNCTION__
+		, (const char *)CW2A(pwstrLocalPath)
+		, viewId.category
+		, viewId.id
+		, removeSource ? "RemoveSource" : "KeepSource");
 	
 	return S_OK;
 }

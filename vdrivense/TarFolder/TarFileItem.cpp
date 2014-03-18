@@ -276,19 +276,12 @@ HRESULT CTarFileItem::_ExtractToFolder(VFS_MENUCOMMAND& Cmd)
    	   DWORD dwCount = 0;
 	   if (Cmd.pShellItems) Cmd.pShellItems->GetCount(&dwCount);
 
-	   {
-		   LocalId ItemId = {0, 0};
-		   _GetIdQuick(m_pidlItem, &ItemId);
-
-		   OUTPUTLOG("%s(), copying [%d:%d] to `%s\' with Title `%s\' [%d]", __FUNCTION__
-											   , ItemId.category, ItemId.id
-											   , (const char *)CW2A((LPCTSTR)Cmd.pUserData)
-											   , (const char *)CW2A(m_pWfd->cFileName)
-											   , dwCount
-											   );
-		   HR( DMDownload(_GetTarArchivePtr(), (LPCTSTR)Cmd.pUserData, *(RemoteId *)&ItemId));
-	   }
-
+	   LocalId ItemId = {0, 0};
+	   _GetIdQuick(m_pidlItem, &ItemId);
+	   HR( DMDownload(_GetTarArchivePtr()
+		   , (LPCTSTR)Cmd.pUserData
+		   , *(RemoteId *)&ItemId
+		   , Cmd.dwDropEffect == DROPEFFECT_MOVE));
        return S_OK;
    } 
 
@@ -361,8 +354,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 
 			// HarryWu, 2014.3.14
 			// Post task to external tool
-			DMUpload(_GetTarArchivePtr(), szFullPath, *(RemoteId *)&ItemId);
-			OUTPUTLOG("%s(), Path: `%s\'", __FUNCTION__, (const char *)CW2A(szFullPath));
+			DMUpload(_GetTarArchivePtr(), szFullPath, *(RemoteId *)&ItemId, Cmd.dwDropEffect == DROPEFFECT_MOVE );
 			
 			strFileList += szFullPath;
 			strFileList += _T(";");
@@ -370,7 +362,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 		}
 
 		//DMUpload(_GetTarArchivePtr(), strFileList.c_str(), *(RemoteId *)&ItemId);
-        OUTPUTLOG("%s(), Copying `%s\' to [%d:%d]", __FUNCTION__, (const char *)CW2A(strFileList.c_str()), ItemId.category, ItemId.id);
+        //OUTPUTLOG("%s(), Copying `%s\' to [%d:%d]", __FUNCTION__, (const char *)CW2A(strFileList.c_str()), ItemId.category, ItemId.id);
         return S_OK;
     }
 

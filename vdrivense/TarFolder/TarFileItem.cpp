@@ -278,10 +278,12 @@ HRESULT CTarFileItem::_ExtractToFolder(VFS_MENUCOMMAND& Cmd)
 
 	   LocalId ItemId = {0, 0};
 	   _GetIdQuick(m_pidlItem, &ItemId);
+
 	   HR( DMDownload(_GetTarArchivePtr()
 		   , (LPCTSTR)Cmd.pUserData
 		   , *(RemoteId *)&ItemId
 		   , Cmd.dwDropEffect == DROPEFFECT_MOVE));
+
        return S_OK;
    } 
 

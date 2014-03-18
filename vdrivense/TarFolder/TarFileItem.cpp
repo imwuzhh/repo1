@@ -211,6 +211,17 @@ HRESULT CTarFileItem::OnSelected(BOOL isSelected)
 }
 
 /**
+* Get Custom Columns
+*/
+HRESULT CTarFileItem::InitCustomColumns()
+{
+    wchar_t szColumns [MAX_PATH] = _T("");
+    LocalId viewId; _GetIdQuick(m_pidlItem, &viewId);
+    HR( DMInitCustomColumns(_GetTarArchivePtr(), *(RemoteId *)&viewId, szColumns, lengthof(szColumns)));
+    return S_OK;
+}
+
+/**
  * Returns the menu-items for an item.
  */
 HMENU CTarFileItem::GetMenu()

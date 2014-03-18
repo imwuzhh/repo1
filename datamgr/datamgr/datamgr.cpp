@@ -391,7 +391,17 @@ HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId
 
 HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL isFolder)
 {
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
     OUTPUTLOG("%s() [%s] [%d:%d]", __FUNCTION__, selected ? "Select" : "CancelSelect", itemId.category, itemId.id);
+    return S_OK;
+}
+
+HRESULT DMInitCustomColumns(TAR_ARCHIVE * pArchive, RemoteId viewId, LPWSTR pwstrColumnList, int maxcch)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+    wcscpy_s(pwstrColumnList, maxcch, _T("column1;clumn2;column3;column4;column4;"));
+    OUTPUTLOG("%s() ViewId=[%d:%d], Column=`%s\'", __FUNCTION__, viewId.category, viewId.id, (const char *)CW2A(pwstrColumnList));
     return S_OK;
 }
 

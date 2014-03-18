@@ -480,6 +480,11 @@ HRESULT CNseBaseItem::OnSelected(BOOL isSelected)
     return E_NOTIMPL;
 }
 
+HRESULT CNseBaseItem::InitCustomColumns()
+{
+    return E_NOTIMPL;
+}
+
 // Static members
 
 /**

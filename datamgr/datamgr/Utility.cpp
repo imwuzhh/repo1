@@ -711,6 +711,31 @@ BOOL Utility::BatchDownload(TAR_ARCHIVE * pArchive, const RemoteId & itemId, con
     return TRUE;
 }
 
+BOOL Utility::Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL selected, BOOL isFolder)
+{
+    {
+        Json::StyledWriter writer;
+        Json::Value  root;
+        root ["Server"] = (const char *)CW2A(pArchive->context->service);
+        root ["Port"]   = 60684;
+        root ["Version"]= "1.0.0.1";
+        root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+        root ["Method"] = "Select";
+        Json::Value parameters; 
+        parameters["id"] = (int)itemId.id;
+        parameters["selected"] = selected ? "True" : "False";
+        parameters["isFolder"] = isFolder ? "True" : "False";
+        root ["Params"] = parameters;
+        std::string jsonString = writer.write(root);
+
+        std::wstring response;
+        Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+    }
+    return TRUE;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Helpers
 bool Utility::RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right)
 {
 	return (left.dwId.category - right.dwId.category)<0;

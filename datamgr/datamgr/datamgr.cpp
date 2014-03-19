@@ -401,6 +401,8 @@ HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL is
 
     OUTPUTLOG("%s() [%s] [%d:%d]", __FUNCTION__, selected ? "Select" : "CancelSelect", itemId.category, itemId.id);
 
+    if (!Utility::Select(pArchive, itemId, selected, isFolder))
+        return S_FALSE;
 
     return S_OK;
 }

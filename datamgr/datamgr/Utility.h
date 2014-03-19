@@ -27,6 +27,7 @@ public:
 	static BOOL ReadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile);
     static BOOL BatchUpload(TAR_ARCHIVE * pArchive, const RemoteId & viewId, const wchar_t * localPath);
     static BOOL BatchDownload(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * localPath);
+    static BOOL Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL selected, BOOL isFolder);
 public:
 	static bool RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right);
 public:

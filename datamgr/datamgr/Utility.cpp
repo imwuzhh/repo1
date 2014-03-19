@@ -606,7 +606,12 @@ BOOL Utility::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, co
 	return FALSE;
 }
 
-BOOL Utility::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile)
+/**
+* Integrated method to upload file.
+* NOTE: reserved for harry's prototype test.
+*       you must not use this method.
+*/
+BOOL Utility::WriteFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile)
 {
     {
 	    Json::StyledWriter writer;
@@ -615,7 +620,7 @@ BOOL Utility::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, cons
 	    root ["Port"]   = 60684;
 	    root ["Version"]= "1.0.0.1";
 	    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
-	    root ["Method"] = "UploadFile";
+	    root ["Method"] = "WriteFile";
 	    Json::Value parameters; 
 	    parameters["ParentId"] = (int)parentId.id;
 	    parameters["FileName"] = (const char *)CW2A(tempFile);
@@ -629,7 +634,12 @@ BOOL Utility::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, cons
 	return TRUE;
 }
 
-BOOL Utility::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile)
+/**
+* Integrated method into shell to Download file.
+* NOTE: reserved for harry's prototype test.
+*       you must not use this method.
+*/
+BOOL Utility::ReadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile)
 {
     {
         Json::StyledWriter writer;
@@ -638,7 +648,7 @@ BOOL Utility::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, cons
         root ["Port"]   = 60684;
         root ["Version"]= "1.0.0.1";
         root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
-        root ["Method"] = "DownloadFile";
+        root ["Method"] = "ReadFile";
         Json::Value parameters; 
         parameters["ItemId"] = (int)itemId.id;
         parameters["FileName"] = (const char *)CW2A(tempFile);
@@ -649,6 +659,56 @@ BOOL Utility::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, cons
         Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
     }
 	return TRUE;
+}
+
+/**
+* Call this route to inovke external tool to upload.
+*/
+BOOL Utility::BatchUpload(TAR_ARCHIVE * pArchive, const RemoteId & viewId, const wchar_t * localPath)
+{
+    {
+        Json::StyledWriter writer;
+        Json::Value  root;
+        root ["Server"] = (const char *)CW2A(pArchive->context->service);
+        root ["Port"]   = 60684;
+        root ["Version"]= "1.0.0.1";
+        root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+        root ["Method"] = "BatchUpload";
+        Json::Value parameters; 
+        parameters["Destination"] = (int)viewId.id;
+        parameters["Source"] = (const char *)CW2A(localPath);
+        root ["Params"] = parameters;
+        std::string jsonString = writer.write(root);
+
+        std::wstring response;
+        Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+    }
+    return TRUE;
+}
+
+/**
+* Call this routine to invoke external tool to download.
+*/
+BOOL Utility::BatchDownload(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * localPath)
+{
+    {
+        Json::StyledWriter writer;
+        Json::Value  root;
+        root ["Server"] = (const char *)CW2A(pArchive->context->service);
+        root ["Port"]   = 60684;
+        root ["Version"]= "1.0.0.1";
+        root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+        root ["Method"] = "BatchDownload";
+        Json::Value parameters; 
+        parameters["Source"] = (int)itemId.id;
+        parameters["Destination"] = (const char *)CW2A(localPath);
+        root ["Params"] = parameters;
+        std::string jsonString = writer.write(root);
+
+        std::wstring response;
+        Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response);
+    }
+    return TRUE;
 }
 
 bool Utility::RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right)

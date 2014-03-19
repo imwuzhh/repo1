@@ -23,8 +23,10 @@ public:
 	static BOOL DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder);
 	static BOOL RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * newName, BOOL isFolder);
 	static BOOL CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * folderName, RemoteId * retId);
-	static BOOL UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile);
-	static BOOL DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile);
+	static BOOL WriteFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile);
+	static BOOL ReadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile);
+    static BOOL BatchUpload(TAR_ARCHIVE * pArchive, const RemoteId & viewId, const wchar_t * localPath);
+    static BOOL BatchDownload(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * localPath);
 public:
 	static bool RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right);
 public:

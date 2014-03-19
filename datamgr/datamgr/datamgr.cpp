@@ -310,7 +310,7 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilen
 		OUTPUTLOG("%s(), write [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), dwFileSize);
 
 		// Upload Temporary file to server.
-		if (!Utility::UploadFile(pArchive, parentId, szTempFile))
+		if (!Utility::WriteFile(pArchive, parentId, szTempFile))
             return S_FALSE;
    }
 
@@ -342,7 +342,7 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 
 		// Download remote file to local temp file,
 		// and then read content from this file.
-		Utility::DownloadFile(pArchive, itemId, szTempFile);
+		Utility::ReadFile(pArchive, itemId, szTempFile);
 
 		// Write content to temp file, 
 		// and then upload this temp file.
@@ -372,6 +372,9 @@ HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemI
 		, itemId.id
 		, removeSource ? "RemoveSource" : "KeepSource");
 
+    if (!Utility::BatchDownload(pArchive, itemId, pwstrLocalDir))
+        return S_FALSE;
+
 	return S_OK;
 }
 
@@ -386,6 +389,9 @@ HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId
 		, viewId.id
 		, removeSource ? "RemoveSource" : "KeepSource");
 	
+    if (!Utility::BatchUpload(pArchive, viewId, pwstrLocalPath))
+        return S_FALSE;
+
 	return S_OK;
 }
 
@@ -394,6 +400,8 @@ HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL is
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
     OUTPUTLOG("%s() [%s] [%d:%d]", __FUNCTION__, selected ? "Select" : "CancelSelect", itemId.category, itemId.id);
+
+
     return S_OK;
 }
 

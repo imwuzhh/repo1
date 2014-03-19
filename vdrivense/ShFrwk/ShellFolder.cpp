@@ -776,6 +776,7 @@ STDMETHODIMP CShellFolder::GetDetailsEx(PCUITEMID_CHILD pidl, const SHCOLUMNID* 
 
 STDMETHODIMP CShellFolder::GetDetailsOf(PCUITEMID_CHILD pidl, UINT iColumn, SHELLDETAILS* psd)
 {
+   OUTPUTLOG("%s(), Column: %d", __FUNCTION__, iColumn);
    ATLTRACE(L"CShellFolder::GetDetailsOf  column=%u\n", iColumn);
    ATLASSERT(psd);
    SHCOLUMNID scid = { 0 };
@@ -796,6 +797,8 @@ STDMETHODIMP CShellFolder::MapColumnToSCID(UINT iColumn, SHCOLUMNID* pscid)
    VFS_COLUMNINFO Info = { 0 };
    HRESULT Hr = m_spFolderItem->GetColumnInfo(iColumn, Info);
    if( FAILED(Hr) ) return Hr;
+   // HarryWu, 2014.3.18
+   // if not column, notify the caller to stop calling next time.
    if( IsBitSet(Info.dwAttributes, VFS_COLF_NOTCOLUMN) ) return E_FAIL;
    *pscid = Info.pkey;
    return S_OK;
@@ -1170,6 +1173,7 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 	//
 	// Spy++ confuse GetParent() and GetAncestor(GA_PARENT)
 
+    m_spFolderItem->InitCustomColumns();
     return 0;
 }
 
@@ -1484,6 +1488,8 @@ HRESULT CShellFolder::_GetColumnDetailsOf(const SHCOLUMNID* pscid, SHELLDETAILS*
 {
    ATLASSERT(pscid);
    ATLASSERT(psd);
+   // HarryWu, 2014.3.18
+   // Here is a chance to customize the column name.
    psd->str.pOleStr = NULL;
    psd->str.uType = STRRET_WSTR;
    CComPtr<IPropertyDescription> spDescription;

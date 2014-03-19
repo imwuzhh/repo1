@@ -147,7 +147,7 @@ STDMETHODIMP CTransferSource::ApplyPropertiesToItem(IShellItem* psiSource, IShel
 STDMETHODIMP CTransferSource::GetDefaultDestinationName(IShellItem* psiSource, IShellItem* psiParentDest, LPWSTR* ppszDestinationName)
 {
 	// HarryWu, 2014.3.17
-	// Catch you now!
+	// Here is a chance to post download task by d-n-d.
 	if (psiParentDest){
 		LPTSTR pszName = NULL;
 		psiParentDest->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
@@ -158,11 +158,17 @@ STDMETHODIMP CTransferSource::GetDefaultDestinationName(IShellItem* psiSource, I
 				return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
 			}
 			VFS_FIND_DATA vfd = spItem->GetFindData();
-            
-			OUTPUTLOG("%s(), copying [%d:%d] to TargetParent=`%s\'"
-				            , __FUNCTION__
-				            , vfd.dwId.category, vfd.dwId.id
-				            , (const char *)CW2A(pszName));
+
+            OUTPUTLOG("%s(), copying [%d:%d] to TargetParent=`%s\'"
+                , __FUNCTION__
+                , vfd.dwId.category, vfd.dwId.id
+                , (const char *)CW2A(pszName));
+
+            CComPtr<IShellItemArray> spItems;
+            HR (::SHCreateShellItemArrayFromShellItem(psiSource, IID_PPV_ARGS(&spItems)));
+            VFS_MENUCOMMAND Cmd = { NULL, ID_FILE_EXTRACT, VFS_MNUCMD_NOVERB, DROPEFFECT_COPY, (IDataObject *)NULL, (IShellItemArray *)spItems, NULL, NULL, wcsdup(pszName) };
+            HR (m_spFolder->ExecuteMenuCommand(Cmd));
+
 			CoTaskMemFree(pszName);
 		}
 	}

@@ -18,6 +18,7 @@ EXPORTS
 	DMUpload
 	
 	DMSelect
+	DMInitCustomColumns
 	
 	DMMalloc
 	DMRealloc

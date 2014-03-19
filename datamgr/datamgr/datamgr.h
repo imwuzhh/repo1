@@ -132,6 +132,7 @@ HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemI
 HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId, BOOL removeSource);
 
 HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL isFolder);
+HRESULT DMInitCustomColumns(TAR_ARCHIVE * pArchive, RemoteId viewId, LPWSTR pwstrColumnList, int maxcch);
 
 HRESULT DMMalloc(LPBYTE * ppBuffer, DWORD dwBufSize);
 HRESULT DMRealloc(LPBYTE * ppBuffer, DWORD dwBufSize);

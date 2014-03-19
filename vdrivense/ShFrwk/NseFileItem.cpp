@@ -86,7 +86,7 @@ HRESULT CNseFileItem::GetColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column)
       { PKEY_ItemType,                    SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
 	  { PKEY_FileVersion,                 SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
 	  { PKEY_Author,                      SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
-	  ////
+	  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       { PKEY_PerceivedType,               SHCOLSTATE_TYPE_INT  | SHCOLSTATE_HIDDEN,                         VFS_COLF_NOTCOLUMN },
       { PKEY_SFGAOFlags,                  SHCOLSTATE_TYPE_INT  | SHCOLSTATE_HIDDEN,                         VFS_COLF_NOTCOLUMN },
       { PKEY_Volume_IsRoot,               SHCOLSTATE_TYPE_INT  | SHCOLSTATE_HIDDEN,                         VFS_COLF_NOTCOLUMN },

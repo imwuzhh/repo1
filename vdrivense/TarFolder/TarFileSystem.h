@@ -106,6 +106,7 @@ public:
    HRESULT Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName);
    HRESULT Delete();
    HRESULT OnSelected(BOOL isSelected);
+   HRESULT InitCustomColumns();
 
    HMENU GetMenu();
    HRESULT ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd);

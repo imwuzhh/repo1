@@ -67,7 +67,8 @@ STDMETHODIMP CTransferSource::OpenItem(IShellItem* psiSource, DWORD dwFlags, REF
 
 STDMETHODIMP CTransferSource::MoveItem(IShellItem* psiSource, IShellItem* psiParentDst, LPCWSTR pszNameDst, DWORD dwFlags, IShellItem** ppsiNew)
 {
-   ATLTRACE(L"CTransferSource::MoveItem  flags=0x%X\n", dwFlags);
+   OUTPUTLOG("CTransferSource::MoveItem  flags=0x%X\n", dwFlags);
+   return S_OK;
    // Tell caller that he should convert this to a "copy and delete" operation instead...
    CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
    if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
@@ -83,7 +84,7 @@ STDMETHODIMP CTransferSource::RecycleItem(IShellItem* psiSource, IShellItem* psi
 
 STDMETHODIMP CTransferSource::RemoveItem(IShellItem* psiSource, DWORD dwFlags)
 {
-   ATLTRACE(L"CTransferSource::RemoveItem  flags=0x%X\n", dwFlags);
+   OUTPUTLOG("CTransferSource::RemoveItem  flags=0x%X\n", dwFlags);
    CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
    if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
    BOOL bIsFolder = spItem->IsFolder();

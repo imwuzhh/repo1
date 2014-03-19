@@ -1198,7 +1198,7 @@ LRESULT CShellFolder::OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam
 		LPITEMIDLIST pidl;
 	};
 	SFVCB_SELECTINFO * pSelectInfo = (SFVCB_SELECTINFO *)lParam;
-	if (pSelectInfo ){
+	if (pSelectInfo && pSelectInfo->pidl){
 		// HarryWu, 2014.3.13
 		// This is the selected signal.
         CNseItemPtr spItem = GenerateChildItem(static_cast<PCUITEMID_CHILD>(pSelectInfo->pidl));

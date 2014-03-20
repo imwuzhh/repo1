@@ -93,15 +93,7 @@ typedef PRFS_FIND_DATAA PRFS_FIND_DATA;
 typedef LPRFS_FIND_DATAA LPRFS_FIND_DATA;
 #endif // UNICODE
 
-struct Edoc2Context {
-	DWORD   dwUserId;
-	wchar_t localeName    [32];
-	wchar_t service       [128];
-	wchar_t username      [32];
-	wchar_t password      [32];
-	wchar_t AccessToken   [128];
-	wchar_t cachedir      [1024];
-};
+struct Edoc2Context;
 
 struct TAR_ARCHIVE
 {
@@ -132,7 +124,7 @@ HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemI
 HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId, BOOL removeSource);
 
 HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL isFolder);
-HRESULT DMInitCustomColumns(TAR_ARCHIVE * pArchive, RemoteId viewId, LPWSTR pwstrColumnList, int maxcch);
+HRESULT DMGetCustomColumns(TAR_ARCHIVE * pArchive, RemoteId viewId, LPWSTR pwstrColumnList, int maxcch);
 
 HRESULT DMMalloc(LPBYTE * ppBuffer, DWORD dwBufSize);
 HRESULT DMRealloc(LPBYTE * ppBuffer, DWORD dwBufSize);

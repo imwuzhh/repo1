@@ -359,6 +359,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HttpImpl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\JsonImpl.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\libdatamgr.def"
 				>
 			</File>
@@ -382,6 +390,22 @@
 			>
 			<File
 				RelativePath=".\datamgr.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Edoc2Context.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HttpImpl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\JsonImpl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Proto.h"
 				>
 			</File>
 			<File

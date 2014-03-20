@@ -6,33 +6,14 @@
 #include <list>
 #include <iostream>
 #include <sys/stat.h>
-
-///////////////////////////////////////////////////////////////////////////////
-// Macros
-
-#ifndef lengthof
-   #define lengthof(x)  (sizeof(x)/sizeof(x[0]))
-#endif  // lengthof
-
-#ifndef offsetof
-  #define offsetof(type, field)  ((int)&((type*)0)->field)
-#endif  // offsetof
-
-#ifndef IsBitSet
-   #define IsBitSet(val, bit)  (((val)&(bit))!=0)
-#endif // IsBitSet
-
-
-#ifdef _DEBUG
-   #define HR(expr)  { HRESULT _hr; if(FAILED(_hr=(expr))) { _CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, NULL, #expr); _CrtDbgBreak(); return _hr; } }  
-#else
-   #define HR(expr)  { HRESULT _hr; if(FAILED(_hr=(expr))) return _hr; }
-#endif // _DEBUG
-
-#include "datamgr.h"
 #include <tinystr.h>
 #include <tinyxml.h>
 #include <json/json.h>
+#include "Edoc2Context.h"
+#include "datamgr.h"
+#include "Proto.h"
+#include "HttpImpl.h"
+#include "JsonImpl.h"
 #include "Utility.h"
 
 /*
@@ -54,21 +35,25 @@
 }
 */
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // cache directory
 #define VDRIVE_LOCAL_CACHE_ROOT ((pArchive && pArchive->context) \
 								? (pArchive->context->cachedir) \
 								: _T(""))
 
+#define ENABLE_HTTP(pArchive)  (pArchive && pArchive->context && pArchive->context->enableHttp)
+
 ///////////////////////////////////////////////////////////////////////////////
 // Global Context
 static Edoc2Context * gspEdoc2Context = NULL;
-
+static __inline Proto * GetProto(TAR_ARCHIVE * pArchive){ return (pArchive->context->proto);}
 ///////////////////////////////////////////////////////////////////////////////
 // TAR archive manipulation
 
 /**
-* Initialize 
+* Initialize from configuration file.
+* e.g: libdatamgr.ini, libdatamgr.xml
 */
 HRESULT DMInit(){
 	HRESULT hr = E_FAIL;
@@ -78,6 +63,15 @@ HRESULT DMInit(){
 	memset(gspEdoc2Context, 0, sizeof(Edoc2Context));
 
 	struct Edoc2Context & context = *gspEdoc2Context;
+
+    // Setup Proxy Type
+    context.enableHttp = TRUE;
+
+    if (context.enableHttp){
+        context.proto = new HttpImpl();
+    }else{
+        context.proto = (Proto *)new JsonImpl();
+    }
 
 	// Setup locale.
 	GetUserDefaultLocaleName(context.localeName, lengthof(context.localeName));
@@ -108,8 +102,8 @@ bail:
 HRESULT DMCleanup()
 {
 	if (gspEdoc2Context){
-		delete gspEdoc2Context;
-		gspEdoc2Context = NULL;
+        delete gspEdoc2Context->proto; gspEdoc2Context->proto = NULL;
+		delete gspEdoc2Context; gspEdoc2Context = NULL;
 	}
 	return S_OK;
 }
@@ -154,27 +148,19 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
    *retList = NULL; *nListCount = 0;
    std::list<RFS_FIND_DATA> tmpList;
 
-   // HarryWu, 2014.2.18
-   // Test code.
-   // 1) get sub folders for Enterprise Level
-   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPublicFolder?token=2ef01717-6f61-4592-a606-7292f3cb5a57"
-   // 2) get sub foders for Personal Level
-   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetTopPersonalFolder?token=2ef01717-6f61-4592-a606-7292f3cb5a57"
-   // 3) get sub folder by id.
-   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetChildFolderListByFolderId?token=2ef01717-6f61-4592-a606-7292f3cb5a57&folderId=16086"
-   // 4) get sub files by id
-   // "http://192.168.253.242/EDoc2WebApi/api/Doc/FileRead/GetChildFileListByFolderId?token=c8132990-f885-440f-9c5b-88fa685d2482&folderId=16415"
-
    if (dwId.category == VdriveCat && dwId.id == VdriveId){
 	   std::list<RFS_FIND_DATA> publicList;
-	   Utility::GetTopPublic(pArchive, publicList);
+       GetProto(pArchive)->GetTopPublic(pArchive, publicList);
 	   tmpList.merge(publicList, Utility::RfsComparation);
+
 	   std::list<RFS_FIND_DATA> personalList;
-	   Utility::GetTopPersonal(pArchive, personalList);
+       GetProto(pArchive)->GetTopPersonal(pArchive, personalList);
 	   tmpList.merge(personalList, Utility::RfsComparation);
+
 	   RFS_FIND_DATA recycleBin;
 	   Utility::ConstructRecycleFolder(pArchive, recycleBin);
 	   tmpList.push_back(recycleBin);
+
 	   RFS_FIND_DATA searchBin;
 	   Utility::ConstructSearchFolder(pArchive, searchBin);
 	   tmpList.push_back(searchBin);
@@ -184,11 +170,12 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
 
    }else if (dwId.category == PublicCat || dwId.category == PersonCat){
 	   std::list<RFS_FIND_DATA> childFolders;
-	   Utility::GetChildFolders(pArchive, dwId, childFolders);
+       GetProto(pArchive)->GetChildFolders(pArchive, dwId, childFolders);
 	   tmpList.merge(childFolders, Utility::RfsComparation);
+
 	   std::list<RFS_FIND_DATA> childFiles;
-	   Utility::GetChildFiles(pArchive, dwId, childFiles);
-	   tmpList.merge(childFiles, Utility::RfsComparation);
+       GetProto(pArchive)->GetChildFiles(pArchive, dwId, childFiles);
+ 	   tmpList.merge(childFiles, Utility::RfsComparation);
    }else{
 	   OUTPUTLOG("Invalid RemoteId{%d,%d}", dwId.category, dwId.id);
 	   return E_INVALIDARG;
@@ -226,11 +213,9 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrNewName, B
 
    OUTPUTLOG("%s(), RemoteId={%d,%d}, NewName=%s", __FUNCTION__, itemId.category, itemId.id, (const char *)CW2A(pwstrNewName));
 
-   { // Rename File/Folder on remote
-	   if (!Utility::RenameItem(pArchive, itemId, pwstrNewName, isFolder)){
-		   OUTPUTLOG("%s(), Failed to rename item on server.", __FUNCTION__);
-		   return E_FAIL;
-	   }
+   if (!GetProto(pArchive)->RenameItem(pArchive, itemId, pwstrNewName, isFolder)){
+	   OUTPUTLOG("%s(), Failed to rename item on server.", __FUNCTION__);
+	   return E_FAIL;
    }
    return S_OK;
 }
@@ -244,12 +229,11 @@ HRESULT DMDelete(TAR_ARCHIVE* pArchive, RemoteId itemId, BOOL isFolder)
 
    OUTPUTLOG("%s(), RemoteId={%d,%d}", __FUNCTION__, itemId.category, itemId.id);
 
-   {// Delete remote File/Folder
-	   if (!Utility::DeleteItem(pArchive, itemId, isFolder))
-	   {
-		   return E_FAIL;
-	   }
+   if (!GetProto(pArchive)->DeleteItem(pArchive, itemId, isFolder))
+   {
+	   return E_FAIL;
    }
+
    return S_OK;
 }
 
@@ -264,17 +248,17 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFi
 
    OUTPUTLOG("%s(), ParentId={%d,%d}, pwstrFilename=[%s]", __FUNCTION__, parentId.category, parentId.id, (const char *)CW2A(pwstrFilename));
 
-   {// Create Folder On remote
-	   if (wcsrchr(pwstrFilename, _T('\\'))){
-		   pwstrFilename = wcsrchr(pwstrFilename, _T('\\')) + 1;
-	   }
-	   RemoteId folderId = {PublicCat, 0};
-	   if (Utility::CreateFolder(pArchive, parentId, pwstrFilename, &folderId)){
-		   pWfd->dwId = folderId;
-		   OUTPUTLOG("%s(`%s\') return Id=[%d:%d]", __FUNCTION__, (const char *)CW2A(pwstrFilename), folderId.category, folderId.id);
-		   return S_OK;
-	   }
+   if (wcsrchr(pwstrFilename, _T('\\'))){
+	   pwstrFilename = wcsrchr(pwstrFilename, _T('\\')) + 1;
    }
+
+   RemoteId folderId = {PublicCat, 0};
+   if (GetProto(pArchive)->CreateFolder(pArchive, parentId, pwstrFilename, &folderId)){
+	   pWfd->dwId = folderId;
+	   OUTPUTLOG("%s(`%s\') return Id=[%d:%d]", __FUNCTION__, (const char *)CW2A(pwstrFilename), folderId.category, folderId.id);
+	   return S_OK;
+   }
+
    return E_FAIL;
 }
 
@@ -295,24 +279,22 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilen
    // HarryWu, 2014.2.15
    // TODO: Post file content to server
    // pbBuffer, dwFileSize
-   {
-		wchar_t szTempFile [MAX_PATH] = _T("");
-		GetTempPath(lengthof(szTempFile), szTempFile);
-		wcscat_s(szTempFile, lengthof(szTempFile), _T("\\"));
-		wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
-		
-		// Write content to temp file, 
-		// and then upload this temp file.
-		FILE * fout = _wfopen(szTempFile, _T("wb"));
-		fwrite(pbBuffer, 1, dwFileSize, fout);
-		fclose(fout);
+	wchar_t szTempFile [MAX_PATH] = _T("");
+	GetTempPath(lengthof(szTempFile), szTempFile);
+	wcscat_s(szTempFile, lengthof(szTempFile), _T("\\"));
+	wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
+	
+	// Write content to temp file, 
+	// and then upload this temp file.
+	FILE * fout = _wfopen(szTempFile, _T("wb"));
+	fwrite(pbBuffer, 1, dwFileSize, fout);
+	fclose(fout);
 
-		OUTPUTLOG("%s(), write [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), dwFileSize);
+	OUTPUTLOG("%s(), write [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), dwFileSize);
 
-		// Upload Temporary file to server.
-		if (!Utility::WriteFile(pArchive, parentId, szTempFile))
-            return S_FALSE;
-   }
+	// Upload Temporary file to server.
+	if (!GetProto(pArchive)->Upload(pArchive, parentId, szTempFile))
+        return S_FALSE;
 
    return S_OK;
 }
@@ -334,30 +316,29 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 	// HarryWu, 2014.2.15
 	// TODO: Read file contents from remote.
 	// ...
-	{
-		wchar_t szTempFile [MAX_PATH] = _T("");
-		GetTempPath(lengthof(szTempFile), szTempFile);
-		wcscat_s(szTempFile, lengthof(szTempFile), _T("\\"));
-		wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
+	wchar_t szTempFile [MAX_PATH] = _T("");
+	GetTempPath(lengthof(szTempFile), szTempFile);
+	wcscat_s(szTempFile, lengthof(szTempFile), _T("\\"));
+	wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
 
-		// Download remote file to local temp file,
-		// and then read content from this file.
-		Utility::ReadFile(pArchive, itemId, szTempFile);
+	// Download remote file to local temp file,
+	// and then read content from this file.
+	GetProto(pArchive)->Download(pArchive, itemId, szTempFile);
 
-		// Write content to temp file, 
-		// and then upload this temp file.
-		FILE * fin = _wfopen(szTempFile, _T("rb"));
-		if (fin != NULL){
-			fseek(fin, 0, SEEK_END);
-			*pdwFileSize = ftell(fin);
-		}
-		OUTPUTLOG("%s(), read [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), *pdwFileSize);
-		DMMalloc((LPBYTE*)ppbBuffer, *pdwFileSize);
-		if (*ppbBuffer && fin){
-			fread(*ppbBuffer, 1, *pdwFileSize, fin);
-		}
-		if (fin) fclose(fin);
+	// Write content to temp file, 
+	// and then upload this temp file.
+	FILE * fin = _wfopen(szTempFile, _T("rb"));
+	if (fin != NULL){
+		fseek(fin, 0, SEEK_END);
+		*pdwFileSize = ftell(fin);
 	}
+	OUTPUTLOG("%s(), read [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), *pdwFileSize);
+	DMMalloc((LPBYTE*)ppbBuffer, *pdwFileSize);
+	if (*ppbBuffer && fin){
+		fread(*ppbBuffer, 1, *pdwFileSize, fin);
+	}
+	if (fin) fclose(fin);
+
 	return S_OK;
 }
 
@@ -372,7 +353,7 @@ HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemI
 		, itemId.id
 		, removeSource ? "RemoveSource" : "KeepSource");
 
-    if (!Utility::BatchDownload(pArchive, itemId, pwstrLocalDir))
+    if (!GetProto(pArchive)->Download(pArchive, itemId, pwstrLocalDir))
         return S_FALSE;
 
 	return S_OK;
@@ -388,8 +369,8 @@ HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId
 		, viewId.category
 		, viewId.id
 		, removeSource ? "RemoveSource" : "KeepSource");
-	
-    if (!Utility::BatchUpload(pArchive, viewId, pwstrLocalPath))
+
+    if (!GetProto(pArchive)->Upload(pArchive, viewId, pwstrLocalPath))
         return S_FALSE;
 
 	return S_OK;
@@ -401,17 +382,17 @@ HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL is
 
     OUTPUTLOG("%s() [%s] [%d:%d]", __FUNCTION__, selected ? "Select" : "CancelSelect", itemId.category, itemId.id);
 
-    if (!Utility::Select(pArchive, itemId, selected, isFolder))
+    if (!GetProto(pArchive)->Select(pArchive, itemId, selected, isFolder))
         return S_FALSE;
 
     return S_OK;
 }
 
-HRESULT DMInitCustomColumns(TAR_ARCHIVE * pArchive, RemoteId viewId, LPWSTR pwstrColumnList, int maxcch)
+HRESULT DMGetCustomColumns(TAR_ARCHIVE * pArchive, RemoteId viewId, LPWSTR pwstrColumnList, int maxcch)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-    wcscpy_s(pwstrColumnList, maxcch, _T("column1;clumn2;column3;column4;column4;"));
-    OUTPUTLOG("%s() ViewId=[%d:%d], Column=`%s\'", __FUNCTION__, viewId.category, viewId.id, (const char *)CW2A(pwstrColumnList));
+    OUTPUTLOG("%s() ViewId=[%d:%d]", __FUNCTION__, viewId.category, viewId.id);
+
     return S_OK;
 }
 

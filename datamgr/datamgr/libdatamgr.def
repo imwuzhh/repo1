@@ -1,7 +1,9 @@
 EXPORTS
 	DMInit
 	DMCleanup
-
+	
+	DMHttpIsEnable
+	
 	DMOpen 
 	DMClose 
 	 

@@ -14,5 +14,5 @@ public:
      virtual BOOL Download(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile) = 0;
      virtual BOOL Upload(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile) = 0;
      virtual BOOL Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL selected, BOOL isFolder) = 0;
-     virtual BOOL GetColumnInfo(TAR_ARCHIVE * pArchive, wchar_t * pColumnInfo, int maxcch) = 0;
+     virtual BOOL GetColumnInfo(TAR_ARCHIVE * pArchive, const RemoteId & viewId, wchar_t * pColumnInfo, int maxcch) = 0;
 };

@@ -398,6 +398,9 @@ BOOL HttpImpl::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, c
 */
 BOOL HttpImpl::Upload(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile)
 {
+    std::wstring response;
+    if (!Utility::HttpPost(pArchive->context->AccessToken, parentId.id, tempFile, response))
+        return FALSE;
     return TRUE;
 }
 
@@ -416,7 +419,8 @@ BOOL HttpImpl::Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL sele
     return TRUE;
 }
 
-BOOL HttpImpl::GetColumnInfo(TAR_ARCHIVE * pArchive, wchar_t * pColumnInfo, int maxcch)
+BOOL HttpImpl::GetColumnInfo(TAR_ARCHIVE * pArchive, const RemoteId & viewId, wchar_t * pColumnInfo, int maxcch)
 {
+    wcscpy_s(pColumnInfo, maxcch, _T("Attr1;Attr2;Attr3;Attr4"));
     return TRUE;
 }

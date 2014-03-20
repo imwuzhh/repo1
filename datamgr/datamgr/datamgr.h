@@ -108,6 +108,8 @@ extern "C" {
 HRESULT DMInit();
 HRESULT DMCleanup();
 
+BOOL DMHttpIsEnable();
+
 HRESULT DMOpen(LPCWSTR pstrFilename, TAR_ARCHIVE** ppArchive);
 HRESULT DMClose(TAR_ARCHIVE* pArchive);
 

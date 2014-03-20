@@ -70,7 +70,7 @@ HRESULT DMInit(){
     if (context.enableHttp){
         context.proto = new HttpImpl();
     }else{
-        context.proto = (Proto *)new JsonImpl();
+        context.proto = new JsonImpl();
     }
 
 	// Setup locale.
@@ -106,6 +106,11 @@ HRESULT DMCleanup()
 		delete gspEdoc2Context; gspEdoc2Context = NULL;
 	}
 	return S_OK;
+}
+
+BOOL DMHttpIsEnable()
+{
+    return gspEdoc2Context && gspEdoc2Context->enableHttp;
 }
 
 /**
@@ -391,7 +396,11 @@ HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL is
 HRESULT DMGetCustomColumns(TAR_ARCHIVE * pArchive, RemoteId viewId, LPWSTR pwstrColumnList, int maxcch)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+    
     OUTPUTLOG("%s() ViewId=[%d:%d]", __FUNCTION__, viewId.category, viewId.id);
+
+    if (!GetProto(pArchive)->GetColumnInfo(pArchive, viewId, pwstrColumnList, maxcch))
+        return S_FALSE;
 
     return S_OK;
 }

@@ -205,6 +205,129 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 	return TRUE;
 }
 
+BOOL Utility::HttpPost(const wchar_t * accessToken, int parentId, const wchar_t * tempFile, std::wstring & response)
+{
+    CURL *curl;
+    CURLcode res;
+
+    struct MemoryStruct chunk;
+    chunk.memory = (char *)malloc(1);  /* will be grown as needed by the realloc above */ 
+    chunk.size = 0;    /* no data at this point */ 
+
+    struct curl_httppost *formpost=NULL;
+    struct curl_httppost *lastptr=NULL;
+    struct curl_slist *headerlist=NULL;
+    static const char buf[] = "Expect:";
+    char szTemp [100] = ""; 
+
+    curl_global_init(CURL_GLOBAL_ALL);
+
+    curl_formadd(&formpost,
+        &lastptr,
+        CURLFORM_COPYNAME, "StartUploadFile",
+        CURLFORM_COPYCONTENTS, (const char *)CW2A(accessToken),
+        CURLFORM_END);
+
+    sprintf_s(szTemp, "%X%x", rand(), rand());
+    curl_formadd(&formpost,
+        &lastptr,
+        CURLFORM_COPYNAME, "UploadId",
+        CURLFORM_COPYCONTENTS, szTemp,
+        CURLFORM_END);
+
+    sprintf_s(szTemp, lengthof(szTemp), "%d", parentId);
+    curl_formadd(&formpost,
+        &lastptr,
+        CURLFORM_COPYNAME, "ParentId",
+        CURLFORM_COPYCONTENTS, szTemp,
+        CURLFORM_END);
+
+    curl_formadd(&formpost,
+        &lastptr,
+        CURLFORM_COPYNAME, "Name",
+        CURLFORM_COPYCONTENTS, (const char *)CW2A(wcsrchr(tempFile, _T('\\')) + 1),
+        CURLFORM_END);
+
+    curl_formadd(&formpost,
+        &lastptr,
+        CURLFORM_COPYNAME, "Remark",
+        CURLFORM_COPYCONTENTS, "",
+        CURLFORM_END);
+
+    curl_formadd(&formpost,
+        &lastptr,
+        CURLFORM_COPYNAME, "FileCode",
+        CURLFORM_COPYCONTENTS, "0",
+        CURLFORM_END);
+
+    curl_formadd(&formpost,
+        &lastptr,
+        CURLFORM_COPYNAME, "DefaultSecurityLevel",
+        CURLFORM_COPYCONTENTS, "0",
+        CURLFORM_END);
+
+    curl_formadd(&formpost,
+        &lastptr,
+        CURLFORM_COPYNAME, "FileSize",
+        CURLFORM_COPYCONTENTS, "0",
+        CURLFORM_END);
+
+
+    curl = curl_easy_init();
+    /* initalize custom header list (stating that Expect: 100-continue is not wanted */
+    headerlist = curl_slist_append(headerlist, buf);
+    if(curl) {
+        /* what URL that receives this POST */
+        curl_easy_setopt(curl, CURLOPT_URL, "http://192.168.253.242/mobile/api/Transfer/UploadFile");
+
+        /* only disable 100-continue header if explicitly requested */
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
+
+        curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+
+        /* send all data to this function  */ 
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+
+        /* we pass our 'chunk' struct to the callback function */ 
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+        /* Perform the request, res will get the return code */
+        res = curl_easy_perform(curl);
+
+        /* Check for errors */
+        if(res != CURLE_OK){
+            OUTPUTLOG("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        }else{
+            /*
+            * Now, our chunk.memory points to a memory block that is chunk.size
+            * bytes big and contains the remote file.
+            *
+            * Do something nice with it!
+            */ 
+            OUTPUTLOG("%lu bytes retrieved\n", (long)chunk.size);
+            // HarryWu, 2014.2.21
+            // I guess that, you are using utf-8.
+            response = (wchar_t *)CA2WEX<128>(chunk.memory, CP_UTF8);
+        }
+        /* always cleanup */
+        curl_easy_cleanup(curl);
+
+        /* then cleanup the formpost chain */
+        curl_formfree(formpost);
+
+        /* free slist */
+        curl_slist_free_all (headerlist);
+    }
+
+    if(chunk.memory){
+        free(chunk.memory);
+    }
+
+    curl_global_cleanup();
+
+    return TRUE;
+}
+
 BOOL Utility::JsonRequest(const wchar_t * reqJson, std::wstring & response)
 {
 	OUTPUTLOG("%s(), JsonRequest: %s", __FUNCTION__, (const char *)CW2A(reqJson));

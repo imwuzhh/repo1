@@ -50,11 +50,12 @@ STDMETHODIMP CTransferSource::SetProperties(IPropertyChangeArray* pPropArray)
 
 STDMETHODIMP CTransferSource::OpenItem(IShellItem* psiSource, DWORD dwFlags, REFIID riid, LPVOID* ppv)
 {
+    ATLTRACE(L"CTransferSource::OpenItem  riid=%s flags=0x%X\n", DbgGetIID(riid), dwFlags);
+
     // HarryWu, 2014.3.18
     // TODO: pretend to cancel it.
-    return COPYENGINE_S_USER_IGNORED;
+    if (!DMHttpIsEnable()) return COPYENGINE_S_USER_IGNORED;
 
-    ATLTRACE(L"CTransferSource::OpenItem  riid=%s flags=0x%X\n", DbgGetIID(riid), dwFlags);
     CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
     if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
     CComObject<CShellItemResources>* pItemResources = NULL;
@@ -67,8 +68,10 @@ STDMETHODIMP CTransferSource::OpenItem(IShellItem* psiSource, DWORD dwFlags, REF
 
 STDMETHODIMP CTransferSource::MoveItem(IShellItem* psiSource, IShellItem* psiParentDst, LPCWSTR pszNameDst, DWORD dwFlags, IShellItem** ppsiNew)
 {
-   OUTPUTLOG("CTransferSource::MoveItem  flags=0x%X\n", dwFlags);
-   return S_OK;
+    OUTPUTLOG("CTransferSource::MoveItem  flags=0x%X\n", dwFlags);
+
+    if (!DMHttpIsEnable()) return S_OK;
+
    // Tell caller that he should convert this to a "copy and delete" operation instead...
    CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
    if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
@@ -147,33 +150,37 @@ STDMETHODIMP CTransferSource::ApplyPropertiesToItem(IShellItem* psiSource, IShel
 
 STDMETHODIMP CTransferSource::GetDefaultDestinationName(IShellItem* psiSource, IShellItem* psiParentDest, LPWSTR* ppszDestinationName)
 {
+    ATLTRACE(L"CTransferSource::GetDefaultDestinationName\n");
+
 	// HarryWu, 2014.3.17
 	// Here is a chance to post download task by d-n-d.
-	if (psiParentDest){
-		LPTSTR pszName = NULL;
-		psiParentDest->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
-		if (pszName){
-			CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
-			if( spItem == NULL ) {
-				CoTaskMemFree(pszName);
-				return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
-			}
-			VFS_FIND_DATA vfd = spItem->GetFindData();
+    if (!DMHttpIsEnable()){
+        if (!psiParentDest) return E_INVALIDARG;
 
-            OUTPUTLOG("%s(), copying [%d:%d] to TargetParent=`%s\'"
-                , __FUNCTION__
-                , vfd.dwId.category, vfd.dwId.id
-                , (const char *)CW2A(pszName));
+        LPTSTR pszName = NULL;
+        psiParentDest->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
+        if (!pszName) return E_FAIL;
 
-            CComPtr<IShellItemArray> spItems;
-            HR (::SHCreateShellItemArrayFromShellItem(psiSource, IID_PPV_ARGS(&spItems)));
-            VFS_MENUCOMMAND Cmd = { NULL, ID_FILE_EXTRACT, VFS_MNUCMD_NOVERB, DROPEFFECT_COPY, (IDataObject *)NULL, (IShellItemArray *)spItems, NULL, NULL, wcsdup(pszName) };
-            HR (m_spFolder->ExecuteMenuCommand(Cmd));
+        CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
+        if( spItem == NULL ) {
+            CoTaskMemFree(pszName);
+            return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
+        }
+        VFS_FIND_DATA vfd = spItem->GetFindData();
 
-			CoTaskMemFree(pszName);
-		}
-	}
-   ATLTRACE(L"CTransferSource::GetDefaultDestinationName\n");
+        OUTPUTLOG("%s(), copying [%d:%d] to TargetParent=`%s\'"
+            , __FUNCTION__
+            , vfd.dwId.category, vfd.dwId.id
+            , (const char *)CW2A(pszName));
+
+        CComPtr<IShellItemArray> spItems;
+        HR (::SHCreateShellItemArrayFromShellItem(psiSource, IID_PPV_ARGS(&spItems)));
+        VFS_MENUCOMMAND Cmd = { NULL, ID_FILE_EXTRACT, VFS_MNUCMD_NOVERB, DROPEFFECT_COPY, (IDataObject *)NULL, (IShellItemArray *)spItems, NULL, NULL, wcsdup(pszName) };
+        HR (m_spFolder->ExecuteMenuCommand(Cmd));
+
+        CoTaskMemFree(pszName);
+    }
+
    // We need to return the name we eventually wish our file should have.
    // We'll start trying out if a filename is available, and if not, fall back to 
    // the regular item and parsing name.

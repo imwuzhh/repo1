@@ -18,5 +18,5 @@ public:
      BOOL Download(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile);
      BOOL Upload(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile);
      BOOL Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL selected, BOOL isFolder);
-     BOOL GetColumnInfo(TAR_ARCHIVE * pArchive, wchar_t * pColumnInfo, int maxcch);
+     BOOL GetColumnInfo(TAR_ARCHIVE * pArchive, const RemoteId & viewId, wchar_t * pColumnInfo, int maxcch);
 };

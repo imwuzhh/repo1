@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="HttpImpl" Collapsed="true">
+    <Position X="1" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAgCAAQAAAAgAAgAAQAAACAEQQADAAAA=</HashCode>
+      <FileName>HttpImpl.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="JsonImpl" Collapsed="true">
+    <Position X="3.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAgCAAQAAAAhAAAAAQAAAAAEQQADAAQA=</HashCode>
+      <FileName>JsonImpl.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Proto" Collapsed="true">
+    <Position X="2.25" Y="1.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAgCAAQAAAAgAAAAAQAAAAAEQQADAAAA=</HashCode>
+      <FileName>Proto.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="微软雅黑" Size="9" />
+</ClassDiagram>

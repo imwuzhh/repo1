@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CTarFileItem" Collapsed="true">
+    <Position X="2.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAACAIIAACAAgAgAIAICAAAAEIAAAIAAABAAJAggA=</HashCode>
+      <FileName>TarFileSystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CTarFileStream" Collapsed="true">
+    <Position X="4.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABEACAAAAAFAUCAAAAACgAAAQACxAAAQCAAGEAAA=</HashCode>
+      <FileName>TarFileSystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CContextMenu" Collapsed="true">
+    <Position X="7" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIFAAAAAQAAAAAAAAAAQAAABAEAAAAAAQSAAEA=</HashCode>
+      <FileName>d:\workspace\github\repo1\vdrivense\ShFrwk\ContextMenu.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CDropTarget" Collapsed="true">
+    <Position X="7" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEEgIQAAAAQCwAAAAAkAAAIRAAhgAAAEAADAQQAAkA=</HashCode>
+      <FileName>d:\workspace\github\repo1\vdrivense\ShFrwk\DropTarget.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CNseItem" Collapsed="true">
+    <Position X="2.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>MECBAGAAIABAAQgAgAIAMyCAhAFMVAEQAQYAAAJBiAA=</HashCode>
+      <FileName>d:\workspace\github\repo1\vdrivense\ShFrwk\NseFileSystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CNseFileStream" Collapsed="true">
+    <Position X="4.75" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAAAAAAAEAACAAAAAAgAAAAAAgAgAQCAAGAAAA=</HashCode>
+      <FileName>d:\workspace\github\repo1\vdrivense\ShFrwk\NseFileSystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CNseBaseItem" Collapsed="true">
+    <Position X="2.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>cECAgDCBIEBAAwiAkAIAMyCAhAFEVAACAQYABIJBmAA=</HashCode>
+      <FileName>d:\workspace\github\repo1\vdrivense\ShFrwk\NseFileSystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CNseFileItem" Collapsed="true">
+    <Position X="2.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>MAABCAAAAAAAAUAIEAAAAAAAhAEIQAEQAAAAAAAJAAA=</HashCode>
+      <FileName>d:\workspace\github\repo1\vdrivense\ShFrwk\NseFileSystem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="IShellFolderViewCBImpl&lt;T&gt;" Collapsed="true">
+    <Position X="0.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>d:\workspace\github\repo1\vdrivense\ShFrwk\ShellExt.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CShellFolder" Collapsed="true">
+    <Position X="0.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>kyAgkGAhMQECgcBREJgAVACkwKCaEEBGcgarEQga4uI=</HashCode>
+      <FileName>d:\workspace\github\repo1\vdrivense\ShFrwk\ShellFolder.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CTransferSource" Collapsed="true">
+    <Position X="7" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AABAgIACAAQABAGAECAEAABQAACAgAAEAICCACSAAAA=</HashCode>
+      <FileName>d:\workspace\github\repo1\vdrivense\ShFrwk\TransferItem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="微软雅黑" Size="9" />
+</ClassDiagram>

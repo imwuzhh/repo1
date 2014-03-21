@@ -559,6 +559,10 @@
 				</File>
 			</Filter>
 		</Filter>
+		<File
+			RelativePath=".\libdatamgr.cd"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

@@ -629,6 +629,10 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\VDriveNSE.cd"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

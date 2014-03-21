@@ -106,20 +106,6 @@ extern "C" {
 #endif
 
 /**
-* Initialize workground, allocate resources.
-* Parameters:
-* None
-*/
-HRESULT DMInit();
-
-/**
-* Cleanup resources
-* Parameters:
-* None
-*/
-HRESULT DMCleanup();
-
-/**
 * Check that Use Http directly or Json proxy to communicate with remote.
 * Parameters:
 * None

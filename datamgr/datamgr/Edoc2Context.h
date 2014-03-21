@@ -6,6 +6,7 @@ class Proto;
 struct Edoc2Context {
     DWORD   dwUserId;
     BOOL    enableHttp;
+    HINSTANCE hInst;
     Proto*  proto;
     wchar_t localeName    [32];
     wchar_t service       [128];

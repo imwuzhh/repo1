@@ -127,11 +127,6 @@ BOOL CTarShellModule::DllMain(DWORD dwReason, LPVOID lpReserved)
 {
 	if (dwReason == DLL_PROCESS_ATTACH){
 		LoadLangResource();
-		DMInit();
-	}
-	if (dwReason == DLL_PROCESS_DETACH)
-	{
-		DMCleanup();
 	}
     return TRUE;
 }

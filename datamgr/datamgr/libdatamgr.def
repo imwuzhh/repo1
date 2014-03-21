@@ -1,7 +1,4 @@
 EXPORTS
-	DMInit
-	DMCleanup
-	
 	DMHttpIsEnable
 	
 	DMOpen 

@@ -38,7 +38,7 @@ BOOL Utility::ConstructRecycleFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & rec
     memset(&recycleFolder, 0, sizeof(recycleFolder));
     recycleFolder.dwId.category = RecycleCat;
     recycleFolder.dwId.id = 0;
-    LoadLocalizedName(pArchive->context->localeName, _T("RecycleBin"), recycleFolder.cFileName, lengthof(recycleFolder.cFileName));
+    LoadLocalizedName(pArchive, pArchive->context->localeName, _T("RecycleBin"), recycleFolder.cFileName, lengthof(recycleFolder.cFileName));
     recycleFolder.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
     SYSTEMTIME stime; GetSystemTime(&stime);
     FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
@@ -51,7 +51,7 @@ BOOL Utility::ConstructSearchFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & sear
     memset(&searchFolder, 0, sizeof(searchFolder));
     searchFolder.dwId.category = SearchCat;
     searchFolder.dwId.id = 0;
-    LoadLocalizedName(pArchive->context->localeName, _T("SearchBin"), searchFolder.cFileName, lengthof(searchFolder.cFileName));
+    LoadLocalizedName(pArchive, pArchive->context->localeName, _T("SearchBin"), searchFolder.cFileName, lengthof(searchFolder.cFileName));
     searchFolder.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
     SYSTEMTIME stime; GetSystemTime(&stime);
     FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
@@ -334,11 +334,14 @@ BOOL Utility::JsonRequest(const wchar_t * reqJson, std::wstring & response)
 	return FALSE;
 }
 
-BOOL Utility::LoadLocalizedName(const wchar_t * localeName, const wchar_t * key, wchar_t * retVaule, int cchMax)
+BOOL Utility::LoadLocalizedName(TAR_ARCHIVE * pArchive, const wchar_t * localeName, const wchar_t * key, wchar_t * retVaule, int cchMax)
 {
 	if (key && retVaule) wcscpy_s(retVaule, cchMax, key);
 	TiXmlDocument * xdoc = new TiXmlDocument();
 	if (!xdoc) return FALSE;
+//     char configpath [MAX_PATH] = "";
+//     GetModuleFileNameA(pArchive->context->hInst, configpath, lengthof(configpath) - 1);
+//     xdoc->LoadFile(configpath);
 	delete xdoc;
 	return TRUE;
 }

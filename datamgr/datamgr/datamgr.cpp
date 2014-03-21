@@ -55,7 +55,7 @@ static __inline Proto * GetProto(TAR_ARCHIVE * pArchive){ return (pArchive->cont
 * Initialize from configuration file.
 * e.g: libdatamgr.ini, libdatamgr.xml
 */
-HRESULT DMInit(){
+static HRESULT DMInit(HINSTANCE hInst){
 	HRESULT hr = E_FAIL;
 	if (gspEdoc2Context) return S_OK;
 
@@ -75,6 +75,9 @@ HRESULT DMInit(){
     }else{
         context.proto = new JsonImpl();
     }
+
+    // Setup Instance handle
+    context.hInst = hInst;
 
 	// Setup locale.
 	GetUserDefaultLocaleName(context.localeName, lengthof(context.localeName));
@@ -102,7 +105,7 @@ bail:
 	return hr;
 }
 
-HRESULT DMCleanup()
+static HRESULT DMCleanup()
 {
 	if (gspEdoc2Context){
         delete gspEdoc2Context->proto; gspEdoc2Context->proto = NULL;
@@ -111,6 +114,21 @@ HRESULT DMCleanup()
 	return S_OK;
 }
 
+BOOL WINAPI DllMain(_In_  HINSTANCE hinstDLL,
+                    _In_  DWORD fdwReason,
+                    _In_  LPVOID lpvReserved
+                    )
+{
+    if (DLL_PROCESS_ATTACH){
+        DMInit(hinstDLL);
+    }
+    if (DLL_PROCESS_DETACH){
+        DMCleanup();
+    }
+    return TRUE;
+}
+
+//////////////////////////////////////////////////////////////////////////
 BOOL DMHttpIsEnable()
 {
     return gspEdoc2Context && gspEdoc2Context->enableHttp;

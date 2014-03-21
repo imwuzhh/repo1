@@ -65,7 +65,10 @@ HRESULT DMInit(){
 	struct Edoc2Context & context = *gspEdoc2Context;
 
     // Setup Proxy Type
-    context.enableHttp = TRUE;
+    // TODO: Load this configuration from file.
+    // Default to False, means that, use Json proxy to access server.
+    // otherwise, use the internal http impl.
+    context.enableHttp = !TRUE;
 
     if (context.enableHttp){
         context.proto = new HttpImpl();

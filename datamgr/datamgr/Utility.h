@@ -13,10 +13,12 @@ public:
     static BOOL ConstructRecycleFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & recycleFolder);
     static BOOL ConstructSearchFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & searchFolder);
 	static bool RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right);
-	static BOOL HttpRequest(const wchar_t * requestUrl, std::wstring & response);
+	static BOOL HttpRequest(const wchar_t * requestUrl, std::wstring & response, unsigned int timeoutMs);
     static BOOL HttpPost(const wchar_t * accessToken,int parentId, const wchar_t * tempFile, std::wstring & response);
 	static BOOL JsonRequest(const wchar_t * reqJson, std::wstring & response);
-	static BOOL LoadLocalizedName(TAR_ARCHIVE * pArchive, const wchar_t * localeName, const wchar_t * key, wchar_t * retVaule, int cchMax);
+	static BOOL LoadLocalizedName(const wchar_t * xmlconfigfile, const wchar_t * localeName, const wchar_t * key, wchar_t * retVaule, int cchMax);
+    static BOOL CheckHttpEnable(const wchar_t * xmlconfigfile);
+    static DWORD GetHttpTimeoutMs(const WCHAR * xmlconfigfile);
 	static unsigned char ToHex(unsigned char x);
 	static unsigned char FromHex(unsigned char x);
 	static std::string UrlEncode(const std::string& str);

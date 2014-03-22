@@ -38,7 +38,7 @@ BOOL Utility::ConstructRecycleFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & rec
     memset(&recycleFolder, 0, sizeof(recycleFolder));
     recycleFolder.dwId.category = RecycleCat;
     recycleFolder.dwId.id = 0;
-    LoadLocalizedName(pArchive, pArchive->context->localeName, _T("RecycleBin"), recycleFolder.cFileName, lengthof(recycleFolder.cFileName));
+    LoadLocalizedName(pArchive->context->configfile, pArchive->context->localeName, _T("RecycleBin"), recycleFolder.cFileName, lengthof(recycleFolder.cFileName));
     recycleFolder.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
     SYSTEMTIME stime; GetSystemTime(&stime);
     FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
@@ -51,7 +51,7 @@ BOOL Utility::ConstructSearchFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & sear
     memset(&searchFolder, 0, sizeof(searchFolder));
     searchFolder.dwId.category = SearchCat;
     searchFolder.dwId.id = 0;
-    LoadLocalizedName(pArchive, pArchive->context->localeName, _T("SearchBin"), searchFolder.cFileName, lengthof(searchFolder.cFileName));
+    LoadLocalizedName(pArchive->context->configfile, pArchive->context->localeName, _T("SearchBin"), searchFolder.cFileName, lengthof(searchFolder.cFileName));
     searchFolder.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
     SYSTEMTIME stime; GetSystemTime(&stime);
     FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
@@ -104,7 +104,7 @@ int XferProgress(void *clientp,
 	return 0; // non-zero will abort xfer.
 }
 
-BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
+BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response, unsigned int timeoutMs)
 {
 	CURL *curl;
 	CURLcode res;
@@ -156,11 +156,8 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response)
 		// HarryWu, 2014.2.20
 		// Setup timeout for connection & read/write, not for dns
 		// Async Dns with timeout require c-ares utility.
-		/*
-		curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, 10000L);
-		*/
-		/*		*/
-		curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, 500L);
+		curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutMs);
+		curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, timeoutMs);
 
 
 		// HarryWu, 2014.2.20
@@ -334,16 +331,117 @@ BOOL Utility::JsonRequest(const wchar_t * reqJson, std::wstring & response)
 	return FALSE;
 }
 
-BOOL Utility::LoadLocalizedName(TAR_ARCHIVE * pArchive, const wchar_t * localeName, const wchar_t * key, wchar_t * retVaule, int cchMax)
+BOOL Utility::LoadLocalizedName(const wchar_t * xmlconfigfile, const wchar_t * localeName, const wchar_t * key, wchar_t * retVaule, int cchMax)
 {
 	if (key && retVaule) wcscpy_s(retVaule, cchMax, key);
 	TiXmlDocument * xdoc = new TiXmlDocument();
 	if (!xdoc) return FALSE;
-//     char configpath [MAX_PATH] = "";
-//     GetModuleFileNameA(pArchive->context->hInst, configpath, lengthof(configpath) - 1);
-//     xdoc->LoadFile(configpath);
-	delete xdoc;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("Locale");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild((const char *)CW2AEX<>(key, CP_UTF8));
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * value = target->FirstChild((const char *)CW2AEX<>(localeName, CP_UTF8));
+    if (!value){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    wcscpy_s(retVaule, cchMax, (const wchar_t *)CA2WEX<>(value->ToElement()->GetText(), CP_UTF8));
+    
+    delete xdoc; xdoc = NULL;
 	return TRUE;
+}
+
+BOOL Utility::CheckHttpEnable(const wchar_t * xmlconfigfile)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("Net");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild("HttpEnable");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    BOOL enablehttp = !strnicmp(target->ToElement()->GetText(), "Yes", 3);
+
+    delete xdoc; xdoc = NULL;
+
+    return enablehttp;
+}
+
+DWORD Utility::GetHttpTimeoutMs(const wchar_t * xmlconfigfile)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("Net");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild("HttpConnectioTimeoutMilliSeconds");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    DWORD httpTimeoutMs = 2000;
+    if (target->ToElement() && target->ToElement()->GetText())
+        httpTimeoutMs = atoi(target->ToElement()->GetText());
+
+    delete xdoc; xdoc = NULL;
+
+    return httpTimeoutMs;
 }
 
 unsigned char Utility::ToHex(unsigned char x) 

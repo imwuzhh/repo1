@@ -6,8 +6,11 @@ class Proto;
 struct Edoc2Context {
     DWORD   dwUserId;
     BOOL    enableHttp;
+    DWORD   HttpTimeoutMs;
     HINSTANCE hInst;
     Proto*  proto;
+    wchar_t modulepath    [1024];
+    wchar_t configfile    [1024];
     wchar_t localeName    [32];
     wchar_t service       [128];
     wchar_t username      [32];

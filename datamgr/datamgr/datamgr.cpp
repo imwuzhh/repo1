@@ -64,23 +64,34 @@ static HRESULT DMInit(HINSTANCE hInst){
 
 	struct Edoc2Context & context = *gspEdoc2Context;
 
+    // Setup Instance handle
+    context.hInst = hInst;
+
+    // Setup module path
+    GetModuleFileName(hInst, context.modulepath, lengthof(context.modulepath));
+    wcsrchr(context.modulepath, _T('\\'))[1] = _T('\0');
+
+    // Setup configuration path
+    wcscpy_s(context.configfile, lengthof(context.configfile), context.modulepath);
+    wcscat_s(context.configfile, lengthof(context.configfile), _T("libdatamgr.xml"));
+
+    // Setup locale.
+	GetUserDefaultLocaleName(context.localeName, lengthof(context.localeName));
+
     // Setup Proxy Type
     // TODO: Load this configuration from file.
     // Default to False, means that, use Json proxy to access server.
     // otherwise, use the internal http impl.
-    context.enableHttp = !TRUE;
+    context.enableHttp = Utility::CheckHttpEnable(context.configfile);
+
+    // Setup Http Timeout in milliseconds.
+    context.HttpTimeoutMs = Utility::GetHttpTimeoutMs(context.configfile);
 
     if (context.enableHttp){
         context.proto = new HttpImpl();
     }else{
         context.proto = new JsonImpl();
     }
-
-    // Setup Instance handle
-    context.hInst = hInst;
-
-	// Setup locale.
-	GetUserDefaultLocaleName(context.localeName, lengthof(context.localeName));
 
 	// Setup local cache directory
 	if (GetTempPathW(lengthof(context.cachedir), context.cachedir) <= 0){

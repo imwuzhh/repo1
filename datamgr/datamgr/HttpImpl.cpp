@@ -5,6 +5,8 @@
 #include <string>
 #include <list>
 #include <iostream>
+#include <sstream>
+#include <fstream>
 #include <sys/stat.h>
 #include <tinystr.h>
 #include <tinyxml.h>
@@ -398,9 +400,45 @@ BOOL HttpImpl::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, c
 */
 BOOL HttpImpl::Upload(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile)
 {
-    std::wstring response;
-    if (!Utility::HttpPost(pArchive->context->AccessToken, parentId.id, tempFile, response))
+    // Prepare upload id, used for query progress.
+    wchar_t uploadidstring [100] = _T("");
+    _stprintf_s(uploadidstring, lengthof(uploadidstring), _T("EDoc2_SWFUpload_%0u_0"), (int)time(NULL));
+
+    // Prepare url.
+    wchar_t url [MaxUrlLength] = _T("");
+    _stprintf_s(url, lengthof(url)
+        , _T("%s/edoc2v4/Document/File_Upload.aspx?tkn=%s&upload=%s")
+        , pArchive->context->service
+        , pArchive->context->AccessToken
+        , uploadidstring);
+
+    std::stringstream response;
+    if (!Utility::HttpPostFile(url, parentId.id, tempFile, response, pArchive->context->HttpTimeoutMs))
         return FALSE;
+
+    return TRUE;
+
+    std::wstring uploadid = (const wchar_t *)CA2WEX<>(response.str().c_str(), CP_UTF8);
+    _stprintf_s(url, lengthof(url)
+        , _T("%s/edoc2v4/UploadProgress.ashx?upload=%s")
+        , pArchive->context->service
+        , uploadidstring);
+
+    std::wstring strresponse;
+    if (!Utility::HttpRequest(url, strresponse, pArchive->context->HttpTimeoutMs))
+        return FALSE;
+
+    // Sample Response string.
+    //{"uploadId":"EDoc2_SWFUpload_1395551254_0","filename":"webapixxx.doc","percent":100,"speed":0,"remaining":-1,"status":"End","message":null,"stack":null,"tag":"103|50|webapixxxx.doc|2601"}
+    Json::Value root;
+    Json::Reader reader; 
+    if (reader.parse((const char *)CW2A(strresponse.c_str()), root, false)){
+        Json::Value tag = root.get("tag", "");
+        if (tag.empty()) return FALSE;
+        std::string tagstr = tag.asString();
+        int fileId = atoi(strchr(tagstr.c_str(), '|') + 1);
+    }
+
     return TRUE;
 }
 
@@ -411,6 +449,32 @@ BOOL HttpImpl::Upload(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const w
 */
 BOOL HttpImpl::Download(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile)
 {
+    // 
+    // Prepare url.
+    wchar_t url [MaxUrlLength] = _T("");
+    _stprintf_s(url, lengthof(url)
+        , _T("%s/edoc2v4/Document/File_Download.aspx?file_id=%d&checkout=false&regionID=1")
+        , pArchive->context->service
+        , itemId.id);
+
+    // Prepare cookie.
+    std::wstring cookie = _T("");
+    cookie += _T("account=");  cookie += pArchive->context->username;    cookie += _T(";");
+    cookie += _T("tkn=");      cookie += pArchive->context->AccessToken; cookie += _T(";");
+    cookie += _T("token=");    cookie += pArchive->context->AccessToken; cookie += _T(";");
+    
+    std::stringstream response;
+    if (!Utility::HttpRequestWithCookie(url, cookie, response, pArchive->context->HttpTimeoutMs)){
+        return FALSE;
+    }
+
+    std::ofstream ofs; ofs.open((const char *)CW2A(tempFile), std::ofstream::binary | std::ofstream::trunc);
+    if (ofs.is_open())
+    {
+        ofs<<response.rdbuf();
+        ofs.close();
+    }
+
     return TRUE;
 }
 

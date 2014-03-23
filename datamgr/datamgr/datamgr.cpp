@@ -104,10 +104,12 @@ static HRESULT DMInit(HINSTANCE hInst){
 	}
 
 	// Setup Service address
-	wcscpy_s(context.service, lengthof(context.service), _T("http://192.168.253.242"));
+    Utility::GetServiceBase(context.configfile, context.service, lengthof(context.service));
+
 	// Setup Username & passworld
-	wcscpy_s(context.username, lengthof(context.username), _T("admin"));
-	wcscpy_s(context.password, lengthof(context.password), _T("edoc2"));
+	Utility::GetServiceUser(context.configfile, context.username, lengthof(context.username));
+	Utility::GetServicePass(context.configfile, context.password, lengthof(context.password));
+
 	// Cleanup AccessToken
 	context.AccessToken [0] = _T('\0');
 
@@ -307,33 +309,37 @@ HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFi
  */
 HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilename, const LPBYTE pbBuffer, DWORD dwFileSize, DWORD dwAttributes)
 {
-   CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-   
-   if (NULL == pwstrFilename || !pbBuffer || !dwFileSize) return E_INVALIDARG;
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-   OUTPUTLOG("%s(),ParentID={%d,%d}, pwstrFilename=[%s], dwFileSize=[%d]", __FUNCTION__, parentId.category, parentId.id, (const char *)CW2A(pwstrFilename), dwFileSize);
+    if (NULL == pwstrFilename || !pbBuffer || !dwFileSize) return E_INVALIDARG;
 
-   // HarryWu, 2014.2.15
-   // TODO: Post file content to server
-   // pbBuffer, dwFileSize
-	wchar_t szTempFile [MAX_PATH] = _T("");
-	GetTempPath(lengthof(szTempFile), szTempFile);
-	wcscat_s(szTempFile, lengthof(szTempFile), _T("\\"));
-	wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
-	
-	// Write content to temp file, 
-	// and then upload this temp file.
-	FILE * fout = _wfopen(szTempFile, _T("wb"));
-	fwrite(pbBuffer, 1, dwFileSize, fout);
-	fclose(fout);
+    OUTPUTLOG("%s(),ParentID={%d,%d}, pwstrFilename=[%s], dwFileSize=[%d]", __FUNCTION__, parentId.category, parentId.id, (const char *)CW2A(pwstrFilename), dwFileSize);
 
-	OUTPUTLOG("%s(), write [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), dwFileSize);
+    // HarryWu, 2014.2.15
+    // TODO: Post file content to server
+    // pbBuffer, dwFileSize
+    wchar_t szTempFile [MAX_PATH] = _T("");
+    GetTempPath(lengthof(szTempFile), szTempFile);
+    wcscat_s(szTempFile, lengthof(szTempFile), _T("\\"));
+    wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
 
-	// Upload Temporary file to server.
-	if (!GetProto(pArchive)->Upload(pArchive, parentId, szTempFile))
+    // Write content to temp file, 
+    // and then upload this temp file.
+    OUTPUTLOG("%s(), [Stream]: Generate temporary file to `%s\'", __FUNCTION__, (const char *)CW2A(szTempFile));
+
+    FILE * fout = _wfopen(szTempFile, _T("wb"));
+    fwrite(pbBuffer, 1, dwFileSize, fout);
+    fclose(fout);
+
+    OUTPUTLOG("%s(), write [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), dwFileSize);
+
+    // Upload Temporary file to server.
+    if (!GetProto(pArchive)->Upload(pArchive, parentId, szTempFile))
         return S_FALSE;
 
-   return S_OK;
+    DeleteFile(szTempFile);
+
+    return S_OK;
 }
 
 /**
@@ -358,9 +364,15 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 	wcscat_s(szTempFile, lengthof(szTempFile), _T("\\"));
 	wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
 
+    if (PathFileExists(szTempFile) && !PathIsDirectory(szTempFile))
+    {
+        DeleteFile(szTempFile);
+    }
+
 	// Download remote file to local temp file,
 	// and then read content from this file.
 	GetProto(pArchive)->Download(pArchive, itemId, szTempFile);
+    OUTPUTLOG("%s(), [Stream]: Generate temporary file to `%s\'", __FUNCTION__, (const char *)CW2A(szTempFile));
 
 	// Write content to temp file, 
 	// and then upload this temp file.
@@ -368,6 +380,7 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 	if (fin != NULL){
 		fseek(fin, 0, SEEK_END);
 		*pdwFileSize = ftell(fin);
+        fseek(fin, 0, SEEK_SET);
 	}
 	OUTPUTLOG("%s(), read [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), *pdwFileSize);
 	DMMalloc((LPBYTE*)ppbBuffer, *pdwFileSize);

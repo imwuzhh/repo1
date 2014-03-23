@@ -5,6 +5,7 @@
 #include <string>
 #include <list>
 #include <iostream>
+#include <sstream>
 #include <sys/stat.h>
 #include <tinystr.h>
 #include <tinyxml.h>
@@ -106,6 +107,15 @@ int XferProgress(void *clientp,
 
 BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response, unsigned int timeoutMs)
 {
+    std::stringstream bytestream;
+    if (!HttpRequestWithCookie(requestUrl, _T(""), bytestream, timeoutMs))
+        return FALSE;
+    response = (const wchar_t *)CA2WEX<>(bytestream.str().c_str(), CP_UTF8);
+    return TRUE;
+}
+
+BOOL Utility::HttpRequestWithCookie(const wchar_t * requestUrl, const std::wstring & cookie, std::stringstream & response, unsigned int timeoutMs)
+{
 	CURL *curl;
 	CURLcode res;
 
@@ -166,6 +176,11 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response, u
 		curl_easy_setopt(curl, CURLOPT_XFERINFOFUNCTION, XferProgress);
 		curl_easy_setopt(curl, CURLOPT_XFERINFODATA, 0L);
 
+        // Setup cookie, if present
+        if (!cookie.empty()){
+            curl_easy_setopt(curl, CURLOPT_COOKIE, (const char *)CW2AEX<>(cookie.c_str(), CP_UTF8));
+        }
+
 		/* Perform the request, res will get the return code */
 		dwBeginTicks = GetTickCount();
 		res = curl_easy_perform(curl);
@@ -186,7 +201,7 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response, u
 			OUTPUTLOG("%lu bytes retrieved\n", (long)chunk.size);
 			// HarryWu, 2014.2.21
 			// I guess that, you are using utf-8.
-			response = (wchar_t *)CA2WEX<128>(chunk.memory, CP_UTF8);
+            if (chunk.size) response.write(chunk.memory, chunk.size);
 		}
 
 		/* always cleanup */
@@ -202,7 +217,7 @@ BOOL Utility::HttpRequest(const wchar_t * requestUrl, std::wstring & response, u
 	return TRUE;
 }
 
-BOOL Utility::HttpPost(const wchar_t * accessToken, int parentId, const wchar_t * tempFile, std::wstring & response)
+BOOL Utility::HttpPostFile(const wchar_t * url, int parentId, const wchar_t * tempFile, std::stringstream & response, int timeoutMs)
 {
     CURL *curl;
     CURLcode res;
@@ -219,63 +234,51 @@ BOOL Utility::HttpPost(const wchar_t * accessToken, int parentId, const wchar_t 
 
     curl_global_init(CURL_GLOBAL_ALL);
 
+    std::string fileName = (const char *)CW2AEX<>(wcsrchr(tempFile, _T('\\')) + 1, CP_UTF8);
     curl_formadd(&formpost,
         &lastptr,
-        CURLFORM_COPYNAME, "StartUploadFile",
-        CURLFORM_COPYCONTENTS, (const char *)CW2A(accessToken),
-        CURLFORM_END);
-
-    sprintf_s(szTemp, "%X%x", rand(), rand());
-    curl_formadd(&formpost,
-        &lastptr,
-        CURLFORM_COPYNAME, "UploadId",
-        CURLFORM_COPYCONTENTS, szTemp,
-        CURLFORM_END);
-
-    sprintf_s(szTemp, lengthof(szTemp), "%d", parentId);
-    curl_formadd(&formpost,
-        &lastptr,
-        CURLFORM_COPYNAME, "ParentId",
-        CURLFORM_COPYCONTENTS, szTemp,
+        CURLFORM_COPYNAME, "Filename",
+        CURLFORM_COPYCONTENTS,fileName.c_str() ,
         CURLFORM_END);
 
     curl_formadd(&formpost,
         &lastptr,
-        CURLFORM_COPYNAME, "Name",
-        CURLFORM_COPYCONTENTS, (const char *)CW2A(wcsrchr(tempFile, _T('\\')) + 1),
+        CURLFORM_COPYNAME, "FILE_MODE",
+        CURLFORM_COPYCONTENTS, "UPLOAD",
+        CURLFORM_END);
+
+    char szFileInfo [MAX_PATH] = "";
+    sprintf_s(szFileInfo, lengthof(szFileInfo)
+        , "%d\01%s\01\01%s\01\01\01"
+        , parentId
+        , fileName.c_str()
+        , fileName.c_str());
+
+    curl_formadd(&formpost,
+        &lastptr,
+        CURLFORM_COPYNAME, "FILE_INFO",
+        CURLFORM_COPYCONTENTS, szFileInfo,
         CURLFORM_END);
 
     curl_formadd(&formpost,
         &lastptr,
-        CURLFORM_COPYNAME, "Remark",
-        CURLFORM_COPYCONTENTS, "",
+        CURLFORM_COPYNAME, "Filedata",
+        CURLFORM_FILE, (const char *)CW2AEX<>(tempFile, CP_ACP),
+        CURLFORM_FILENAME, fileName.c_str(), 
         CURLFORM_END);
 
     curl_formadd(&formpost,
         &lastptr,
-        CURLFORM_COPYNAME, "FileCode",
-        CURLFORM_COPYCONTENTS, "0",
+        CURLFORM_COPYNAME, "upload",
+        CURLFORM_COPYCONTENTS, "Submit Query",
         CURLFORM_END);
-
-    curl_formadd(&formpost,
-        &lastptr,
-        CURLFORM_COPYNAME, "DefaultSecurityLevel",
-        CURLFORM_COPYCONTENTS, "0",
-        CURLFORM_END);
-
-    curl_formadd(&formpost,
-        &lastptr,
-        CURLFORM_COPYNAME, "FileSize",
-        CURLFORM_COPYCONTENTS, "0",
-        CURLFORM_END);
-
 
     curl = curl_easy_init();
     /* initalize custom header list (stating that Expect: 100-continue is not wanted */
     headerlist = curl_slist_append(headerlist, buf);
     if(curl) {
         /* what URL that receives this POST */
-        curl_easy_setopt(curl, CURLOPT_URL, "http://192.168.253.242/mobile/api/Transfer/UploadFile");
+        curl_easy_setopt(curl, CURLOPT_URL, (const char *)CW2AEX<>(url, CP_ACP));
 
         /* only disable 100-continue header if explicitly requested */
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
@@ -301,10 +304,12 @@ BOOL Utility::HttpPost(const wchar_t * accessToken, int parentId, const wchar_t 
             *
             * Do something nice with it!
             */ 
-            OUTPUTLOG("%lu bytes retrieved\n", (long)chunk.size);
+
             // HarryWu, 2014.2.21
             // I guess that, you are using utf-8.
-            response = (wchar_t *)CA2WEX<128>(chunk.memory, CP_UTF8);
+            response.write(chunk.memory, chunk.size);
+
+            OUTPUTLOG("url=[%s] [%lu] bytes retrieved\n", (const char *)CW2A(url), (long)chunk.size);
         }
         /* always cleanup */
         curl_easy_cleanup(curl);
@@ -442,6 +447,114 @@ DWORD Utility::GetHttpTimeoutMs(const wchar_t * xmlconfigfile)
     delete xdoc; xdoc = NULL;
 
     return httpTimeoutMs;
+}
+
+BOOL Utility::GetServiceBase(const wchar_t* xmlconfigfile, wchar_t * pszSvcBase, int maxcch)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("Net");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild("Service");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    if (target->ToElement() && target->ToElement()->GetText())
+       wcscpy_s(pszSvcBase, maxcch, (const wchar_t *)CA2WEX<>(target->ToElement()->GetText(), CP_UTF8));
+
+    delete xdoc; xdoc = NULL;
+
+    return TRUE;
+}
+
+BOOL Utility::GetServiceUser(const wchar_t* xmlconfigfile, wchar_t * pszSvcUser, int maxcch)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("Net");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild("User");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    if (target->ToElement() && target->ToElement()->GetText())
+        wcscpy_s(pszSvcUser, maxcch, (const wchar_t *)CA2WEX<>(target->ToElement()->GetText(), CP_UTF8));
+
+    delete xdoc; xdoc = NULL;
+
+    return TRUE;
+}
+
+BOOL Utility::GetServicePass(const wchar_t* xmlconfigfile, wchar_t * pszSvcPass, int maxcch)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("Net");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild("Pass");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    if (target->ToElement() && target->ToElement()->GetText())
+        wcscpy_s(pszSvcPass, maxcch, (const wchar_t *)CA2WEX<>(target->ToElement()->GetText(), CP_UTF8));
+
+    delete xdoc; xdoc = NULL;
+
+    return TRUE;
 }
 
 unsigned char Utility::ToHex(unsigned char x) 

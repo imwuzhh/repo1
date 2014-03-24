@@ -318,17 +318,20 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilen
     // HarryWu, 2014.2.15
     // TODO: Post file content to server
     // pbBuffer, dwFileSize
+    std::wstring basename = wcsrchr(pwstrFilename, _T('\\')) ? (wcsrchr(pwstrFilename, _T('\\')) + 1): (pwstrFilename);
     wchar_t szTempFile [MAX_PATH] = _T("");
-    GetTempPath(lengthof(szTempFile), szTempFile);
-    wcscat_s(szTempFile, lengthof(szTempFile), _T("\\"));
-    wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
+    if (!Utility::GenerateTempFilePath(szTempFile, lengthof(szTempFile), basename.c_str()))
+        return S_FALSE;
 
     // Write content to temp file, 
     // and then upload this temp file.
     OUTPUTLOG("%s(), [Stream]: Generate temporary file to `%s\'", __FUNCTION__, (const char *)CW2A(szTempFile));
 
     FILE * fout = _wfopen(szTempFile, _T("wb"));
-    fwrite(pbBuffer, 1, dwFileSize, fout);
+    int byteswritten = fwrite(pbBuffer, 1, dwFileSize, fout);
+    if (byteswritten != dwFileSize){
+        fclose(fout); return S_FALSE;
+    }
     fclose(fout);
 
     OUTPUTLOG("%s(), write [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), dwFileSize);
@@ -336,8 +339,6 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilen
     // Upload Temporary file to server.
     if (!GetProto(pArchive)->Upload(pArchive, parentId, szTempFile))
         return S_FALSE;
-
-    DeleteFile(szTempFile);
 
     return S_OK;
 }
@@ -359,13 +360,10 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 	// HarryWu, 2014.2.15
 	// TODO: Read file contents from remote.
 	// ...
-	wchar_t szTempFile [MAX_PATH] = _T("");
-	GetTempPath(lengthof(szTempFile), szTempFile);
-	wcscat_s(szTempFile, lengthof(szTempFile), _T("\\"));
-	wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
-
-    if (PathFileExists(szTempFile) && !PathIsDirectory(szTempFile))
-        DeleteFile(szTempFile);
+    std::wstring basename = wcsrchr(pwstrFilename, _T('\\')) ? (wcsrchr(pwstrFilename, _T('\\')) + 1): (pwstrFilename);
+    wchar_t szTempFile [MAX_PATH] = _T("");
+    if (!Utility::GenerateTempFilePath(szTempFile, lengthof(szTempFile), basename.c_str()))
+        return S_FALSE;
 
 	// Download remote file to local temp file,
 	// and then read content from this file.

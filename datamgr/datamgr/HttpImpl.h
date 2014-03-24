@@ -16,8 +16,8 @@ public:
      BOOL DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder);
      BOOL RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * newName, BOOL isFolder);
      BOOL CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * folderName, RemoteId * retId);
-     BOOL Download(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile);
-     BOOL Upload(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile);
+     BOOL Download(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile);
+     BOOL Upload(TAR_ARCHIVE * pArchive, const RemoteId & parentFolderId, const wchar_t * tempFile);
      BOOL Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL selected, BOOL isFolder);
      BOOL GetColumnInfo(TAR_ARCHIVE * pArchive, const RemoteId & viewId, wchar_t * pColumnInfo, int maxcch);
 };

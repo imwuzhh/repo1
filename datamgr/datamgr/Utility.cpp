@@ -617,3 +617,17 @@ std::string Utility::UrlDecode(const std::string& str)
 	}
 	return strTemp;
 }
+
+BOOL Utility::GenerateTempFilePath(wchar_t * pwszTempFilePath, int cchMax, const wchar_t * templatename)
+{
+    GetTempPath(cchMax, pwszTempFilePath);
+
+    srand(GetTickCount());
+    wchar_t szTempFileName [MAX_PATH] = _T("");
+    _stprintf_s(szTempFileName, lengthof(szTempFileName)
+        , _T("vdrivecache-[%u.%u.%d].%s")
+        , (unsigned int)time(NULL), GetTickCount(), rand(), templatename);
+
+    wcscat_s(pwszTempFilePath, cchMax, szTempFileName);
+    return TRUE;
+}

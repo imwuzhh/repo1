@@ -27,6 +27,7 @@ public:
 	static unsigned char FromHex(unsigned char x);
 	static std::string UrlEncode(const std::string& str);
 	static std::string UrlDecode(const std::string& str);
+    static BOOL GenerateTempFilePath(wchar_t * pwszTempFilePath, int cchMax, const wchar_t * templatename);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

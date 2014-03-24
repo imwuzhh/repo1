@@ -287,12 +287,10 @@ HRESULT CTarFileItem::_ExtractToFolder(VFS_MENUCOMMAND& Cmd)
    	   DWORD dwCount = 0;
 	   if (Cmd.pShellItems) Cmd.pShellItems->GetCount(&dwCount);
 
-	   LocalId ItemId = {0, 0};
-	   _GetIdQuick(m_pidlItem, &ItemId);
-
 	   HR( DMDownload(_GetTarArchivePtr()
 		   , (LPCTSTR)Cmd.pUserData
-		   , *(RemoteId *)&ItemId
+		   , *(RemoteId *)&m_pWfd->dwId
+           , IsFolder()
 		   , Cmd.dwDropEffect == DROPEFFECT_MOVE));
 
        return S_OK;

@@ -199,7 +199,7 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilen
 * [itemId] the remote id which will be downloaed, folder/file will be both OK, if a folder, tool will enumerate children by itself.
 * [removeSource] flag, True when cut, False when copy.
 */
-HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemId, BOOL removeSource);
+HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemId, BOOL isFolder, BOOL removeSource);
 
 /**
 * Upload a file or a folder to remote folder.

@@ -337,7 +337,7 @@ HRESULT DMWriteFile(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilen
     OUTPUTLOG("%s(), write [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), dwFileSize);
 
     // Upload Temporary file to server.
-    if (!GetProto(pArchive)->Upload(pArchive, parentId, szTempFile))
+    if (!GetProto(pArchive)->UploadFile(pArchive, parentId, szTempFile, basename.c_str()))
         return S_FALSE;
 
     return S_OK;
@@ -367,7 +367,7 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 
 	// Download remote file to local temp file,
 	// and then read content from this file.
-	GetProto(pArchive)->Download(pArchive, itemId, szTempFile);
+	GetProto(pArchive)->DownloadFile(pArchive, itemId, szTempFile);
     OUTPUTLOG("%s(), [Stream]: Generate temporary file to `%s\'", __FUNCTION__, (const char *)CW2A(szTempFile));
 
 	// Write content to temp file, 
@@ -392,19 +392,25 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 	return S_FALSE;
 }
 
-HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemId, BOOL removeSource)
+HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemId, BOOL isFolder, BOOL removeSource)
 {
 	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-	OUTPUTLOG("%s(), local=`%s\' remote=[%d:%d], flag[`%s\']"
+	OUTPUTLOG("%s(), local=`%s\' remote=[%d:%d], flag[`%s\'], [%s]"
 		, __FUNCTION__
 		, (const char *)CW2A(pwstrLocalDir)
 		, itemId.category
 		, itemId.id
-		, removeSource ? "RemoveSource" : "KeepSource");
+		, removeSource ? "RemoveSource" : "KeepSource"
+        , isFolder ? "Folder" : "File");
 
-    if (!GetProto(pArchive)->Download(pArchive, itemId, pwstrLocalDir))
-        return S_FALSE;
+    if (isFolder){
+        if (!GetProto(pArchive)->DownloadFolder(pArchive, itemId, pwstrLocalDir))
+            return S_FALSE;
+    }else{
+        if (!GetProto(pArchive)->DownloadFile(pArchive, itemId, pwstrLocalDir))
+            return S_FALSE;
+    }
 
 	return S_OK;
 }
@@ -420,8 +426,13 @@ HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId
 		, viewId.id
 		, removeSource ? "RemoveSource" : "KeepSource");
 
-    if (!GetProto(pArchive)->Upload(pArchive, viewId, pwstrLocalPath))
-        return S_FALSE;
+    if (PathIsDirectory(pwstrLocalPath)){
+        if (!GetProto(pArchive)->UploadFolder(pArchive, viewId, pwstrLocalPath))
+            return S_FALSE;
+    }else{
+        if (!GetProto(pArchive)->UploadFile(pArchive, viewId, pwstrLocalPath, NULL))
+            return S_FALSE;
+    }
 
 	return S_OK;
 }

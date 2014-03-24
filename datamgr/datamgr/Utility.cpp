@@ -217,7 +217,7 @@ BOOL Utility::HttpRequestWithCookie(const wchar_t * requestUrl, const std::wstri
 	return TRUE;
 }
 
-BOOL Utility::HttpPostFile(const wchar_t * url, int parentId, const wchar_t * tempFile, std::stringstream & response, int timeoutMs)
+BOOL Utility::HttpPostFile(const wchar_t * url, int parentId, const wchar_t * tempFile, const wchar_t * faceName, std::stringstream & response, int timeoutMs)
 {
     CURL *curl;
     CURLcode res;
@@ -234,7 +234,13 @@ BOOL Utility::HttpPostFile(const wchar_t * url, int parentId, const wchar_t * te
 
     curl_global_init(CURL_GLOBAL_ALL);
 
-    std::string fileName = (const char *)CW2AEX<>(wcsrchr(tempFile, _T('\\')) + 1, CP_UTF8);
+    std::string fileName = "";
+
+    if (faceName == NULL)
+        fileName = (const char *)CW2AEX<>(wcsrchr(tempFile, _T('\\')) + 1, CP_UTF8);
+    else
+        fileName = (const char *)CW2AEX<>(faceName, CP_UTF8);
+
     curl_formadd(&formpost,
         &lastptr,
         CURLFORM_COPYNAME, "Filename",

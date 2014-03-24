@@ -403,7 +403,7 @@ BOOL HttpImpl::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, c
 * NOTE: reserved for harry's prototype test.
 *       you must not use this method.
 */
-BOOL HttpImpl::Upload(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile)
+BOOL HttpImpl::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile, const wchar_t * faceName)
 {
     // Prepare upload id, used for query progress.
     wchar_t uploadidstring [100] = _T("");
@@ -418,7 +418,7 @@ BOOL HttpImpl::Upload(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const w
         , uploadidstring);
 
     std::stringstream response;
-    if (!Utility::HttpPostFile(url, parentId.id, tempFile, response, pArchive->context->HttpTimeoutMs))
+    if (!Utility::HttpPostFile(url, parentId.id, tempFile, faceName, response, pArchive->context->HttpTimeoutMs))
         return FALSE;
 
     return TRUE;
@@ -452,9 +452,8 @@ BOOL HttpImpl::Upload(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const w
 * NOTE: reserved for harry's prototype test.
 *       you must not use this method.
 */
-BOOL HttpImpl::Download(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile)
+BOOL HttpImpl::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile)
 {
-    // 
     // Prepare url.
     wchar_t url [MaxUrlLength] = _T("");
     _stprintf_s(url, lengthof(url)
@@ -481,6 +480,16 @@ BOOL HttpImpl::Download(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const w
     }
 
     return TRUE;
+}
+
+BOOL HttpImpl::UploadFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentFolderId, const wchar_t * localPath)
+{
+    return S_FALSE;
+}
+
+BOOL HttpImpl::DownloadFolder(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * localPath)
+{
+    return S_FALSE;
 }
 
 BOOL HttpImpl::Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL selected, BOOL isFolder)

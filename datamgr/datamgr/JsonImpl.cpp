@@ -261,7 +261,7 @@ BOOL JsonImpl::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, c
 /**
 * Call this route to inovke external tool to upload.
 */
-BOOL JsonImpl::Upload(TAR_ARCHIVE * pArchive, const RemoteId & viewId, const wchar_t * localPath)
+BOOL JsonImpl::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & viewId, const wchar_t * localPath, const wchar_t * faceName)
 {
     Json::StyledWriter writer;
     Json::Value  root;
@@ -269,10 +269,12 @@ BOOL JsonImpl::Upload(TAR_ARCHIVE * pArchive, const RemoteId & viewId, const wch
     root ["Port"]   = 60684;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
-    root ["Method"] = "BatchUpload";
+    root ["Method"] = "UploadFile";
+
     Json::Value parameters; 
     parameters["Destination"] = (int)viewId.id;
     parameters["Source"] = (const char *)CW2A(localPath);
+
     root ["Params"] = parameters;
     std::string jsonString = writer.write(root);
 
@@ -286,7 +288,7 @@ BOOL JsonImpl::Upload(TAR_ARCHIVE * pArchive, const RemoteId & viewId, const wch
 /**
 * Call this routine to invoke external tool to download.
 */
-BOOL JsonImpl::Download(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * localPath)
+BOOL JsonImpl::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * localPath)
 {
     Json::StyledWriter writer;
     Json::Value  root;
@@ -294,10 +296,12 @@ BOOL JsonImpl::Download(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const w
     root ["Port"]   = 60684;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
-    root ["Method"] = "BatchDownload";
+    root ["Method"] = "DownloadFile";
+
     Json::Value parameters; 
     parameters["Source"] = (int)itemId.id;
     parameters["Destination"] = (const char *)CW2A(localPath);
+
     root ["Params"] = parameters;
     std::string jsonString = writer.write(root);
 
@@ -306,6 +310,54 @@ BOOL JsonImpl::Download(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const w
         return FALSE;
 
     return TRUE;
+}
+
+BOOL JsonImpl::UploadFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentFolderId, const wchar_t * localPath)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "UploadFolder";
+
+    Json::Value parameters; 
+    parameters["Destination"] = (int)parentFolderId.id;
+    parameters["Source"] = (const char *)CW2A(localPath);
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    return TRUE;
+}
+
+BOOL JsonImpl::DownloadFolder(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * localPath)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "DownloadFolder";
+
+    Json::Value parameters; 
+    parameters["Source"] = (int)itemId.id;
+    parameters["Destination"] = (const char *)CW2A(localPath);
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    return TRUE; 
 }
 
 BOOL JsonImpl::Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL selected, BOOL isFolder)

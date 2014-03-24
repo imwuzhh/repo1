@@ -15,7 +15,7 @@ public:
 	static bool RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right);
     static BOOL HttpRequest(const wchar_t * requestUrl, std::wstring & response, unsigned int timeoutMs);
     static BOOL HttpRequestWithCookie(const wchar_t * requestUrl, const std::wstring & cookie, std::stringstream & response, unsigned int timeoutMs);
-    static BOOL HttpPostFile(const wchar_t * service, int parentId, const wchar_t * tempFile, std::stringstream & response, int timeoutMs);
+    static BOOL HttpPostFile(const wchar_t * service, int parentId, const wchar_t * tempFile, const wchar_t * faceName, std::stringstream & response, int timeoutMs);
 	static BOOL JsonRequest(const wchar_t * reqJson, std::wstring & response);
 	static BOOL LoadLocalizedName(const wchar_t * xmlconfigfile, const wchar_t * localeName, const wchar_t * key, wchar_t * retVaule, int cchMax);
     static BOOL CheckHttpEnable(const wchar_t * xmlconfigfile);

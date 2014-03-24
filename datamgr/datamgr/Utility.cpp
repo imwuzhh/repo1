@@ -166,7 +166,7 @@ BOOL Utility::HttpRequestWithCookie(const wchar_t * requestUrl, const std::wstri
 		// HarryWu, 2014.2.20
 		// Setup timeout for connection & read/write, not for dns
 		// Async Dns with timeout require c-ares utility.
-		curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutMs);
+		// curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutMs);
 		curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, timeoutMs);
 
 
@@ -290,6 +290,9 @@ BOOL Utility::HttpPostFile(const wchar_t * url, int parentId, const wchar_t * te
 
         /* we pass our 'chunk' struct to the callback function */ 
         curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+        // curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutMs);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, timeoutMs);
 
         /* Perform the request, res will get the return code */
         res = curl_easy_perform(curl);

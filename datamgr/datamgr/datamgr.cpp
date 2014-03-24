@@ -365,9 +365,7 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 	wcscat_s(szTempFile, lengthof(szTempFile), wcsrchr(pwstrFilename, _T('\\')) ? wcsrchr(pwstrFilename, _T('\\')) + 1: pwstrFilename);
 
     if (PathFileExists(szTempFile) && !PathIsDirectory(szTempFile))
-    {
         DeleteFile(szTempFile);
-    }
 
 	// Download remote file to local temp file,
 	// and then read content from this file.
@@ -382,14 +380,18 @@ HRESULT DMReadFile(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pwstrFilename
 		*pdwFileSize = ftell(fin);
         fseek(fin, 0, SEEK_SET);
 	}
+
 	OUTPUTLOG("%s(), read [%s] with %d bytes", __FUNCTION__, (const char *)CW2A(szTempFile), *pdwFileSize);
 	DMMalloc((LPBYTE*)ppbBuffer, *pdwFileSize);
 	if (*ppbBuffer && fin){
-		fread(*ppbBuffer, 1, *pdwFileSize, fin);
+		int readbytes = fread(*ppbBuffer, 1, *pdwFileSize, fin);
+        if (readbytes == *pdwFileSize) {
+            fclose(fin); return S_OK;
+        }
 	}
-	if (fin) fclose(fin);
 
-	return S_OK;
+	if (fin) fclose(fin);
+	return S_FALSE;
 }
 
 HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemId, BOOL removeSource)

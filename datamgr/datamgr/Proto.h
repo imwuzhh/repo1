@@ -21,12 +21,49 @@ public:
      
      virtual BOOL CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * folderName, RemoteId * retId) = 0;
      
+     /**
+     * Download remote item to local disk.
+     * Parameters:
+     * 1) pArchive, the session context info.
+     * 2) itemId, item's id.
+     * 3) localPath, if this is a directory, use the item's name for full path, otherwise, use this value as the destination full path.
+     * Return:
+     * True for successful, False for failure.
+     */
      virtual BOOL DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * localPath) = 0;
      
+     /**
+     * Upload a local file to remote server.
+     * Parameters:
+     * 1) pArchive, the session context info.
+     * 2) parentFolderId, remote folder's id, in which local file will be uploaded.
+     * 3) localPath, the file's full path in local disk;
+     * 4) faceName, the display name, this is a chance for user to setup the display name of this uploaded item.
+     * Return:
+     * True for successful, False for failure.
+     */
      virtual BOOL UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentFolderId, const wchar_t * localPath, const wchar_t * faceName) = 0;
      
+     /**
+     * Download remote item to local disk.
+     * Parameters:
+     * 1) pArchive, the session context info.
+     * 2) itemId, item's id.
+     * 3) localPath, this is a directory, and will be used as the parent of downloaded item.
+     * Return:
+     * True for successful, False for failure.
+     */
      virtual BOOL DownloadFolder(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * localPath) = 0;
      
+     /**
+     * Upload a local file to remote server.
+     * Parameters:
+     * 1) pArchive, the session context info.
+     * 2) parentFolderId, remote folder's id, in which local file will be uploaded.
+     * 3) localPath, the directory's full path in local disk;
+     * Return:
+     * True for successful, False for failure.
+     */
      virtual BOOL UploadFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentFolderId, const wchar_t * localPath) = 0;
      
      virtual BOOL Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL selected, BOOL isFolder) = 0;

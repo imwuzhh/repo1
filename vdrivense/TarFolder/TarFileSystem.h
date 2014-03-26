@@ -117,6 +117,8 @@ public:
    HRESULT _ExtractToFolder(VFS_MENUCOMMAND& Cmd);
    HRESULT _DoPasteFiles(VFS_MENUCOMMAND& Cmd);
    HRESULT _PreviewFile(PCITEMID_CHILD pidl);
+   HRESULT _PrevPage(VFS_MENUCOMMAND & Cmd);
+   HRESULT _NextPage(VFS_MENUCOMMAND & Cmd);
 };
 
 

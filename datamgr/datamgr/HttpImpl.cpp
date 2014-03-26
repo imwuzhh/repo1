@@ -502,3 +502,10 @@ BOOL HttpImpl::GetColumnInfo(TAR_ARCHIVE * pArchive, const RemoteId & viewId, wc
     wcscpy_s(pColumnInfo, maxcch, _T("Attr1;Attr2;Attr3;Attr4"));
     return TRUE;
 }
+
+BOOL HttpImpl::PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
+{
+    // Dummy Implementation
+    char szMsg [100]; sprintf_s(szMsg, lengthof(szMsg), "%s(ID=[%d:%d])", __FUNCTION__, itemId.category, itemId.id); MessageBoxA(GetActiveWindow(), szMsg, __FUNCTION__, MB_OKCANCEL | MB_ICONINFORMATION);
+    return TRUE;
+}

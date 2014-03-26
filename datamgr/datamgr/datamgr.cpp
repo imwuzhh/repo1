@@ -461,6 +461,18 @@ HRESULT DMGetCustomColumns(TAR_ARCHIVE * pArchive, RemoteId viewId, LPWSTR pwstr
     return S_OK;
 }
 
+HRESULT DMPreviewFile(TAR_ARCHIVE * pArchive, RemoteId itemId)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() itemId=[%d:%d]", __FUNCTION__, itemId.category, itemId.id);
+
+    if (!GetProto(pArchive)->PreviewFile(pArchive, itemId))
+        return S_FALSE;
+
+    return S_OK;
+}
+
 HRESULT DMMalloc(LPBYTE * ppBuffer, DWORD dwBufSize)
 {
 	*ppBuffer = (LPBYTE)malloc(dwBufSize);

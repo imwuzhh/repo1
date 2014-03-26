@@ -69,4 +69,6 @@ public:
      virtual BOOL Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL selected, BOOL isFolder) = 0;
      
      virtual BOOL GetColumnInfo(TAR_ARCHIVE * pArchive, const RemoteId & viewId, wchar_t * pColumnInfo, int maxcch) = 0;
+
+     virtual BOOL PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId) = 0;
 };

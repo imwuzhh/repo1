@@ -245,6 +245,8 @@ HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
    case DFM_CMD_NEWFOLDER:   return _DoNewFolder(Cmd, IDS_NEWFOLDER);
    case ID_FILE_NEWFOLDER:   return _DoNewFolder(Cmd, IDS_NEWFOLDER);
    case ID_FILE_PROPERTIES:  return _DoShowProperties(Cmd);
+   case ID_FILE_PREV:        return _PrevPage(Cmd);
+   case ID_FILE_NEXT:        return _NextPage(Cmd);
    }
    return E_NOTIMPL;
 }
@@ -401,6 +403,24 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 
 HRESULT CTarFileItem::_PreviewFile( PCITEMID_CHILD pidl)
 {
-	MessageBox(GetActiveWindow(), _T("Preview"), _T("VDrive"), MB_OK | MB_ICONINFORMATION);
+	LocalId itemId = m_pWfd->dwId;
+
+    if (!DMPreviewFile(_GetTarArchivePtr(), *(RemoteId *)&itemId))
+        return S_FALSE;
+
 	return S_OK;
+}
+
+HRESULT CTarFileItem::_PrevPage( VFS_MENUCOMMAND & Cmd)
+{
+    if (m_pWfd->dwPage > 0) m_pWfd->dwPage--; else return S_OK;
+    _RefreshFolderView();
+    return S_OK;
+}
+
+HRESULT CTarFileItem::_NextPage( VFS_MENUCOMMAND & Cmd)
+{
+    if (m_pWfd->dwPage < m_pWfd->dwTotalPage) m_pWfd->dwPage++; else return S_OK;
+    _RefreshFolderView();
+    return S_OK;
 }

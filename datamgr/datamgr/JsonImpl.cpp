@@ -404,3 +404,26 @@ BOOL JsonImpl::GetColumnInfo(TAR_ARCHIVE * pArchive, const RemoteId & viewId, wc
     wcscpy_s(pColumnInfo, maxcch, _T("Attr1;Attr2;Attr3;Attr4"));
     return TRUE;
 }
+
+BOOL JsonImpl::PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "PreviewFile";
+
+    Json::Value parameters; 
+    parameters["id"] = (int)itemId.id;
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    return TRUE;
+}

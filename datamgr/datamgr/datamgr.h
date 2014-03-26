@@ -232,6 +232,14 @@ HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL is
 HRESULT DMGetCustomColumns(TAR_ARCHIVE * pArchive, RemoteId viewId, LPWSTR pwstrColumnList, int maxcch);
 
 /**
+* Notify external assistance tool to preivew a file.
+* Parameters:
+* [pArchive] context handle.
+* [itemId] file's id.
+*/
+HRESULT DMPreviewFile(TAR_ARCHIVE * pArchive, RemoteId itemId);
+
+/**
 * Malloc memory from libdatamgr, as we use /MT to build, if you get memory from this module, free it with DMFree().
 * Parameters:
 * [ppBuffer] out pointer to hold the buffer position allated.

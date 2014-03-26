@@ -19,6 +19,8 @@ EXPORTS
 	DMSelect
 	DMGetCustomColumns
 	
+	DMPreviewFile
+	
 	DMMalloc
 	DMRealloc
 	DMFree

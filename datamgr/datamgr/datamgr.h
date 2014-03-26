@@ -140,6 +140,27 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive);
 HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA ** aList, int * nListCount);
 
 /**
+* Enumerate the children of specified id.
+* Parameters:
+* [pArchive] the context.
+* [dwId] the folder's id used to enumerate its childeren.
+* [PageSize]
+* [PageNo]
+* [totalPage]
+* [aList] pointer to hold the array of children, it's DMAllocat-ed internally, so free it with DMFree().
+* [nListCount] pointer to get number of the total children.
+*/
+HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, RFS_FIND_DATA ** aList, int * nListCount);
+
+/**
+* Get Page size
+* Parameters:
+* 
+*/
+HRESULT DMGetPageSize(TAR_ARCHIVE * pArchive, DWORD * pdwPageSize);
+
+
+/**
 * Rename an item
 * Parameters:
 * [pArchive] the context.

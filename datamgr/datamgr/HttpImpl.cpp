@@ -279,9 +279,109 @@ BOOL HttpImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, 
     return TRUE;
 }
 
-BOOL HttpImpl::GetChildFolderAndFiles(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<RFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
+BOOL HttpImpl::GetChildFolderAndFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
 {
-    return FALSE;
+    // HarryWu, 2014.2.28
+    // Here begin of HttpRequest, directly to remote server
+    if (pArchive->context->AccessToken[0] == _T('\0')){
+        if (!Login(pArchive)){
+            OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
+            return FALSE;
+        }
+    }
+    // "http://192.168.253.242/EDoc2WebApi/api/Doc/FolderRead/GetDocListInfo?token=%s&folderId=%d&pageNum=%d&pageSize=%d"
+    wchar_t url [MaxUrlLength] = _T("");
+    wsprintf(url
+        , _T("%s/EDoc2WebApi/api/Doc/FolderRead/GetDocListInfo?token=%s&folderId=%d&docViewId=0&pageNum=%d&pageSize=%d")
+        , pArchive->context->service, pArchive->context->AccessToken, remoteId.id, PageNo, PageSize);
+
+    std::wstring response;
+    if (!Utility::HttpRequest(url, response, pArchive->context->HttpTimeoutMs))
+        return FALSE;
+
+    // Sample Response:
+    // {"$id":"1","_infoItems":[{"$id":"2","_name":"basic:name","_title":"name","_remark":null,"_dataType":"docName","<Width>k__BackingField":0},{"$id":"3","_name":"basic:size","_title":"size","_remark":null,"_dataType":"fileSize","<Width>k__BackingField":0},{"$id":"4","_name":"basic:creator","_title":"creator","_remark":null,"_dataType":"string","<Width>k__BackingField":0},{"$id":"5","_name":"basic:editor","_title":"editor","_remark":null,"_dataType":"string","<Width>k__BackingField":0},{"$id":"6","_name":"basic:modifyTime","_title":"modifyTime","_remark":null,"_dataType":"datetime","<Width>k__BackingField":0},{"$id":"7","_name":"basic:version","_title":"version","_remark":null,"_dataType":"version","<Width>k__BackingField":0}],"_foldersInfo":[{"$id":"8","id":122,"name":"新建文件夹","code":"0","path":"2\\8\\122","parentFolderId":8,"childFolderCount":0,"childFileCount":0,"size":0,"maxFolderSize":0,"createTime":"2014-03-26T13:18:52.007","modifyTime":"2014-03-26T13:18:52.007","creatorId":2,"creatorName":"Administrator","editorId":2,"editorName":"Administrator","state":0,"folderType":1,"remark":"NAN","isDeleted":false,"uploadType":0,"favoriteId":"","favoriteType":"","isfavorite":false,"permission":-1}],"_filesInfo":[{"$id":"9","id":81,"name":"api.doc","code":"","path":"2\\8\\","parentFolderId":8,"size":81920,"curSize":81920,"createTime":"2014-03-24T16:21:47.08","modifyTime":"2014-03-24T16:21:47.08","creatorId":2,"creatorName":"Administrator","editorId":2,"editorName":"Administrator","state":0,"remark":"","curVerId":80,"curVerNumStr":"1.0","fileType":2,"currentOperatorId":0,"currentOperator":null,"lastVerId":80,"lastVerNumStr":"1.0","isDeleted":false,"securityLevelId":0,"effectiveTime":"","expirationTime":"","FileCipherText":false,"securityLevelName":"","isoState":0,"isfavorite":false,"favoriteId":"","favoriteType":"","permission":-1}],"_settings":{"$id":"10","pageNum":1,"pageSize":2,"totalCount":12,"viewMode":"List","docViewId":0},"_mustOnline":true,"_enabledOutSend":false,"_securityEnable":false,"_processStrategy":[],"_archiveStrategy":{"$id":"11"},"_isArchive":false,"_ciphertextOutwardPolicy":0}
+
+    if (response.empty())
+        return FALSE;
+
+    OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
+    Json::Value root;
+    Json::Reader reader; 
+    if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
+        // Parse Folder array
+        Json::Value _fodersInfo = root.get("_foldersInfo", "");
+        if (!_fodersInfo.empty()){
+            for (size_t index = 0; index < _fodersInfo.size(); index ++){
+                RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+
+                // Parse id
+                Json::Value folderId = _fodersInfo[index].get("id", 0);
+                rfd.dwId.id = folderId.asInt();
+                rfd.dwId.category = remoteId.category;
+                if (rfd.dwId.id == 0) return FALSE;
+
+                // Parse Name
+                Json::Value folderName = _fodersInfo[index].get("name", "");
+                std::string test = folderName.asString();
+                if (test.empty()) return FALSE;
+                wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
+
+                // Parse FileCurSize
+                Json::Value fileSize = _fodersInfo[index].get("size", 0);
+                rfd.nFileSizeLow = fileSize.asInt();
+
+                rfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+                SYSTEMTIME stime; GetSystemTime(&stime);
+                FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
+                rfd.ftLastAccessTime = rfd.ftLastWriteTime = rfd.ftCreationTime = ftime;
+
+                children.push_back(rfd);
+            }
+        }
+        // Parse Files array
+        Json::Value _filesInfo = root.get("_filesInfo", "");
+        if (!_filesInfo.empty()){
+            for (size_t index = 0; index < _filesInfo.size(); index ++){
+                RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+
+                // Parse id
+                Json::Value folderId = _filesInfo[index].get("id", 0);
+                rfd.dwId.id = folderId.asInt();
+                rfd.dwId.category = remoteId.category;
+                if (rfd.dwId.id == 0) return FALSE;
+
+                // Parse Name
+                Json::Value folderName = _filesInfo[index].get("name", "");
+                std::string test = folderName.asString();
+                if (test.empty()) return FALSE;
+                wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
+
+                // Parse FileCurSize
+                Json::Value fileSize = _filesInfo[index].get("size", 0);
+                rfd.nFileSizeLow = fileSize.asInt();
+
+                rfd.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+                SYSTEMTIME stime; GetSystemTime(&stime);
+                FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
+                rfd.ftLastAccessTime = rfd.ftLastWriteTime = rfd.ftCreationTime = ftime;
+
+                children.push_back(rfd);
+            }
+        }
+        // Parse _settings.
+        Json::Value _settings = root.get("_settings", "");
+        if (!_settings.empty()){
+            Json::Value JsonTotalCount = _settings.get("totalCount", 0);
+            if (!JsonTotalCount.empty()){
+                *PageCount = JsonTotalCount.asInt();
+            }
+            if (*PageCount == 0)
+                return FALSE;
+        }
+    }
+    return TRUE;
 }
 
 BOOL HttpImpl::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder)

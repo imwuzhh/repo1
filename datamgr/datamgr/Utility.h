@@ -28,6 +28,7 @@ public:
 	static std::string UrlEncode(const std::string& str);
 	static std::string UrlDecode(const std::string& str);
     static BOOL GenerateTempFilePath(wchar_t * pwszTempFilePath, int cchMax, const wchar_t * templatename);
+    static BOOL HttpPostForm(const wchar_t * url, const wchar_t * httpform, const wchar_t * cookie, std::stringstream & response, int timeoutMs);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

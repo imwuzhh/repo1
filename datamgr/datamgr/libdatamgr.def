@@ -5,6 +5,8 @@ EXPORTS
 	DMClose 
 	 
 	DMGetChildrenList 
+	DMGetChildrenListEx
+	DMGetPageSize
 	
 	DMRename 
 	DMDelete

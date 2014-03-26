@@ -219,6 +219,16 @@ BOOL Utility::HttpRequestWithCookie(const wchar_t * requestUrl, const std::wstri
 
 BOOL Utility::HttpPostFile(const wchar_t * url, int parentId, const wchar_t * tempFile, const wchar_t * faceName, std::stringstream & response, int timeoutMs)
 {
+    /*
+    const wchar_t * formxml = 
+        _T("<form>")
+            _T("<input type='file' name='Filedata'  value='' filename=''></input>")
+            _T("<input type='text' name='FILE_INFO' value=''></input>")
+            _T("<input type='text' name='FILE_MODE' value=''></input>")
+        _T("</form>");
+    HttpPostForm(url, formxml, _T(""), response, timeoutMs);
+    */
+
     CURL *curl;
     CURLcode res;
 
@@ -637,3 +647,105 @@ BOOL Utility::GenerateTempFilePath(wchar_t * pwszTempFilePath, int cchMax, const
     wcscat_s(pwszTempFilePath, cchMax, szTempFileName);
     return TRUE;
 }
+
+BOOL Utility::HttpPostForm(const wchar_t * url, const wchar_t * httpform, const wchar_t * cookie, std::stringstream & response, int timeoutMs)
+{
+    {
+        TiXmlDocument * xdoc = new TiXmlDocument();
+        xdoc->Parse((const char *)CW2AEX<>(httpform, CP_UTF8));
+
+        TiXmlElement * xroot = xdoc->RootElement();
+
+        for (TiXmlElement * child = xroot->FirstChildElement("input"); child; child = child->NextSiblingElement("input"))
+        {
+            const char * typestr = child->Attribute("type");
+
+            if (!stricmp(typestr, "file")){
+                const char * valuestr = child->Attribute("value");
+            }
+
+            if (!stricmp(typestr, "text") || !stricmp(typestr, "hidden") || !stricmp(typestr, "button")){
+                const char * valuestr = child->Attribute("value");
+            }
+        }
+
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }    
+
+    CURL *curl;
+    CURLcode res;
+
+    struct MemoryStruct chunk;
+    chunk.memory = (char *)malloc(1);  /* will be grown as needed by the realloc above */ 
+    chunk.size = 0;    /* no data at this point */ 
+
+    struct curl_httppost *formpost=NULL;
+    struct curl_httppost *lastptr=NULL;
+    struct curl_slist *headerlist=NULL;
+    static const char buf[] = "Expect:";
+    
+    curl_global_init(CURL_GLOBAL_ALL);
+
+    //TODO: parse http form, and setup parameters for http post.
+    
+    curl = curl_easy_init();
+    /* initalize custom header list (stating that Expect: 100-continue is not wanted */
+    headerlist = curl_slist_append(headerlist, buf);
+    if(curl) {
+        /* what URL that receives this POST */
+        curl_easy_setopt(curl, CURLOPT_URL, (const char *)CW2AEX<>(url, CP_ACP));
+
+        /* only disable 100-continue header if explicitly requested */
+        curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
+
+        curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+
+        /* send all data to this function  */ 
+        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
+
+        /* we pass our 'chunk' struct to the callback function */ 
+        curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+
+        // curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutMs);
+        curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, timeoutMs);
+
+        /* Perform the request, res will get the return code */
+        res = curl_easy_perform(curl);
+
+        /* Check for errors */
+        if(res != CURLE_OK){
+            OUTPUTLOG("curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+        }else{
+            /*
+            * Now, our chunk.memory points to a memory block that is chunk.size
+            * bytes big and contains the remote file.
+            *
+            * Do something nice with it!
+            */ 
+
+            // HarryWu, 2014.2.21
+            // I guess that, you are using utf-8.
+            response.write(chunk.memory, chunk.size);
+
+            OUTPUTLOG("url=[%s] [%lu] bytes retrieved\n", (const char *)CW2A(url), (long)chunk.size);
+        }
+        /* always cleanup */
+        curl_easy_cleanup(curl);
+
+        /* then cleanup the formpost chain */
+        curl_formfree(formpost);
+
+        /* free slist */
+        curl_slist_free_all (headerlist);
+    }
+
+    if(chunk.memory){
+        free(chunk.memory);
+    }
+
+    curl_global_cleanup();
+
+    return TRUE;
+}
+

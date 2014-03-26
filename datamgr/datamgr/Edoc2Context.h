@@ -7,6 +7,7 @@ struct Edoc2Context {
     DWORD   dwUserId;
     BOOL    enableHttp;
     DWORD   HttpTimeoutMs;
+    DWORD   pageSize;
     HINSTANCE hInst;
     Proto*  proto;
     wchar_t modulepath    [1024];

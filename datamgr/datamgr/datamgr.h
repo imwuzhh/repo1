@@ -37,7 +37,7 @@ struct RemoteId {
 	DWORD id;
 };
 
-typedef struct _RFS_FIND_DATAA {
+typedef struct _VFS_FIND_DATAA {
 	DWORD dwFileAttributes;
 	FILETIME ftCreationTime;
 	FILETIME ftLastAccessTime;
@@ -48,20 +48,11 @@ typedef struct _RFS_FIND_DATAA {
 	DWORD dwReserved1;
 	CHAR   cFileName[ MAX_PATH ];
 	CHAR   cAlternateFileName[ 14 ];
-#ifdef _MAC
-	DWORD dwFileType;
-	DWORD dwCreatorType;
-	WORD  wFinderFlags;
-#endif
+///////////////////////////////////////////////////
 	RemoteId dwId;
-	DWORD dwVersion;
-	DWORD dwAttributes;
-	DWORD dwPage;
-	DWORD dwTotalPage;
-	unsigned char md5 [16];
-} RFS_FIND_DATAA, *PRFS_FIND_DATAA, *LPRFS_FIND_DATAA;
+} VFS_FIND_DATAA, *PVFS_FIND_DATAA, *LPVFS_FIND_DATAA;
 
-typedef struct _RFS_FIND_DATAW {
+typedef struct _VFS_FIND_DATAW {
 	DWORD dwFileAttributes;
 	FILETIME ftCreationTime;
 	FILETIME ftLastAccessTime;
@@ -72,27 +63,18 @@ typedef struct _RFS_FIND_DATAW {
 	DWORD dwReserved1;
 	WCHAR  cFileName[ MAX_PATH ];
 	WCHAR  cAlternateFileName[ 14 ];
-#ifdef _MAC
-	DWORD dwFileType;
-	DWORD dwCreatorType;
-	WORD  wFinderFlags;
-#endif
-	RemoteId dwId;
-	DWORD dwVersion;
-	DWORD dwAttributes;
-	DWORD dwPage;
-	DWORD dwTotalPage;
-	unsigned char md5 [16];
-} RFS_FIND_DATAW, *PRFS_FIND_DATAW, *LPRFS_FIND_DATAW;
+//////////////////////////////////////////////////
+    RemoteId dwId;
+} VFS_FIND_DATAW, *PVFS_FIND_DATAW, *LPVFS_FIND_DATAW;
 
 #ifdef UNICODE
-    typedef RFS_FIND_DATAW RFS_FIND_DATA;
-    typedef PRFS_FIND_DATAW PRFS_FIND_DATA;
-    typedef LPRFS_FIND_DATAW LPRFS_FIND_DATA;
+    typedef VFS_FIND_DATAW VFS_FIND_DATA;
+    typedef PVFS_FIND_DATAW PVFS_FIND_DATA;
+    typedef LPVFS_FIND_DATAW LPVFS_FIND_DATA;
 #else
-    typedef RFS_FIND_DATAA RFS_FIND_DATA;
-    typedef PRFS_FIND_DATAA PRFS_FIND_DATA;
-    typedef LPRFS_FIND_DATAA LPRFS_FIND_DATA;
+    typedef VFS_FIND_DATAA VFS_FIND_DATA;
+    typedef PVFS_FIND_DATAA PVFS_FIND_DATA;
+    typedef LPVFS_FIND_DATAA LPVFS_FIND_DATA;
 #endif // UNICODE
 
 struct Edoc2Context;
@@ -137,7 +119,7 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive);
 * [aList] pointer to hold the array of children, it's DMAllocat-ed internally, so free it with DMFree().
 * [nListCount] pointer to get number of the total children.
 */
-HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA ** aList, int * nListCount);
+HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA ** aList, int * nListCount);
 
 /**
 * Enumerate the children of specified id.
@@ -150,7 +132,7 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
 * [aList] pointer to hold the array of children, it's DMAllocat-ed internally, so free it with DMFree().
 * [nListCount] pointer to get number of the total children.
 */
-HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, RFS_FIND_DATA ** aList, int * nListCount);
+HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, VFS_FIND_DATA ** aList, int * nListCount);
 
 /**
 * Get Page size
@@ -187,7 +169,7 @@ HRESULT DMDelete(TAR_ARCHIVE* pArchive, RemoteId itemId, BOOL isFolder);
 * [pstrFilename] the folder's name.
 * [pWfd] structure used to hold the brand-new id of the newly created folder.
 */
-HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pstrFilename, RFS_FIND_DATA * pWfd);
+HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pstrFilename, VFS_FIND_DATA * pWfd);
 
 /**
 * Download a file from remote, use curl and save it to local position specified by pwstrFilename.

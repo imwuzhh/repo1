@@ -64,7 +64,7 @@ BOOL HttpImpl::Login(TAR_ARCHIVE * pArchive)
 }
 
 
-BOOL HttpImpl::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPublic)
+BOOL HttpImpl::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & topPublic)
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
@@ -94,7 +94,7 @@ BOOL HttpImpl::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & t
     Json::Value root;
     Json::Reader reader; 
     if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
-        RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+        VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
         Json::Value folderId = root.get("FolderId", 0);
         rfd.dwId.id = folderId.asInt();
@@ -116,7 +116,7 @@ BOOL HttpImpl::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & t
     return TRUE;
 }
 
-BOOL HttpImpl::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPersonal)
+BOOL HttpImpl::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & topPersonal)
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
@@ -145,7 +145,7 @@ BOOL HttpImpl::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> &
     Json::Value root;
     Json::Reader reader; 
     if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
-        RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+        VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
         Json::Value folderId = root.get("FolderId", 0);
         rfd.dwId.id = folderId.asInt();
@@ -167,7 +167,7 @@ BOOL HttpImpl::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> &
     return TRUE;
 }
 
-BOOL HttpImpl::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & childFolders)
+BOOL HttpImpl::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<VFS_FIND_DATA> & childFolders)
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
@@ -197,7 +197,7 @@ BOOL HttpImpl::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId
     Json::Reader reader; 
     if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
         for (size_t index = 0; index < root.size(); index ++){
-            RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+            VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
             Json::Value folderId = root[index].get("FolderId", 0);
             rfd.dwId.id = folderId.asInt();
@@ -220,7 +220,7 @@ BOOL HttpImpl::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId
     return TRUE;
 }
 
-BOOL HttpImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & childFiles)
+BOOL HttpImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<VFS_FIND_DATA> & childFiles)
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
@@ -250,7 +250,7 @@ BOOL HttpImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, 
     Json::Reader reader; 
     if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
         for (size_t index = 0; index < root.size(); index ++){
-            RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+            VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
             // Parse id
             Json::Value folderId = root[index].get("FileId", 0);
@@ -279,7 +279,7 @@ BOOL HttpImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, 
     return TRUE;
 }
 
-BOOL HttpImpl::GetChildFolderAndFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
+BOOL HttpImpl::GetChildFolderAndFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
@@ -314,7 +314,7 @@ BOOL HttpImpl::GetChildFolderAndFiles(TAR_ARCHIVE * pArchive, const RemoteId & r
         Json::Value _fodersInfo = root.get("_foldersInfo", "");
         if (!_fodersInfo.empty()){
             for (size_t index = 0; index < _fodersInfo.size(); index ++){
-                RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+                VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
                 // Parse id
                 Json::Value folderId = _fodersInfo[index].get("id", 0);
@@ -344,7 +344,7 @@ BOOL HttpImpl::GetChildFolderAndFiles(TAR_ARCHIVE * pArchive, const RemoteId & r
         Json::Value _filesInfo = root.get("_filesInfo", "");
         if (!_filesInfo.empty()){
             for (size_t index = 0; index < _filesInfo.size(); index ++){
-                RFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+                VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
                 // Parse id
                 Json::Value folderId = _filesInfo[index].get("id", 0);

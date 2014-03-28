@@ -339,7 +339,7 @@ HRESULT CNseFileItem::_GetPathnameQuick(PCIDLIST_RELATIVE pidlPath, PCITEMID_CHI
    return S_OK;
 }
 
-HRESULT CNseFileItem::_GetIdQuick(PCITEMID_CHILD pidlChild, LocalId * pdwID) const
+HRESULT CNseFileItem::_GetIdQuick(PCITEMID_CHILD pidlChild, RemoteId * pdwID) const
 {
 	ATLASSERT(ILIsAligned64(pidlChild));
 	if( !::ILIsEmpty(pidlChild) ) {
@@ -352,7 +352,7 @@ HRESULT CNseFileItem::_GetIdQuick(PCITEMID_CHILD pidlChild, LocalId * pdwID) con
 	return S_OK;
 }
 
-HRESULT CNseFileItem::_GetViewIdQuick(PCIDLIST_RELATIVE pidlPath, LocalId * pLocalId) const
+HRESULT CNseFileItem::_GetViewIdQuick(PCIDLIST_RELATIVE pidlPath, RemoteId * pRemoteId) const
 {
 	ATLASSERT(ILIsAligned64(pidlPath));
 	if( ::ILIsEmpty(pidlPath) ) {
@@ -360,7 +360,7 @@ HRESULT CNseFileItem::_GetViewIdQuick(PCIDLIST_RELATIVE pidlPath, LocalId * pLoc
 	}
 	while( !::ILIsEmpty(pidlPath) ) {
 		const VFS_FIND_DATA* pWfd = &(reinterpret_cast<const NSEFILEPIDLDATA*>(pidlPath))->wfd;
-		*pLocalId = pWfd->dwId;
+		*pRemoteId = pWfd->dwId;
 		pidlPath = static_cast<PCIDLIST_RELATIVE>(::ILNext(pidlPath));
 	}
 	return S_OK;

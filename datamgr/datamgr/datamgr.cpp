@@ -180,27 +180,27 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive)
 /**
  * Return the list of children of a sub-folder.
  */
-HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA ** retList, int * nListCount)
+HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA ** retList, int * nListCount)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    OUTPUTLOG("%s(), RemoteId={%d, %d}", __FUNCTION__, dwId.category, dwId.id);
    *retList = NULL; *nListCount = 0;
-   std::list<RFS_FIND_DATA> tmpList;
+   std::list<VFS_FIND_DATA> tmpList;
 
    if (dwId.category == VdriveCat && dwId.id == VdriveId){
-	   std::list<RFS_FIND_DATA> publicList;
+	   std::list<VFS_FIND_DATA> publicList;
        GetProto(pArchive)->GetTopPublic(pArchive, publicList);
 	   tmpList.merge(publicList, Utility::RfsComparation);
 
-	   std::list<RFS_FIND_DATA> personalList;
+	   std::list<VFS_FIND_DATA> personalList;
        GetProto(pArchive)->GetTopPersonal(pArchive, personalList);
 	   tmpList.merge(personalList, Utility::RfsComparation);
 
-	   RFS_FIND_DATA recycleBin;
+	   VFS_FIND_DATA recycleBin;
 	   Utility::ConstructRecycleFolder(pArchive, recycleBin);
 	   tmpList.push_back(recycleBin);
 
-	   RFS_FIND_DATA searchBin;
+	   VFS_FIND_DATA searchBin;
 	   Utility::ConstructSearchFolder(pArchive, searchBin);
 	   tmpList.push_back(searchBin);
    }else if (dwId.category == RecycleCat){
@@ -208,11 +208,11 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
    }else if (dwId.category == SearchCat){
 
    }else if (dwId.category == PublicCat || dwId.category == PersonCat){
-	   std::list<RFS_FIND_DATA> childFolders;
+	   std::list<VFS_FIND_DATA> childFolders;
        GetProto(pArchive)->GetChildFolders(pArchive, dwId, childFolders);
 	   tmpList.merge(childFolders, Utility::RfsComparation);
 
-	   std::list<RFS_FIND_DATA> childFiles;
+	   std::list<VFS_FIND_DATA> childFiles;
        GetProto(pArchive)->GetChildFiles(pArchive, dwId, childFiles);
  	   tmpList.merge(childFiles, Utility::RfsComparation);
    }else{
@@ -222,16 +222,16 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
 
    if (tmpList.size() == 0) return S_OK;
 
-   if (S_OK != DMMalloc((LPBYTE *)retList, tmpList.size() * sizeof(RFS_FIND_DATA))){
+   if (S_OK != DMMalloc((LPBYTE *)retList, tmpList.size() * sizeof(VFS_FIND_DATA))){
 	   return E_OUTOFMEMORY;
    }
-   RFS_FIND_DATA *aList = (RFS_FIND_DATA *)(*retList);
+   VFS_FIND_DATA *aList = (VFS_FIND_DATA *)(*retList);
 
    int index = 0;
-   for(std::list<RFS_FIND_DATA>::iterator it = tmpList.begin(); 
+   for(std::list<VFS_FIND_DATA>::iterator it = tmpList.begin(); 
 	   it != tmpList.end(); it ++){ aList [index] = *it;
 		// refine the attributes.
-		RFS_FIND_DATA * pData = &aList[index];
+		VFS_FIND_DATA * pData = &aList[index];
 		pData->dwFileAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;   
 		pData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
 		if (!IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
@@ -242,7 +242,7 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, RFS_FIND_DATA **
    return S_OK;
 }
 
-HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, RFS_FIND_DATA ** retList, int * nListCount)
+HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, VFS_FIND_DATA ** retList, int * nListCount)
 {
     OUTPUTLOG("%s(), RemoteId={%d, %d}", __FUNCTION__, dwId.category, dwId.id);
     *retList = NULL; *nListCount = 0;
@@ -254,7 +254,7 @@ HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, 
     }
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-    std::list<RFS_FIND_DATA> tmpList;
+    std::list<VFS_FIND_DATA> tmpList;
     if (dwId.category == PublicCat || dwId.category == PersonCat)
     {
         if(!GetProto(pArchive)->GetChildFolderAndFiles(pArchive, dwId, tmpList, PageSize, PageNo, totalPage))
@@ -262,16 +262,16 @@ HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, 
     }
     if (!tmpList.size()) return S_FALSE;
 
-    if (S_OK != DMMalloc((LPBYTE *)retList, tmpList.size() * sizeof(RFS_FIND_DATA))){
+    if (S_OK != DMMalloc((LPBYTE *)retList, tmpList.size() * sizeof(VFS_FIND_DATA))){
         return E_OUTOFMEMORY;
     }
-    RFS_FIND_DATA *aList = (RFS_FIND_DATA *)(*retList);
+    VFS_FIND_DATA *aList = (VFS_FIND_DATA *)(*retList);
 
     int index = 0;
-    for(std::list<RFS_FIND_DATA>::iterator it = tmpList.begin(); 
+    for(std::list<VFS_FIND_DATA>::iterator it = tmpList.begin(); 
         it != tmpList.end(); it ++){ aList [index] = *it;
         // refine the attributes.
-        RFS_FIND_DATA * pData = &aList[index];
+        VFS_FIND_DATA * pData = &aList[index];
         pData->dwFileAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;   
         pData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
         if (!IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
@@ -327,7 +327,7 @@ HRESULT DMDelete(TAR_ARCHIVE* pArchive, RemoteId itemId, BOOL isFolder)
 /**
  * Create a new sub-folder in the archive.
  */
-HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilename, RFS_FIND_DATA * pWfd)
+HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilename, VFS_FIND_DATA * pWfd)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    

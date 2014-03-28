@@ -89,10 +89,10 @@ HRESULT CTarFileItem::GetChild(LPCWSTR pwstrName, SHGNO ParseType, CNseItem** pI
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
    ::PathAppend(wszFilename, pwstrName);
    
-   LocalId parentId;
+   RemoteId parentId;
    HR( _GetIdQuick(m_pidlItem, &parentId));
    VFS_FIND_DATA wfd = { 0 };
-   RFS_FIND_DATA * childList = NULL; int childCount = 0;
+   VFS_FIND_DATA * childList = NULL; int childCount = 0;
    DMGetChildrenList(_GetTarArchivePtr(), *(RemoteId *)&parentId, &childList, &childCount);
    for (int i = 0; i < childCount; i++)
    {
@@ -121,7 +121,7 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
 
    // HarryWu, 2014.2.18
    // Get the actual id to retrieve a list of sub-items
-   LocalId dwId = {0,0};
+   RemoteId dwId = {0,0};
    HR( _GetIdQuick(m_pidlItem, &dwId));
 
    DWORD dwPageSize = 0;
@@ -130,10 +130,11 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    // HarryWu, 2014.1.29
    // Note!, it is NOT safe to pass c++ objects array between modules.
    // use /MD to genereate these modules.
-   RFS_FIND_DATA * aList = NULL; int nListCount = 0;
+   VFS_FIND_DATA * aList = NULL; int nListCount = 0;
 
    if (dwPageSize){
-       HR( DMGetChildrenListEx(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, m_pWfd->dwPage, (int *)&m_pWfd->dwTotalPage, &aList, &nListCount));
+       DWORD dwTotalPage = 0;
+       HR( DMGetChildrenListEx(_GetTarArchivePtr(), *(RemoteId *)&dwId, 0x7fffFFFF, 1, (int *)&dwTotalPage, &aList, &nListCount));
    }else{
        HR( DMGetChildrenList(_GetTarArchivePtr(), *(RemoteId*)&dwId, &aList, &nListCount) );
    } 
@@ -156,10 +157,10 @@ HRESULT CTarFileItem::GetStream(const VFS_STREAM_REASON& Reason, CNseFileStream*
    WCHAR wszFilename[MAX_PATH] = { 0 };
    HR( _GetPathnameQuick(m_pidlFolder, m_pidlItem, wszFilename) );
    
-   LocalId parentId;
+   RemoteId parentId;
    HR( _GetViewIdQuick(m_pidlFolder, &parentId));
    
-   LocalId itemId;
+   RemoteId itemId;
    HR(_GetIdQuick(m_pidlItem, &itemId));
 
    *ppFile = new CTarFileStream(static_cast<CTarFileSystem*>(m_pFolder->m_spFS.m_p), parentId, itemId, wszFilename, Reason.uAccess);
@@ -171,7 +172,7 @@ HRESULT CTarFileItem::GetStream(const VFS_STREAM_REASON& Reason, CNseFileStream*
  */
 HRESULT CTarFileItem::CreateFolder()
 {
-   LocalId parentId = {0,0};
+   RemoteId parentId = {0,0};
    HR( _GetViewIdQuick(m_pidlFolder, &parentId));
 
    // Create new directory in archive
@@ -180,7 +181,7 @@ HRESULT CTarFileItem::CreateFolder()
 
    OUTPUTLOG("%s(), pidlFodler=%p, pidlItem=%p", __FUNCTION__, m_pidlFolder, m_pidlItem);
 
-   HR( DMCreateFolder(_GetTarArchivePtr(), *(RemoteId *)&parentId, wszFilename, (RFS_FIND_DATA *)m_pWfd) );
+   HR( DMCreateFolder(_GetTarArchivePtr(), *(RemoteId *)&parentId, wszFilename, (VFS_FIND_DATA *)m_pWfd) );
    return S_OK;
 }
 
@@ -225,7 +226,7 @@ HRESULT CTarFileItem::OnSelected(BOOL isSelected)
 HRESULT CTarFileItem::InitCustomColumns()
 {
     wchar_t szColumns [MAX_PATH] = _T("");
-    LocalId viewId; _GetIdQuick(m_pidlItem, &viewId);
+    RemoteId viewId; _GetIdQuick(m_pidlItem, &viewId);
     HR( DMGetCustomColumns(_GetTarArchivePtr(), *(RemoteId *)&viewId, szColumns, lengthof(szColumns)));
     return S_OK;
 }
@@ -344,7 +345,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
     // http://msdn.microsoft.com/en-us/library/windows/desktop/dd318066(v=vs.85).aspx
     if (!DMHttpIsEnable())
     {
-        LocalId ItemId; _GetIdQuick(m_pidlItem, &ItemId);
+        RemoteId ItemId; _GetIdQuick(m_pidlItem, &ItemId);
 
 		FORMATETC fmtec; 
 		fmtec.cfFormat = CF_HDROP;
@@ -412,7 +413,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 
 HRESULT CTarFileItem::_PreviewFile( PCITEMID_CHILD pidl)
 {
-	LocalId itemId = m_pWfd->dwId;
+	RemoteId itemId = m_pWfd->dwId;
 
     if (!DMPreviewFile(_GetTarArchivePtr(), *(RemoteId *)&itemId))
         return S_FALSE;
@@ -422,14 +423,12 @@ HRESULT CTarFileItem::_PreviewFile( PCITEMID_CHILD pidl)
 
 HRESULT CTarFileItem::_PrevPage( VFS_MENUCOMMAND & Cmd)
 {
-    if (m_pWfd->dwPage > 0) m_pWfd->dwPage--; else return S_OK;
     _RefreshFolderView();
     return S_OK;
 }
 
 HRESULT CTarFileItem::_NextPage( VFS_MENUCOMMAND & Cmd)
 {
-    if (m_pWfd->dwPage < m_pWfd->dwTotalPage) m_pWfd->dwPage++; else return S_OK;
     _RefreshFolderView();
     return S_OK;
 }

@@ -9,15 +9,15 @@ public:
 public:
     BOOL Login(TAR_ARCHIVE * pArchive);
 
-    BOOL GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPublic);
+    BOOL GetTopPublic(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & topPublic);
 
-    BOOL GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPersonal);
+    BOOL GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & topPersonal);
 
-    BOOL GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<RFS_FIND_DATA> & childFolders);
+    BOOL GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<VFS_FIND_DATA> & childFolders);
 
-    BOOL GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<RFS_FIND_DATA> & childFiles);
+    BOOL GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<VFS_FIND_DATA> & childFiles);
 
-    BOOL GetChildFolderAndFiles(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<RFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount);
+    BOOL GetChildFolderAndFiles(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount);
 
     BOOL DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder);
 

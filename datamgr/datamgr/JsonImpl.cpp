@@ -54,7 +54,7 @@ BOOL JsonImpl::Login(TAR_ARCHIVE * pArchive)
     return TRUE;
 }
 
-BOOL JsonImpl::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPublic)
+BOOL JsonImpl::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & topPublic)
 {
     // HarryWu, 2014.2.28
     // Json Format request, not in use now, 
@@ -79,7 +79,7 @@ BOOL JsonImpl::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & t
     return TRUE;
 }
 
-BOOL JsonImpl::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> & topPersonal)
+BOOL JsonImpl::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & topPersonal)
 {
     // HarryWu, 2014.2.28
     // Json Format request, not in use now, 
@@ -104,7 +104,7 @@ BOOL JsonImpl::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<RFS_FIND_DATA> &
     return TRUE;
 }
 
-BOOL JsonImpl::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & childFolders)
+BOOL JsonImpl::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<VFS_FIND_DATA> & childFolders)
 {
     // HarryWu, 2014.2.28
     // Json Format request, not in use now, 
@@ -130,7 +130,7 @@ BOOL JsonImpl::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId
 }
 
 
-BOOL JsonImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<RFS_FIND_DATA> & childFiles)
+BOOL JsonImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std::list<VFS_FIND_DATA> & childFiles)
 {
     // HarryWu, 2014.2.28
     // Json Format request, not in use now, 
@@ -155,7 +155,7 @@ BOOL JsonImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, 
     return TRUE;
 }
 
-BOOL JsonImpl::GetChildFolderAndFiles(TAR_ARCHIVE *pArchive, const RemoteId &folderId, std::list<RFS_FIND_DATA> &children, int PageSize, int PageNo, int *PageCount)
+BOOL JsonImpl::GetChildFolderAndFiles(TAR_ARCHIVE *pArchive, const RemoteId &folderId, std::list<VFS_FIND_DATA> &children, int PageSize, int PageNo, int *PageCount)
 {
     // HarryWu, 2014.2.28
     // Json Format request, not in use now, 

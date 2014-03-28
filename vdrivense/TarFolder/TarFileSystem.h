@@ -18,11 +18,11 @@
 
 #pragma once
 
-#include "NseFileSystem.h"
-
 // HarryWu, 2014.1.29
 // the data source implementation.
 #include <datamgr.h>
+
+#include "NseFileSystem.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // Definitions
@@ -135,12 +135,12 @@ public:
    DWORD m_dwCurPos;                             // Current position in memory buffer
    DWORD m_dwFileSize;                           // Known size of file in memory
    UINT m_uAccess;                               // Stream opened for read or write access?
-   LocalId m_itemId;
-   LocalId m_parentId;
+   RemoteId m_itemId;
+   RemoteId m_parentId;
 
    // Constructor
 
-   CTarFileStream(CTarFileSystem* pFS, LocalId parentId, LocalId itemId, LPCWSTR pstrFilename, UINT uAccess);
+   CTarFileStream(CTarFileSystem* pFS, RemoteId parentId, RemoteId itemId, LPCWSTR pstrFilename, UINT uAccess);
    virtual ~CTarFileStream();
 
    // CNseFileStream

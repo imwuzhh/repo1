@@ -7,7 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // CTarFileStream
 
-CTarFileStream::CTarFileStream(CTarFileSystem* pFS, LocalId parentId, LocalId itemId, LPCWSTR pstrFilename, UINT uAccess) :
+CTarFileStream::CTarFileStream(CTarFileSystem* pFS, RemoteId parentId, RemoteId itemId, LPCWSTR pstrFilename, UINT uAccess) :
    m_uAccess(uAccess), m_pData(NULL), m_dwCurPos(0), m_dwFileSize(0), m_dwAllocSize(10L * 1024L)
 {
    m_spFS = pFS;

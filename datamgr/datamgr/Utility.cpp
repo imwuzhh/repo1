@@ -34,7 +34,7 @@ void OutputLog(const char * format, ...){
 
 //////////////////////////////////////////////////////////////////////////
 // Helpers
-BOOL Utility::ConstructRecycleFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & recycleFolder)
+BOOL Utility::ConstructRecycleFolder(TAR_ARCHIVE * pArchive, VFS_FIND_DATA & recycleFolder)
 {
     memset(&recycleFolder, 0, sizeof(recycleFolder));
     recycleFolder.dwId.category = RecycleCat;
@@ -47,7 +47,7 @@ BOOL Utility::ConstructRecycleFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & rec
     return TRUE;
 }
 
-BOOL Utility::ConstructSearchFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & searchFolder)
+BOOL Utility::ConstructSearchFolder(TAR_ARCHIVE * pArchive, VFS_FIND_DATA & searchFolder)
 {
     memset(&searchFolder, 0, sizeof(searchFolder));
     searchFolder.dwId.category = SearchCat;
@@ -60,7 +60,7 @@ BOOL Utility::ConstructSearchFolder(TAR_ARCHIVE * pArchive, RFS_FIND_DATA & sear
     return TRUE;
 }
 
-bool Utility::RfsComparation(const RFS_FIND_DATA & left, const RFS_FIND_DATA & right)
+bool Utility::RfsComparation(const VFS_FIND_DATA & left, const VFS_FIND_DATA & right)
 {
 	return (left.dwId.category - right.dwId.category)<0;
 	//return wcscmp(left.cFileName, right.cFileName);

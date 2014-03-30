@@ -427,3 +427,75 @@ BOOL JsonImpl::PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
 
     return TRUE;
 }
+
+BOOL JsonImpl::OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "OnShellViewCreated";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["WindowHandle"] = (int)shellViewWnd;
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    return TRUE;
+}
+
+BOOL JsonImpl::OnShellViweSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "OnShellViweSized";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["WindowHandle"] = (int)shellViewWnd;
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    return TRUE;
+}
+
+BOOL JsonImpl::OnShellViewRefreshed(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "OnShellViewRefreshed";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["WindowHandle"] = (int)shellViewWnd;
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    return TRUE;
+}

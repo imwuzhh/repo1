@@ -38,4 +38,10 @@ public:
      BOOL GetColumnInfo(TAR_ARCHIVE * pArchive, const RemoteId & viewId, wchar_t * pColumnInfo, int maxcch);
 
      BOOL PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId);
+
+     BOOL OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
+
+     BOOL OnShellViweSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
+
+     BOOL OnShellViewRefreshed(TAR_ARCHIVE  * pArchive, HWND shellViewWnd);
 };

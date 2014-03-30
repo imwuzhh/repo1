@@ -480,6 +480,21 @@ HRESULT CNseBaseItem::OnSelected(BOOL isSelected)
     return E_NOTIMPL;
 }
 
+HRESULT CNseBaseItem::OnShellViewCreated(HWND shellViewWnd)
+{
+    return E_NOTIMPL;
+}
+
+HRESULT CNseBaseItem::OnShellViewRefreshed(HWND shellViewWnd)
+{
+    return E_NOTIMPL;
+}
+
+HRESULT CNseBaseItem::OnShellViewSized(HWND shellViewWnd)
+{
+    return E_NOTIMPL;
+}
+
 HRESULT CNseBaseItem::InitCustomColumns()
 {
     return E_NOTIMPL;

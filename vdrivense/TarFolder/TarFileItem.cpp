@@ -421,6 +421,30 @@ HRESULT CTarFileItem::_PreviewFile( PCITEMID_CHILD pidl)
 	return S_OK;
 }
 
+HRESULT CTarFileItem::OnShellViewCreated(HWND shellViewWnd)
+{
+    if (!DMOnShellViewCreated(_GetTarArchivePtr(), shellViewWnd))
+        return S_FALSE;
+
+    return S_OK;
+}
+
+HRESULT CTarFileItem::OnShellViewSized(HWND shellViewWnd)
+{
+    if (!DMOnShellViewSized(_GetTarArchivePtr(), shellViewWnd))
+        return S_FALSE;
+
+    return S_OK;
+}
+
+HRESULT CTarFileItem::OnShellViewRefreshed(HWND shellViewWnd)
+{
+    if (!DMOnShellViewRefreshed(_GetTarArchivePtr(), shellViewWnd))
+        return S_FALSE;
+
+    return S_OK;
+}
+
 HRESULT CTarFileItem::_PrevPage( VFS_MENUCOMMAND & Cmd)
 {
     _RefreshFolderView();

@@ -1174,6 +1174,9 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 	// Spy++ confuse GetParent() and GetAncestor(GA_PARENT)
 
     m_spFolderItem->InitCustomColumns();
+
+    m_spFolderItem->OnShellViewCreated((HWND)wParam);
+
     return 0;
 }
 
@@ -1191,6 +1194,7 @@ LRESULT CShellFolder::OnListRefreshed(UINT uMsg, WPARAM wParam, LPARAM lParam, B
    // This is an undocumented feature, but it appears that when the user
    // forces a refresh (ie. through F5) then the wParam is non-zero.
    if( wParam != 0 ) m_spFolderItem->Refresh(VFS_REFRESH_USERFORCED);
+   m_spFolderItem->OnShellViewRefreshed(NULL);
    return 0;
 }
 
@@ -1227,6 +1231,7 @@ LRESULT CShellFolder::OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam
 
 LRESULT CShellFolder::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+    m_spFolderItem->OnShellViewSized(NULL);
 	return S_FALSE;
 }
 

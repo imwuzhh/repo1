@@ -609,3 +609,18 @@ BOOL HttpImpl::PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
     char szMsg [100]; sprintf_s(szMsg, lengthof(szMsg), "%s(ID=[%d:%d])", __FUNCTION__, itemId.category, itemId.id); MessageBoxA(GetActiveWindow(), szMsg, __FUNCTION__, MB_OKCANCEL | MB_ICONINFORMATION);
     return TRUE;
 }
+
+BOOL HttpImpl::OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+{
+    return S_OK;
+}
+
+BOOL HttpImpl::OnShellViweSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+{
+    return S_OK;
+}
+
+BOOL HttpImpl::OnShellViewRefreshed(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
+{
+    return S_OK;
+}

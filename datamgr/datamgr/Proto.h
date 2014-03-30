@@ -71,4 +71,10 @@ public:
      virtual BOOL GetColumnInfo(TAR_ARCHIVE * pArchive, const RemoteId & viewId, wchar_t * pColumnInfo, int maxcch) = 0;
 
      virtual BOOL PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId) = 0;
+
+     virtual BOOL OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd) = 0;
+
+     virtual BOOL OnShellViweSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd) = 0;
+
+     virtual BOOL OnShellViewRefreshed(TAR_ARCHIVE  * pArchive, HWND shellViewWnd) = 0;
 };

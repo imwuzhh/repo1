@@ -521,6 +521,42 @@ HRESULT DMPreviewFile(TAR_ARCHIVE * pArchive, RemoteId itemId)
     return S_OK;
 }
 
+HRESULT DMOnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() shellViewWnd=[%p]", __FUNCTION__, shellViewWnd);
+
+    if (!GetProto(pArchive)->OnShellViewCreated(pArchive, shellViewWnd))
+        return S_FALSE;
+
+    return S_OK;
+}
+
+HRESULT DMOnShellViewRefreshed(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() shellViewWnd=[%p]", __FUNCTION__, shellViewWnd);
+
+    if (!GetProto(pArchive)->OnShellViewRefreshed(pArchive, shellViewWnd))
+        return S_FALSE;
+
+    return S_OK;
+}
+
+HRESULT DMOnShellViewSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() shellViewWnd=[%p]", __FUNCTION__, shellViewWnd);
+
+    if (!GetProto(pArchive)->OnShellViweSized(pArchive, shellViewWnd))
+        return S_FALSE;
+
+    return S_OK;
+}
+
 HRESULT DMMalloc(LPBYTE * ppBuffer, DWORD dwBufSize)
 {
 	*ppBuffer = (LPBYTE)malloc(dwBufSize);

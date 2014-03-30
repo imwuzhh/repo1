@@ -106,6 +106,9 @@ public:
    HRESULT Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName);
    HRESULT Delete();
    HRESULT OnSelected(BOOL isSelected);
+   HRESULT OnShellViewCreated(HWND shellViewWnd);
+   HRESULT OnShellViewRefreshed(HWND shellViewWnd);
+   HRESULT OnShellViewSized(HWND shellViewWnd);
    HRESULT InitCustomColumns();
 
    HMENU GetMenu();

@@ -445,6 +445,14 @@ HRESULT CTarFileItem::OnShellViewRefreshed(HWND shellViewWnd)
     return S_OK;
 }
 
+HRESULT CTarFileItem::OnShellViewClosing(HWND shellViewWnd)
+{
+    if (!DMOnShellViewClosing(_GetTarArchivePtr(), shellViewWnd))
+        return S_FALSE;
+
+    return S_OK;
+}
+
 HRESULT CTarFileItem::_PrevPage( VFS_MENUCOMMAND & Cmd)
 {
     _RefreshFolderView();

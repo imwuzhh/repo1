@@ -41,7 +41,9 @@ public:
 
      BOOL OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
 
-     BOOL OnShellViweSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
+     BOOL OnShellViewSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
 
      BOOL OnShellViewRefreshed(TAR_ARCHIVE  * pArchive, HWND shellViewWnd);
+
+     BOOL OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd);
 };

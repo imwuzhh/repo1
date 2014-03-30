@@ -1235,6 +1235,12 @@ LRESULT CShellFolder::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	return S_FALSE;
 }
 
+LRESULT CShellFolder::OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+    m_spFolderItem->OnShellViewClosing(NULL);
+    return S_FALSE;
+}
+
 // Operations
 
 /**

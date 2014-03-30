@@ -495,6 +495,11 @@ HRESULT CNseBaseItem::OnShellViewSized(HWND shellViewWnd)
     return E_NOTIMPL;
 }
 
+HRESULT CNseBaseItem::OnShellViewClosing(HWND shellViewWnd)
+{
+    return E_NOTIMPL;
+}
+
 HRESULT CNseBaseItem::InitCustomColumns()
 {
     return E_NOTIMPL;

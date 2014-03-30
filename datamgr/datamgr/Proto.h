@@ -74,7 +74,9 @@ public:
 
      virtual BOOL OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd) = 0;
 
-     virtual BOOL OnShellViweSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd) = 0;
+     virtual BOOL OnShellViewSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd) = 0;
 
      virtual BOOL OnShellViewRefreshed(TAR_ARCHIVE  * pArchive, HWND shellViewWnd) = 0;
+
+     virtual BOOL OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd) = 0;
 };

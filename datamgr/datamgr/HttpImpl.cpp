@@ -615,12 +615,17 @@ BOOL HttpImpl::OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
     return S_OK;
 }
 
-BOOL HttpImpl::OnShellViweSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+BOOL HttpImpl::OnShellViewSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
 {
     return S_OK;
 }
 
 BOOL HttpImpl::OnShellViewRefreshed(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
+{
+    return S_OK;
+}
+
+BOOL HttpImpl::OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
 {
     return S_OK;
 }

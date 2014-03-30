@@ -267,6 +267,14 @@ HRESULT DMOnShellViewRefreshed(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
 HRESULT DMOnShellViewSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
 
 /**
+* Notify about size change of shell view window
+* Parameters:
+* [pArchive] context handle
+* [shellViewWnd] window handle of shell view window
+*/
+HRESULT DMOnShellViewClosing(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
+
+/**
 * Malloc memory from libdatamgr, as we use /MT to build, if you get memory from this module, free it with DMFree().
 * Parameters:
 * [ppBuffer] out pointer to hold the buffer position allated.

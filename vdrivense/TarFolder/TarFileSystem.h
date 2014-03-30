@@ -109,6 +109,7 @@ public:
    HRESULT OnShellViewCreated(HWND shellViewWnd);
    HRESULT OnShellViewRefreshed(HWND shellViewWnd);
    HRESULT OnShellViewSized(HWND shellViewWnd);
+   HRESULT OnShellViewClosing(HWND shellViewWnd);
    HRESULT InitCustomColumns();
 
    HMENU GetMenu();

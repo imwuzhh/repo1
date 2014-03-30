@@ -551,7 +551,19 @@ HRESULT DMOnShellViewSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
 
     OUTPUTLOG("%s() shellViewWnd=[%p]", __FUNCTION__, shellViewWnd);
 
-    if (!GetProto(pArchive)->OnShellViweSized(pArchive, shellViewWnd))
+    if (!GetProto(pArchive)->OnShellViewSized(pArchive, shellViewWnd))
+        return S_FALSE;
+
+    return S_OK;
+}
+
+HRESULT DMOnShellViewClosing(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() shellViewWnd=[%p]", __FUNCTION__, shellViewWnd);
+
+    if (!GetProto(pArchive)->OnShellViewClosing(pArchive, shellViewWnd))
         return S_FALSE;
 
     return S_OK;

@@ -270,7 +270,7 @@ public:
    virtual HRESULT OnShellViewCreated(HWND shellViewWnd) = 0;
    virtual HRESULT OnShellViewRefreshed(HWND shellViewWnd) = 0;
    virtual HRESULT OnShellViewSized(HWND shellViewWnd) = 0;
-
+   virtual HRESULT OnShellViewClosing(HWND shellViewWnd) = 0;
    virtual HRESULT InitCustomColumns() = 0;
 };
 
@@ -363,6 +363,7 @@ public:
    HRESULT OnShellViewCreated(HWND shellViewWnd);
    HRESULT OnShellViewRefreshed(HWND shellViewWnd);
    HRESULT OnShellViewSized(HWND shellViewWnd);
+   HRESULT OnShellViewClosing(HWND shellViewWnd);
    HRESULT InitCustomColumns();
 
    // Implementation

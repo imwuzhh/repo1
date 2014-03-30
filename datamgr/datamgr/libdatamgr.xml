@@ -8,7 +8,7 @@
     <HttpConnectioTimeoutMilliSeconds>5000</HttpConnectioTimeoutMilliSeconds>
   </Net>
   <View>
-    <PageSize>2147483148</PageSize>
+    <PageSize>3</PageSize>
   </View>
   <Locale>
     <RecycleBin>

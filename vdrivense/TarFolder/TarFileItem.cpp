@@ -127,6 +127,11 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    DWORD dwPageSize = 0;
    HR (DMGetPageSize(_GetTarArchivePtr(), &dwPageSize));
 
+   DWORD dwCurrPage = 0;
+   if (dwId.id != VdriveId){
+       HR (DMGetCurrentPageNumber(_GetTarArchivePtr(), dwId, &dwCurrPage));
+   }
+
    // HarryWu, 2014.1.29
    // Note!, it is NOT safe to pass c++ objects array between modules.
    // use /MD to genereate these modules.
@@ -134,7 +139,10 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
 
    if (dwPageSize){
        DWORD dwTotalPage = 0;
-       HR( DMGetChildrenListEx(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, 1, (int *)&dwTotalPage, &aList, &nListCount));
+       HR( DMGetChildrenListEx(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &aList, &nListCount));
+       if (dwId.id != VdriveId){
+           HR( DMSetTotalPageNumber(_GetTarArchivePtr(), dwId, dwTotalPage));
+       }       
    }else{
        HR( DMGetChildrenList(_GetTarArchivePtr(), *(RemoteId*)&dwId, &aList, &nListCount) );
    } 
@@ -144,6 +152,8 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
       if( SHFilterEnumItem(grfFlags, *(WIN32_FIND_DATA *)(&aList[i])) != S_OK ) continue;
       // Create an NSE Item from the file-info data
       aItems.Add( GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, *(VFS_FIND_DATA *)(&aList[i])) );
+      // Cache it to db
+      DMAddItemToDB(_GetTarArchivePtr(), aList[i].dwId, aList[i].cFileName, IsBitSet(aList[i].dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
    }
    DMFree((LPBYTE)aList);
    return S_OK;
@@ -455,12 +465,14 @@ HRESULT CTarFileItem::OnShellViewClosing(HWND shellViewWnd)
 
 HRESULT CTarFileItem::_PrevPage( VFS_MENUCOMMAND & Cmd)
 {
+    HR( DMDecCurrentPageNumber(_GetTarArchivePtr(), m_pWfd->dwId));
     _RefreshFolderView();
     return S_OK;
 }
 
 HRESULT CTarFileItem::_NextPage( VFS_MENUCOMMAND & Cmd)
 {
+    HR( DMIncCurrentPageNumber(_GetTarArchivePtr(), m_pWfd->dwId));
     _RefreshFolderView();
     return S_OK;
 }

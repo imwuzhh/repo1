@@ -374,11 +374,14 @@ BOOL HttpImpl::GetChildFolderAndFiles(TAR_ARCHIVE * pArchive, const RemoteId & r
         Json::Value _settings = root.get("_settings", "");
         if (!_settings.empty()){
             Json::Value JsonTotalCount = _settings.get("totalCount", 0);
+            int itemCount = 0;
             if (!JsonTotalCount.empty()){
-                *PageCount = JsonTotalCount.asInt();
+                itemCount = JsonTotalCount.asInt();
             }
-            if (*PageCount == 0)
+            if (itemCount == 0)
                 return FALSE;
+
+            *PageCount = ( itemCount % PageSize ) ? (itemCount/PageSize + 1): (itemCount/PageSize);
         }
     }
     return TRUE;

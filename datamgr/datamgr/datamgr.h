@@ -275,6 +275,23 @@ HRESULT DMOnShellViewSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
 HRESULT DMOnShellViewClosing(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
 
 /**
+* Get Current Page Number
+* Parameters:
+* [pArchive] context handle
+* [id] folder's id
+* [retPageNo] pointer to retrieve current page number.
+*/
+HRESULT DMGetCurrentPageNumber(TAR_ARCHIVE * pArchive, RemoteId id, DWORD * retPageNo);
+
+HRESULT DMIncCurrentPageNumber(TAR_ARCHIVE * pArchive, RemoteId id);
+
+HRESULT DMDecCurrentPageNumber(TAR_ARCHIVE * pArchive, RemoteId id);
+
+HRESULT DMSetTotalPageNumber(TAR_ARCHIVE * pArchive, RemoteId id, DWORD totalPage);
+
+HRESULT DMAddItemToDB(TAR_ARCHIVE * pArchive, RemoteId id, wchar_t * pwstrName, BOOL isFolder);
+
+/**
 * Malloc memory from libdatamgr, as we use /MT to build, if you get memory from this module, free it with DMFree().
 * Parameters:
 * [ppBuffer] out pointer to hold the buffer position allated.

@@ -21,6 +21,13 @@ EXPORTS
 	DMSelect
 	DMGetCustomColumns
 	
+	DMGetCurrentPageNumber
+	DMIncCurrentPageNumber
+	DMDecCurrentPageNumber
+	DMSetTotalPageNumber
+	
+	DMAddItemToDB
+	
 	DMPreviewFile
 	
 	DMOnShellViewCreated

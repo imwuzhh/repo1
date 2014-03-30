@@ -49,6 +49,22 @@
 static Edoc2Context * gspEdoc2Context = NULL;
 static __inline Proto * GetProto(TAR_ARCHIVE * pArchive){ return (pArchive->context->proto);}
 ///////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
+// Global database ref-ed by id
+struct ServerItemInfo
+{
+    DWORD id;
+    BOOL  isFolder;
+    DWORD dwCurPage;
+    DWORD dwTotalPage;
+    wchar_t szName[MAX_PATH];
+};
+typedef std::map<DWORD, ServerItemInfo> DBType;
+static DBType * gspGlobalDB = NULL;
+static __inline DBType * GetDB(TAR_ARCHIVE * pArchive) {return (gspGlobalDB);}
+//////////////////////////////////////////////////////////////////////////
+
 // TAR archive manipulation
 
 /**
@@ -59,6 +75,10 @@ static HRESULT DMInit(HINSTANCE hInst){
 	HRESULT hr = E_FAIL;
 	if (gspEdoc2Context) return S_OK;
 
+    // Create a global db
+    gspGlobalDB = new DBType();
+
+    // Create a global context
 	gspEdoc2Context = new Edoc2Context();
 	memset(gspEdoc2Context, 0, sizeof(Edoc2Context));
 
@@ -596,3 +616,84 @@ HRESULT DMFree(LPBYTE pBuffer)
 	return S_OK;
 }
 
+HRESULT DMGetCurrentPageNumber(TAR_ARCHIVE * pArchive, RemoteId id, DWORD * retPageNo)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    if (GetDB(pArchive)->find(id.id) == GetDB(pArchive)->end())
+        return E_FAIL;
+
+    const ServerItemInfo & refItem = gspGlobalDB->find(id.id)->second;
+
+    *retPageNo = refItem.dwCurPage;
+
+    return S_OK;
+}
+
+HRESULT DMIncCurrentPageNumber(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    if (GetDB(pArchive)->find(id.id) == GetDB(pArchive)->end())
+        return E_FAIL;
+
+    ServerItemInfo & refItem = gspGlobalDB->find(id.id)->second;
+
+    if (refItem.dwCurPage < refItem.dwTotalPage) refItem.dwCurPage ++;
+
+    return S_OK;
+}
+
+HRESULT DMDecCurrentPageNumber(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    if (GetDB(pArchive)->find(id.id) == GetDB(pArchive)->end())
+        return E_FAIL;
+
+    ServerItemInfo & refItem = gspGlobalDB->find(id.id)->second;
+
+    if (refItem.dwCurPage > 1) refItem.dwCurPage --;
+
+    return S_OK;
+}
+
+HRESULT DMSetTotalPageNumber(TAR_ARCHIVE * pArchive, RemoteId id, DWORD totalPage)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    if (GetDB(pArchive)->find(id.id) == GetDB(pArchive)->end())
+        return E_FAIL;
+
+    ServerItemInfo & refItem = gspGlobalDB->find(id.id)->second;
+
+    refItem.dwTotalPage = totalPage;
+
+    return S_OK;
+}
+
+HRESULT DMAddItemToDB(TAR_ARCHIVE * pArchive, RemoteId id, wchar_t * pwstrName, BOOL isFolder)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    ServerItemInfo item = {0};
+    item.id = id.id;
+    item.dwCurPage = 1;
+    item.dwTotalPage = 0;
+    item.isFolder = isFolder;
+    wcscpy_s(item.szName, lengthof(item.szName), pwstrName);
+
+    GetDB(pArchive)->insert(std::make_pair(id.id, item));
+
+    return S_OK;
+}

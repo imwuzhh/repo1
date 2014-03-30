@@ -46,4 +46,8 @@ public:
     BOOL OnShellViewRefreshed(TAR_ARCHIVE  * pArchive, HWND shellViewWnd);
 
     BOOL OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd);
+
+    BOOL FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo);
+
+    BOOL FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo);
 };

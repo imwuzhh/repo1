@@ -523,3 +523,55 @@ BOOL JsonImpl::OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
 
     return TRUE;
 }
+
+BOOL JsonImpl::FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "FileExists";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["parentId"] = (int)parentId.id;
+    parameters["childName"]= (const char *)CW2AEX<>(childName, CP_UTF8);
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}
+
+BOOL JsonImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "FolderExists";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["parentId"] = (int)parentId.id;
+    parameters["childName"]= (const char *)CW2AEX<>(childName, CP_UTF8);
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}

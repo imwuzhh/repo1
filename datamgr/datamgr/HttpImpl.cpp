@@ -615,20 +615,30 @@ BOOL HttpImpl::PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
 
 BOOL HttpImpl::OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
 {
-    return S_OK;
+    return FALSE;
 }
 
 BOOL HttpImpl::OnShellViewSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
 {
-    return S_OK;
+    return FALSE;
 }
 
 BOOL HttpImpl::OnShellViewRefreshed(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
 {
-    return S_OK;
+    return FALSE;
 }
 
 BOOL HttpImpl::OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
 {
-    return S_OK;
+    return FALSE;
+}
+
+BOOL HttpImpl::FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo)
+{
+    return FALSE;
+}
+
+BOOL HttpImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo)
+{
+    return FALSE;
 }

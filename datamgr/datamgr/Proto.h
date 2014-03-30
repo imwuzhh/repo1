@@ -79,4 +79,8 @@ public:
      virtual BOOL OnShellViewRefreshed(TAR_ARCHIVE  * pArchive, HWND shellViewWnd) = 0;
 
      virtual BOOL OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd) = 0;
+
+     virtual BOOL FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo) = 0;
+
+     virtual BOOL FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo) = 0;
 };

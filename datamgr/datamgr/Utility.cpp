@@ -749,3 +749,38 @@ BOOL Utility::HttpPostForm(const wchar_t * url, const wchar_t * httpform, const 
     return TRUE;
 }
 
+BOOL Utility::GetShellViewPageSize(const wchar_t* xmlconfigfile, DWORD * pageSize)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("View");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild("PageSize");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    if (target->ToElement() && target->ToElement()->GetText())
+        *pageSize = atoi(target->ToElement()->GetText());
+
+    delete xdoc; xdoc = NULL;
+
+    return TRUE;
+}

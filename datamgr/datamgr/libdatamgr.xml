@@ -7,6 +7,9 @@
     <HttpEnable>Yes</HttpEnable>
     <HttpConnectioTimeoutMilliSeconds>5000</HttpConnectioTimeoutMilliSeconds>
   </Net>
+  <View>
+    <PageSize>2147483148</PageSize>
+  </View>
   <Locale>
     <RecycleBin>
       <en-US>RecycleBin</en-US>

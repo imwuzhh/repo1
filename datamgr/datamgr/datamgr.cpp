@@ -110,6 +110,9 @@ static HRESULT DMInit(HINSTANCE hInst){
 	Utility::GetServiceUser(context.configfile, context.username, lengthof(context.username));
 	Utility::GetServicePass(context.configfile, context.password, lengthof(context.password));
 
+    // Setup PageSize of View
+    Utility::GetShellViewPageSize(context.configfile, &context.pageSize);
+
 	// Cleanup AccessToken
 	context.AccessToken [0] = _T('\0');
 

@@ -134,7 +134,7 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
 
    if (dwPageSize){
        DWORD dwTotalPage = 0;
-       HR( DMGetChildrenListEx(_GetTarArchivePtr(), *(RemoteId *)&dwId, 0x7fffFFFF, 1, (int *)&dwTotalPage, &aList, &nListCount));
+       HR( DMGetChildrenListEx(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, 1, (int *)&dwTotalPage, &aList, &nListCount));
    }else{
        HR( DMGetChildrenList(_GetTarArchivePtr(), *(RemoteId*)&dwId, &aList, &nListCount) );
    } 

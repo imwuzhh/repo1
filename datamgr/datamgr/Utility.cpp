@@ -785,9 +785,10 @@ BOOL Utility::GetShellViewPageSize(const wchar_t* xmlconfigfile, DWORD * pageSiz
     return TRUE;
 }
 
-BOOL Utility::ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime)
+BOOL Utility::ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime2)
 {
     // "2014-03-26T16:15:38.223"
+    SYSTEMTIME sTime, *retTime ; retTime = &sTime;
     _stscanf_s(timestr.c_str(), _T("%04hd-%02hd-%02hdT%02hd:%02hd:%02hd.%03hd")
         , &retTime->wYear
         , &retTime->wMonth
@@ -796,5 +797,7 @@ BOOL Utility::ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime)
         , &retTime->wMinute
         , &retTime->wSecond
         , &retTime->wMilliseconds);
+    TIME_ZONE_INFORMATION tz; GetTimeZoneInformation(&tz);
+    SystemTimeToTzSpecificLocalTime(&tz, retTime, retTime2);
     return TRUE;
 }

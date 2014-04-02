@@ -442,12 +442,11 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
 
                 rfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
 
-                SYSTEMTIME stime, localTime; GetSystemTime(&stime);
+                SYSTEMTIME stime; GetSystemTime(&stime);
                 Json::Value modifyTime = _fodersInfo[index].get("modifyTime", "0000-00-00T00:00:00.000");
                 if (!modifyTime.empty()){
                     Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
                 }
-                SystemTimeToTzSpecificLocalTime(NULL, &stime, &localTime);
                 FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
                 rfd.ftLastAccessTime = rfd.ftLastWriteTime = ftime;
 
@@ -456,7 +455,6 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
                 if (!modifyTime.empty()){
                     Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
                 }
-                SystemTimeToTzSpecificLocalTime(NULL, &stime, &localTime);
                 SystemTimeToFileTime(&stime, &ftime);
                 rfd.ftCreationTime = ftime;
 
@@ -487,12 +485,11 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
 
                 rfd.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
                 
-                SYSTEMTIME stime, localTime; GetSystemTime(&stime);
+                SYSTEMTIME stime; GetSystemTime(&stime);
                 Json::Value modifyTime = _filesInfo[index].get("modifyTime", "0000-00-00T00:00:00.000");
                 if (!modifyTime.empty()){
                     Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
                 }
-                SystemTimeToTzSpecificLocalTime(NULL, &stime, &localTime);
                 FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
                 rfd.ftLastAccessTime = rfd.ftLastWriteTime = rfd.ftCreationTime = ftime;
 
@@ -501,7 +498,6 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
                 if (!modifyTime.empty()){
                     Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
                 }
-                SystemTimeToTzSpecificLocalTime(NULL, &stime, &localTime);
                 SystemTimeToFileTime(&stime, &ftime);
                 rfd.ftCreationTime = ftime;
 

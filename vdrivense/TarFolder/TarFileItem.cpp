@@ -136,10 +136,11 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    // Note!, it is NOT safe to pass c++ objects array between modules.
    // use /MD to genereate these modules.
    VFS_FIND_DATA * aList = NULL; int nListCount = 0;
-
+   ViewSettings vs; memset(&vs, 0, sizeof(vs));
    if (dwPageSize){
        DWORD dwTotalPage = 0;
-       HR( DMGetChildrenListEx(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &aList, &nListCount));
+       //HR( DMGetChildrenListEx(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &aList, &nListCount));
+       HR( DMGetDocInfo(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &vs, &aList, &nListCount));
        if (dwId.id != VdriveId){
            HR( DMSetTotalPageNumber(_GetTarArchivePtr(), dwId, dwTotalPage));
        }       

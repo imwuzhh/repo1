@@ -784,3 +784,17 @@ BOOL Utility::GetShellViewPageSize(const wchar_t* xmlconfigfile, DWORD * pageSiz
 
     return TRUE;
 }
+
+BOOL Utility::ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime)
+{
+    // "2014-03-26T16:15:38.223"
+    _stscanf_s(timestr.c_str(), _T("%04hd-%02hd-%02hdT%02hd:%02hd:%02hd.%03hd")
+        , &retTime->wYear
+        , &retTime->wMonth
+        , &retTime->wDay
+        , &retTime->wHour
+        , &retTime->wMinute
+        , &retTime->wSecond
+        , &retTime->wMilliseconds);
+    return TRUE;
+}

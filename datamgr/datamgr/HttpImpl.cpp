@@ -441,9 +441,24 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
                 rfd.nFileSizeLow = fileSize.asInt();
 
                 rfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
-                SYSTEMTIME stime; GetSystemTime(&stime);
+
+                SYSTEMTIME stime, localTime; GetSystemTime(&stime);
+                Json::Value modifyTime = _fodersInfo[index].get("modifyTime", "0000-00-00T00:00:00.000");
+                if (!modifyTime.empty()){
+                    Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
+                }
+                SystemTimeToTzSpecificLocalTime(NULL, &stime, &localTime);
                 FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
-                rfd.ftLastAccessTime = rfd.ftLastWriteTime = rfd.ftCreationTime = ftime;
+                rfd.ftLastAccessTime = rfd.ftLastWriteTime = ftime;
+
+                GetSystemTime(&stime);
+                modifyTime = _fodersInfo[index].get("createTime", "0000-00-00T00:00:00.000");
+                if (!modifyTime.empty()){
+                    Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
+                }
+                SystemTimeToTzSpecificLocalTime(NULL, &stime, &localTime);
+                SystemTimeToFileTime(&stime, &ftime);
+                rfd.ftCreationTime = ftime;
 
                 children.push_back(rfd);
             }
@@ -471,9 +486,24 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
                 rfd.nFileSizeLow = fileSize.asInt();
 
                 rfd.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
-                SYSTEMTIME stime; GetSystemTime(&stime);
+                
+                SYSTEMTIME stime, localTime; GetSystemTime(&stime);
+                Json::Value modifyTime = _filesInfo[index].get("modifyTime", "0000-00-00T00:00:00.000");
+                if (!modifyTime.empty()){
+                    Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
+                }
+                SystemTimeToTzSpecificLocalTime(NULL, &stime, &localTime);
                 FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
                 rfd.ftLastAccessTime = rfd.ftLastWriteTime = rfd.ftCreationTime = ftime;
+
+                GetSystemTime(&stime);
+                modifyTime = _filesInfo[index].get("createTime", "0000-00-00T00:00:00.000");
+                if (!modifyTime.empty()){
+                    Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
+                }
+                SystemTimeToTzSpecificLocalTime(NULL, &stime, &localTime);
+                SystemTimeToFileTime(&stime, &ftime);
+                rfd.ftCreationTime = ftime;
 
                 children.push_back(rfd);
             }
@@ -490,6 +520,18 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
                 return FALSE;
 
             *PageCount = ( itemCount % PageSize ) ? (itemCount/PageSize + 1): (itemCount/PageSize);
+        }
+
+        // Parse _infoItems
+        Json::Value _infoItems = root.get("_infoItems", "");
+        if (!_infoItems.empty() && _infoItems.isArray()){
+            for (int i = 0; i < _infoItems.size(); i++)
+            {
+                Json::Value item = _infoItems[i].get("_title", "");
+                if (!item.empty()){
+                    columns.push_back((const wchar_t *)CA2WEX<>(item.asString().c_str(), CP_UTF8));
+                }
+            }
         }
     }
     return TRUE;

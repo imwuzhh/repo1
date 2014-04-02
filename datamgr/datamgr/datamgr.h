@@ -77,6 +77,15 @@ typedef struct _VFS_FIND_DATAW {
     typedef LPVFS_FIND_DATAA LPVFS_FIND_DATA;
 #endif // UNICODE
 
+struct ColumnDef {
+    wchar_t colName [100];
+};
+
+struct ViewSettings{
+    int colCount;
+    struct ColumnDef aColumns [100];
+};
+
 struct Edoc2Context;
 
 struct TAR_ARCHIVE
@@ -125,7 +134,7 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA **
 * Enumerate the children of specified id.
 * Parameters:
 * [pArchive] the context.
-* [dwId] the folder's id used to enumerate its childeren.
+* [dwId] the folder's id used to enumerate its children.
 * [PageSize]
 * [PageNo]
 * [totalPage]
@@ -133,6 +142,8 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA **
 * [nListCount] pointer to get number of the total children.
 */
 HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, VFS_FIND_DATA ** aList, int * nListCount);
+
+HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** aList, int * nListCount);
 
 /**
 * Get Page size

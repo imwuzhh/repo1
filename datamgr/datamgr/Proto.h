@@ -15,6 +15,8 @@ public:
      
      virtual BOOL GetChildFolderAndFiles(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount) = 0;
      
+     virtual BOOL GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<std::wstring> & columns, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount) = 0;
+     
      virtual BOOL DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder) = 0;
      
      virtual BOOL RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * newName, BOOL isFolder) = 0;

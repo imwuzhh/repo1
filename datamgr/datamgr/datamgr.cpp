@@ -345,7 +345,7 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int Pag
     for (std::list<std::wstring>::iterator colIt = columns.begin(); colIt != columns.end(); colIt++)
     {
         if (colIndex < lengthof(pVS->aColumns)){
-            pVS->aColumns[colIndex].colName, lengthof(pVS->aColumns[colIndex].colName, colIt->c_str());
+            wcscpy_s(pVS->aColumns[colIndex].colName, lengthof(pVS->aColumns[colIndex].colName), colIt->c_str());
             colIndex ++;
         }
     }

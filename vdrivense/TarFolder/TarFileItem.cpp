@@ -96,7 +96,7 @@ HRESULT CTarFileItem::GetChild(LPCWSTR pwstrName, SHGNO ParseType, CNseItem** pI
    DMGetChildrenList(_GetTarArchivePtr(), *(RemoteId *)&parentId, &childList, &childCount);
    for (int i = 0; i < childCount; i++)
    {
-	   if (!wcsicmp(pwstrName, childList[i].cFileName)){
+	   if (!_wcsicmp(pwstrName, childList[i].cFileName)){
 		   wfd = *(VFS_FIND_DATA *)&childList[i];
 		   *pItem = GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, wfd);
 		   DMFree((LPBYTE)childList);
@@ -268,6 +268,14 @@ HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
    case ID_FILE_PROPERTIES:  return _DoShowProperties(Cmd);
    case ID_FILE_PREV:        return _PrevPage(Cmd);
    case ID_FILE_NEXT:        return _NextPage(Cmd);
+   case ID_FILE_SHARE:       return _Share(Cmd);
+   case ID_FILE_INNERLINK:   return _InternalLink(Cmd);
+   case ID_FILE_DISTRIBUTE:  return _Distribute(Cmd);
+   case ID_FILE_LOCK:        return _LockFile(Cmd, TRUE);
+   case ID_FILE_UNLOCK:      return _LockFile(Cmd, FALSE);
+   case ID_FILE_OLDVERSION:  return _HistoryVersion(Cmd);
+   case ID_FILE_VIEWLOG:     return _ViewLog(Cmd);
+   case ID_FILE_EXTEDIT:     return _ExtEdit(Cmd);
    }
    return E_NOTIMPL;
 }
@@ -475,5 +483,47 @@ HRESULT CTarFileItem::_NextPage( VFS_MENUCOMMAND & Cmd)
 {
     HR( DMIncCurrentPageNumber(_GetTarArchivePtr(), m_pWfd->dwId));
     _RefreshFolderView();
+    return S_OK;
+}
+
+HRESULT CTarFileItem::_Share(VFS_MENUCOMMAND & Cmd)
+{
+    HR ( DMShareFile(_GetTarArchivePtr(), m_pWfd->dwId));
+    return S_OK;
+}
+
+HRESULT CTarFileItem::_InternalLink(VFS_MENUCOMMAND & Cmd)
+{
+    HR ( DMInternalLink(_GetTarArchivePtr(), m_pWfd->dwId));
+    return S_OK;
+}
+
+HRESULT CTarFileItem::_Distribute(VFS_MENUCOMMAND & Cmd)
+{
+    HR ( DMDistributeFile(_GetTarArchivePtr(), m_pWfd->dwId));
+    return S_OK;
+}
+
+HRESULT CTarFileItem::_LockFile(VFS_MENUCOMMAND & Cmd, BOOL lock)
+{
+    HR ( DMLockFile(_GetTarArchivePtr(), m_pWfd->dwId, lock));
+    return S_OK;
+}
+
+HRESULT CTarFileItem::_HistoryVersion(VFS_MENUCOMMAND & Cmd)
+{
+    HR ( DMHistoryVersion(_GetTarArchivePtr(), m_pWfd->dwId));
+    return S_OK;
+}
+
+HRESULT CTarFileItem::_ViewLog(VFS_MENUCOMMAND & Cmd)
+{
+    HR ( DMViewLog(_GetTarArchivePtr(), m_pWfd->dwId));
+    return S_OK;
+}
+
+HRESULT CTarFileItem::_ExtEdit(VFS_MENUCOMMAND & Cmd)
+{
+    HR ( DMExtEditFile(_GetTarArchivePtr(), m_pWfd->dwId));
     return S_OK;
 }

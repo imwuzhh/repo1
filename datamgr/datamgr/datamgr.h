@@ -302,6 +302,23 @@ HRESULT DMSetTotalPageNumber(TAR_ARCHIVE * pArchive, RemoteId id, DWORD totalPag
 
 HRESULT DMAddItemToDB(TAR_ARCHIVE * pArchive, RemoteId id, wchar_t * pwstrName, BOOL isFolder);
 
+HRESULT DMLockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock);
+
+HRESULT DMIsFileLocked(TAR_ARCHIVE * pArchive, RemoteId id, BOOL * isLocked);
+
+HRESULT DMInternalLink(TAR_ARCHIVE * pArchive, RemoteId id);
+
+HRESULT DMShareFile(TAR_ARCHIVE * pArchive, RemoteId id);
+
+HRESULT DMExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id);
+
+HRESULT DMDistributeFile(TAR_ARCHIVE * pArchive, RemoteId id);
+
+HRESULT DMViewLog(TAR_ARCHIVE * pArchive, RemoteId id);
+
+HRESULT DMHistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id);
+
+
 /**
 * Malloc memory from libdatamgr, as we use /MT to build, if you get memory from this module, free it with DMFree().
 * Parameters:

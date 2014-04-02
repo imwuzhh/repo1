@@ -55,6 +55,7 @@ static __inline Proto * GetProto(TAR_ARCHIVE * pArchive){ return (pArchive->cont
 struct ServerItemInfo
 {
     DWORD id;
+    BOOL  isLocked;
     BOOL  isFolder;
     DWORD dwCurPage;
     DWORD dwTotalPage;
@@ -742,6 +743,78 @@ HRESULT DMAddItemToDB(TAR_ARCHIVE * pArchive, RemoteId id, wchar_t * pwstrName, 
     wcscpy_s(item.szName, lengthof(item.szName), pwstrName);
 
     GetDB(pArchive)->insert(std::make_pair(id.id, item));
+
+    return S_OK;
+}
+
+HRESULT DMLockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d], lock=[%d]", __FUNCTION__, id.category, id.id, toLock);
+
+    return S_OK;
+}
+
+HRESULT DMIsFileLocked(TAR_ARCHIVE * pArchive, RemoteId id, BOOL * isLocked)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    return S_OK;
+}
+
+HRESULT DMInternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    return S_OK;
+}
+
+HRESULT DMShareFile(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    return S_OK;
+}
+
+HRESULT DMExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    return S_OK;
+}
+
+HRESULT DMDistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    return S_OK;
+}
+
+HRESULT DMViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    return S_OK;
+}
+
+HRESULT DMHistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
 
     return S_OK;
 }

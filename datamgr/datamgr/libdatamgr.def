@@ -30,6 +30,14 @@ EXPORTS
 	DMAddItemToDB
 	
 	DMPreviewFile
+	DMLockFile
+	DMIsFileLocked
+	DMInternalLink
+	DMShareFile
+	DMExtEditFile
+	DMDistributeFile
+	DMViewLog
+	DMHistoryVersion
 	
 	DMOnShellViewCreated
 	DMOnShellViewSized

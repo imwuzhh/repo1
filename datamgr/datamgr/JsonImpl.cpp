@@ -213,6 +213,34 @@ BOOL JsonImpl::GetDocInfo(TAR_ARCHIVE *pArchive, const RemoteId &folderId, std::
     return TRUE;
 }
 
+BOOL JsonImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
+{
+    // HarryWu, 2014.2.28
+    // Json Format request, not in use now, 
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "GetPagedRecycleItems";
+
+    Json::Value parameters; 
+    parameters["PageSize"] = (int)PageSize;
+    parameters["PageNo"]   = (int)PageNo;
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    // Do Json Request
+    std::wstring jsonResp;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), jsonResp))
+        return FALSE;
+
+    // TODO: Json result parsing.
+    return TRUE;
+}
+
 BOOL JsonImpl::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder)
 {
     Json::StyledWriter writer;

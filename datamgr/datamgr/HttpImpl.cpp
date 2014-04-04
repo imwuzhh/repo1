@@ -542,6 +542,186 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
     return TRUE;
 }
 
+BOOL HttpImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
+{
+    // HarryWu, 2014.2.28
+    // Here begin of HttpRequest, directly to remote server
+    if (pArchive->context->AccessToken[0] == _T('\0')){
+        if (!Login(pArchive)){
+            OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
+            return FALSE;
+        }
+    }
+    // "http://7.25.25.112/edoc2v4/?token=97cc65e4-9e70-49e4-91cc-ac8453936a8b"
+    // [PostData]
+    // jueAction:postBack
+    // jueUid:webClient
+    // jueEvt:LoadPagedDocRecycle
+    // pageNum:1
+    // pageSize:0
+    wchar_t url [MaxUrlLength] = _T("");
+    wsprintf(url
+        , _T("%s/edoc2v4/?token=%s")
+        , pArchive->context->service, pArchive->context->AccessToken);
+
+    wchar_t formxml [MaxUrlLength] = _T("");
+    wsprintf(formxml
+        , _T("<form>")
+        _T("<input type='text' name='jueAction' value='postBack'></input>")
+        _T("<input type='text' name='jueUid' value='webClient'></input>")
+        _T("<input type='text' name='jueEvt' value='LoadPagedDocRecycle'></input>")
+        _T("<input type='text' name='pageNum' value='%d'></input>")
+        _T("<input type='text' name='pageSize' value='%d'></input>")
+        _T("</form>")
+        , PageNo, PageSize);
+
+    // Prepare cookie.
+    std::wstring cookie = _T("");
+    cookie += _T("account=");  cookie += pArchive->context->username;    cookie += _T(";");
+    cookie += _T("tkn=");      cookie += pArchive->context->AccessToken; cookie += _T(";");
+    cookie += _T("token=");    cookie += pArchive->context->AccessToken; cookie += _T(";");
+    cookie += _T("remeberAccount=true");cookie += _T(";");
+
+    std::stringstream respstream;
+    if (!Utility::HttpPostForm(url, formxml, cookie, respstream, pArchive->context->HttpTimeoutMs))
+        return FALSE;
+
+    std::string respstr = respstream.str();
+
+    std::wstring response = (const wchar_t *)CA2WEX<>(respstr.c_str(), CP_UTF8);
+
+    // Sample Response:
+    // {"result":0,"pageNum":1,"pageSize":30,"totalCount":69,"folders":[{"id":113,"name":"新建文件夹 (1)","size":16826340,"deleteTime":new Date(1395646476007),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹 (1)","folderType":1},{"id":117,"name":"新建文件夹","size":4206585,"deleteTime":new Date(1395646475817),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹","folderType":1},{"id":112,"name":"1","size":8438763,"deleteTime":new Date(1395646475597),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\1","folderType":1},{"id":96,"name":"pdb","size":227897,"deleteTime":new Date(1395564222297),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\pdb","folderType":1},{"id":40,"name":"321简体","size":132103,"deleteTime":new Date(1395564221717),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\321简体","folderType":1},{"id":72,"name":"123是3","size":959981,"deleteTime":new Date(1395564220387),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\123是3","folderType":1},{"id":99,"name":"几","size":0,"deleteTime":new Date(1395396857870),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"企业内容库\\123中文\\几","folderType":1},{"id":95,"name":"haoderen","size":0,"deleteTime":new Date(1395324669897),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\haoderen","folderType":1},{"id":92,"name":"新建文件夹 (1)","size":0,"deleteTime":new Date(1395208297690),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"企业内容库\\新建文件夹 (1)","folderType":1},{"id":66,"name":"pdb","size":0,"deleteTime":new Date(1395121656737),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\pdb","folderType":1},{"id":93,"name":"新建文件夹 (2)","size":0,"deleteTime":new Date(1395046902390),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"企业内容库\\新建文件夹 (2)","folderType":1},{"id":46,"name":"testfolderrename","size":0,"deleteTime":new Date(1395043644743),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\testfolderrename","folderType":1},{"id":94,"name":"新建文件夹 (3)","size":0,"deleteTime":new Date(1395037542607),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"企业内容库\\新建文件夹 (3)","folderType":1},{"id":88,"name":"新建文件夹 (2)","size":0,"deleteTime":new Date(1395036910120),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"企业内容库\\新建文件夹 (2)","folderType":1},{"id":86,"name":"新建文件sdd","size":0,"deleteTime":new Date(1395036895037),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"企业内容库\\新建文件sdd","folderType":1},{"id":87,"name":"新建文件夹 (1)","size":0,"deleteTime":new Date(1395036589640),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"企业内容库\\新建文件夹 (1)","folderType":1},{"id":89,"name":"新建文件夹 (3)","size":0,"deleteTime":new Date(1395036475940),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"企业内容库\\新建文件夹 (3)","folderType":1},{"id":90,"name":"新建文件夹 (4)","size":0,"deleteTime":new Date(1395036386410),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"企业内容库\\新建文件夹 (4)","folderType":1},{"id":56,"name":"新建文件夹 (10)","size":0,"deleteTime":new Date(1394701252897),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹 (10)","folderType":1},{"id":55,"name":"新建文件夹 (9)","size":0,"deleteTime":new Date(1394701252627),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹 (9)","folderType":1},{"id":54,"name":"新建文件夹 (8)","size":0,"deleteTime":new Date(1394701252533),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹 (8)","folderType":1},{"id":53,"name":"新建文件夹 (7)","size":0,"deleteTime":new Date(1394701252377),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹 (7)","folderType":1},{"id":52,"name":"新建文件夹 (6)","size":0,"deleteTime":new Date(1394701252303),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹 (6)","folderType":1},{"id":51,"name":"新建文件夹 (5)","size":0,"deleteTime":new Date(1394701252183),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹 (5)","folderType":1},{"id":50,"name":"新建文件夹 (4)","size":0,"deleteTime":new Date(1394701252063),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹 (4)","folderType":1},{"id":49,"name":"新建文件夹 (3)","size":0,"deleteTime":new Date(1394701252003),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹 (3)","folderType":1},{"id":48,"name":"新建文件夹 (2)","size":0,"deleteTime":new Date(1394701251867),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹 (2)","folderType":1},{"id":47,"name":"新建文件夹 (1)","size":0,"deleteTime":new Date(1394701251717),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"个人内容库\\Administrator\\新建文件夹 (1)","folderType":1},{"id":42,"name":"看io扩","size":0,"deleteTime":new Date(1394520798527),"deletedBy":"Administrator","creatorName":"Administrator","namePath":"企业内容库\\123中文\\看io扩","folderType":1}],"files":[{"id":95,"name":"雾里看花.jpg","size":16093,"deleteTime":new Date(1395897960107),"deletedBy":"test1","creatorName":"Administrator","namePath":"企业内容库\\新丼建文件夹","fileType":2}]}
+
+    if (response.empty())
+        return FALSE;
+
+    while(true){
+        size_t pBegin = response.find(_T("new Date("));
+        if (pBegin != std::wstring::npos) {
+            size_t pEnd = response.find(_T(")"), pBegin);
+            if (pEnd != std::wstring::npos){
+                response.replace(pBegin, pEnd - pBegin + 1, _T("\"2104-04-04T12:12:12.000\""));
+            }
+        } else break;
+    }
+
+    OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
+    Json::Value root;
+    Json::Reader reader; 
+    if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
+        // Parse Folder array
+        Json::Value _fodersInfo = root.get("folders", "");
+        if (!_fodersInfo.empty()){
+            for (size_t index = 0; index < _fodersInfo.size(); index ++){
+                VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+
+                // Parse id
+                Json::Value folderId = _fodersInfo[index].get("id", 0);
+                rfd.dwId.id = folderId.asInt();
+                rfd.dwId.category = RecycleCat;
+                if (rfd.dwId.id == 0) return FALSE;
+
+                // Parse Name
+                Json::Value folderName = _fodersInfo[index].get("name", "");
+                std::string test = folderName.asString();
+                if (test.empty()) return FALSE;
+                wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
+
+                // Parse FileCurSize
+                Json::Value fileSize = _fodersInfo[index].get("size", 0);
+                rfd.nFileSizeLow = fileSize.asInt();
+
+                rfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+
+                SYSTEMTIME stime; GetSystemTime(&stime);
+                Json::Value modifyTime = _fodersInfo[index].get("modifyTime", "0000-00-00T00:00:00.000");
+                if (!modifyTime.empty()){
+                    Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
+                }
+                FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
+                rfd.ftLastAccessTime = rfd.ftLastWriteTime = ftime;
+
+                GetSystemTime(&stime);
+                modifyTime = _fodersInfo[index].get("createTime", "0000-00-00T00:00:00.000");
+                if (!modifyTime.empty()){
+                    Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
+                }
+                SystemTimeToFileTime(&stime, &ftime);
+                rfd.ftCreationTime = ftime;
+
+                std::string creatorName = _fodersInfo[index].get("creatorName", "").asString();
+                wcscpy_s(rfd.creatorName, lengthof(rfd.creatorName), (const wchar_t *)CA2WEX<>(creatorName.c_str(), CP_UTF8));
+
+                children.push_back(rfd);
+            }
+        }
+        // Parse Files array
+        Json::Value _filesInfo = root.get("files", "");
+        if (!_filesInfo.empty()){
+            for (size_t index = 0; index < _filesInfo.size(); index ++){
+                VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+
+                // Parse id
+                Json::Value folderId = _filesInfo[index].get("id", 0);
+                rfd.dwId.id = folderId.asInt();
+                rfd.dwId.category = RecycleCat;
+                if (rfd.dwId.id == 0) return FALSE;
+
+                // Parse Name
+                Json::Value folderName = _filesInfo[index].get("name", "");
+                std::string test = folderName.asString();
+                if (test.empty()) return FALSE;
+                wcscpy_s(rfd.cFileName, lengthof(rfd.cFileName), (const wchar_t *)CA2W(test.c_str()));
+
+                // Parse FileCurSize
+                Json::Value fileSize = _filesInfo[index].get("size", 0);
+                rfd.nFileSizeLow = fileSize.asInt();
+
+                rfd.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+
+                SYSTEMTIME stime; GetSystemTime(&stime);
+                Json::Value modifyTime = _filesInfo[index].get("modifyTime", "0000-00-00T00:00:00.000");
+                if (!modifyTime.empty()){
+                    Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
+                }
+                FILETIME   ftime; SystemTimeToFileTime(&stime, &ftime);
+                rfd.ftLastAccessTime = rfd.ftLastWriteTime = rfd.ftCreationTime = ftime;
+
+                GetSystemTime(&stime);
+                modifyTime = _filesInfo[index].get("createTime", "0000-00-00T00:00:00.000");
+                if (!modifyTime.empty()){
+                    Utility::ParseTime((const wchar_t *)CA2WEX<>(modifyTime.asString().c_str(), CP_UTF8), &stime);
+                }
+                SystemTimeToFileTime(&stime, &ftime);
+                rfd.ftCreationTime = ftime;
+
+                std::string creatorName = _filesInfo[index].get("creatorName", "").asString();
+                wcscpy_s(rfd.creatorName, lengthof(rfd.creatorName), (const wchar_t *)CA2WEX<>(creatorName.c_str(), CP_UTF8));
+
+                std::string lastVerNumStr = _filesInfo[index].get("lastVerNumStr", "").asString();
+                wcscpy_s(rfd.versionStr, lengthof(rfd.versionStr), (const wchar_t *)CA2WEX<>(lastVerNumStr.c_str(), CP_UTF8));
+
+                children.push_back(rfd);
+            }
+        }
+        // Parse _settings.
+        {
+            Json::Value JsonTotalCount = root.get("totalCount", 0);
+            int itemCount = 0;
+            if (!JsonTotalCount.empty()){
+                itemCount = JsonTotalCount.asInt();
+            }
+            if (itemCount == 0)
+                return FALSE;
+
+            *PageCount = ( itemCount % PageSize ) ? (itemCount/PageSize + 1): (itemCount/PageSize);
+        }
+    }
+    return TRUE;
+}
+
 BOOL HttpImpl::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder)
 {
     // HarryWu, 2014.2.28

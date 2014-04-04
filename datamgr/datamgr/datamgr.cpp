@@ -237,7 +237,7 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA **
  	   tmpList.merge(childFiles, Utility::RfsComparation);
    }else{
 	   OUTPUTLOG("Invalid RemoteId{%d,%d}", dwId.category, dwId.id);
-	   return E_INVALIDARG;
+	   return S_FALSE;
    }
 
    if (tmpList.size() == 0) return S_OK;
@@ -307,7 +307,7 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int Pag
     OUTPUTLOG("%s(), RemoteId={%d, %d}", __FUNCTION__, dwId.category, dwId.id);
     *retList = NULL; *nListCount = 0;
     // TODO, not implemented for root/search/recycle, use default NON-PAGED version.
-    if (dwId.category == VdriveCat || dwId.category == SearchCat || dwId.category == RecycleCat){
+    if (dwId.category == VdriveCat){
         HR(DMGetChildrenList(pArchive, dwId, retList, nListCount));
         *totalPage = 1;
         return S_OK;
@@ -320,6 +320,15 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int Pag
     {
         if(!GetProto(pArchive)->GetDocInfo(pArchive, dwId, columns, tmpList, PageSize, PageNo, totalPage))
             return S_FALSE;
+    }
+    if (dwId.category == RecycleCat)
+    {
+        if(!GetProto(pArchive)->GetPagedRecycleItems(pArchive, tmpList, PageSize, PageNo, totalPage))
+            return S_FALSE;        
+    }
+    if (dwId.category == SearchCat){
+        // ...
+        return S_FALSE;
     }
     if (!tmpList.size()) return S_FALSE;
 

@@ -648,31 +648,9 @@ BOOL Utility::GenerateTempFilePath(wchar_t * pwszTempFilePath, int cchMax, const
     return TRUE;
 }
 
-BOOL Utility::HttpPostForm(const wchar_t * url, const wchar_t * httpform, const wchar_t * cookie, std::stringstream & response, int timeoutMs)
+BOOL Utility::HttpPostForm(const wchar_t * url, const wchar_t * httpform, const std::wstring & cookie, std::stringstream & response, int timeoutMs)
 {
-    {
-        TiXmlDocument * xdoc = new TiXmlDocument();
-        xdoc->Parse((const char *)CW2AEX<>(httpform, CP_UTF8));
-
-        TiXmlElement * xroot = xdoc->RootElement();
-
-        for (TiXmlElement * child = xroot->FirstChildElement("input"); child; child = child->NextSiblingElement("input"))
-        {
-            const char * typestr = child->Attribute("type");
-
-            if (!stricmp(typestr, "file")){
-                const char * valuestr = child->Attribute("value");
-            }
-
-            if (!stricmp(typestr, "text") || !stricmp(typestr, "hidden") || !stricmp(typestr, "button")){
-                const char * valuestr = child->Attribute("value");
-            }
-        }
-
-        delete xdoc; xdoc = NULL;
-        return FALSE;
-    }    
-
+    bool useMulitPartPost = false;
     CURL *curl;
     CURLcode res;
 
@@ -688,6 +666,45 @@ BOOL Utility::HttpPostForm(const wchar_t * url, const wchar_t * httpform, const 
     curl_global_init(CURL_GLOBAL_ALL);
 
     //TODO: parse http form, and setup parameters for http post.
+    std::string formdataurlencoded = "";
+    {
+        TiXmlDocument * xdoc = new TiXmlDocument();
+        xdoc->Parse((const char *)CW2AEX<>(httpform, CP_UTF8));
+
+        TiXmlElement * xroot = xdoc->RootElement();
+
+        for (TiXmlElement * child = xroot->FirstChildElement("input"); child; child = child->NextSiblingElement("input"))
+        {
+            const char * typestr = child->Attribute("type");
+            if (typestr == NULL) continue ;
+
+            const char *namestr = NULL; const char * valuestr = NULL;
+            if (!stricmp(typestr, "file")){
+                namestr  = child->Attribute("name");
+                valuestr = child->Attribute("value");
+            }
+
+            if (!stricmp(typestr, "text") || !stricmp(typestr, "hidden") || !stricmp(typestr, "button")){
+                namestr  = child->Attribute("name");             
+                valuestr = child->Attribute("value");
+
+                if (useMulitPartPost){
+                    curl_formadd(&formpost,
+                        &lastptr,
+                        CURLFORM_COPYNAME, namestr,
+                        CURLFORM_COPYCONTENTS, valuestr,
+                        CURLFORM_END);
+                }else{
+                    formdataurlencoded += namestr; formdataurlencoded += "="; formdataurlencoded += valuestr; formdataurlencoded += "&"; 
+                }
+            }
+
+            if (namestr && valuestr) OUTPUTLOG("KEY[`%s\']->Value[`%s\']", namestr, valuestr);
+        }
+
+        delete xdoc; xdoc = NULL;
+        //return FALSE;
+    }  
     
     curl = curl_easy_init();
     /* initalize custom header list (stating that Expect: 100-continue is not wanted */
@@ -699,7 +716,8 @@ BOOL Utility::HttpPostForm(const wchar_t * url, const wchar_t * httpform, const 
         /* only disable 100-continue header if explicitly requested */
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
 
-        curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+        curl_easy_setopt(curl, CURLOPT_POST, 1);
+        curl_easy_setopt(curl, CURLOPT_COPYPOSTFIELDS, formdataurlencoded.c_str());
 
         /* send all data to this function  */ 
         curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
@@ -709,6 +727,11 @@ BOOL Utility::HttpPostForm(const wchar_t * url, const wchar_t * httpform, const 
 
         // curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, timeoutMs);
         curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT_MS, timeoutMs);
+
+        // Setup cookie, if present
+        if (!cookie.empty()){
+            curl_easy_setopt(curl, CURLOPT_COOKIE, (const char *)CW2AEX<>(cookie.c_str(), CP_UTF8));
+        }
 
         /* Perform the request, res will get the return code */
         res = curl_easy_perform(curl);

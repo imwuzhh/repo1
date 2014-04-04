@@ -128,7 +128,7 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    HR (DMGetPageSize(_GetTarArchivePtr(), &dwPageSize));
 
    DWORD dwCurrPage = 0;
-   if (dwId.id != VdriveId){
+   if (dwId.category != VdriveCat){
        HR (DMGetCurrentPageNumber(_GetTarArchivePtr(), dwId, &dwCurrPage));
    }
 

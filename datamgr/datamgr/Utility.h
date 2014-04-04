@@ -31,6 +31,7 @@ public:
     static BOOL HttpPostForm(const wchar_t * url, const wchar_t * httpform, const wchar_t * cookie, std::stringstream & response, int timeoutMs);
     static BOOL GetShellViewPageSize(const wchar_t* xmlconfigfile, DWORD * pageSize);
     static BOOL ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime);
+    static BOOL ParseVersion(const std::wstring & verString, DWORD * dwVersion);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

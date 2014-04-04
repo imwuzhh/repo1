@@ -458,6 +458,9 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
                 SystemTimeToFileTime(&stime, &ftime);
                 rfd.ftCreationTime = ftime;
 
+                std::string creatorName = _fodersInfo[index].get("creatorName", "").asString();
+                wcscpy_s(rfd.creatorName, lengthof(rfd.creatorName), (const wchar_t *)CA2WEX<>(creatorName.c_str(), CP_UTF8));
+
                 children.push_back(rfd);
             }
         }
@@ -500,6 +503,12 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
                 }
                 SystemTimeToFileTime(&stime, &ftime);
                 rfd.ftCreationTime = ftime;
+
+                std::string creatorName = _filesInfo[index].get("creatorName", "").asString();
+                wcscpy_s(rfd.creatorName, lengthof(rfd.creatorName), (const wchar_t *)CA2WEX<>(creatorName.c_str(), CP_UTF8));
+
+                std::string lastVerNumStr = _filesInfo[index].get("lastVerNumStr", "").asString();
+                wcscpy_s(rfd.versionStr, lengthof(rfd.versionStr), (const wchar_t *)CA2WEX<>(lastVerNumStr.c_str(), CP_UTF8));
 
                 children.push_back(rfd);
             }

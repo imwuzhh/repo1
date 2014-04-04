@@ -37,21 +37,6 @@ struct RemoteId {
 	DWORD id;
 };
 
-typedef struct _VFS_FIND_DATAA {
-	DWORD dwFileAttributes;
-	FILETIME ftCreationTime;
-	FILETIME ftLastAccessTime;
-	FILETIME ftLastWriteTime;
-	DWORD nFileSizeHigh;
-	DWORD nFileSizeLow;
-	DWORD dwReserved0;
-	DWORD dwReserved1;
-	CHAR   cFileName[ MAX_PATH ];
-	CHAR   cAlternateFileName[ 14 ];
-///////////////////////////////////////////////////
-	RemoteId dwId;
-} VFS_FIND_DATAA, *PVFS_FIND_DATAA, *LPVFS_FIND_DATAA;
-
 typedef struct _VFS_FIND_DATAW {
 	DWORD dwFileAttributes;
 	FILETIME ftCreationTime;
@@ -65,17 +50,9 @@ typedef struct _VFS_FIND_DATAW {
 	WCHAR  cAlternateFileName[ 14 ];
 //////////////////////////////////////////////////
     RemoteId dwId;
-} VFS_FIND_DATAW, *PVFS_FIND_DATAW, *LPVFS_FIND_DATAW;
-
-#ifdef UNICODE
-    typedef VFS_FIND_DATAW VFS_FIND_DATA;
-    typedef PVFS_FIND_DATAW PVFS_FIND_DATA;
-    typedef LPVFS_FIND_DATAW LPVFS_FIND_DATA;
-#else
-    typedef VFS_FIND_DATAA VFS_FIND_DATA;
-    typedef PVFS_FIND_DATAA PVFS_FIND_DATA;
-    typedef LPVFS_FIND_DATAA LPVFS_FIND_DATA;
-#endif // UNICODE
+    WCHAR versionStr [16];
+    WCHAR creatorName[32];
+} VFS_FIND_DATA, *PVFS_FIND_DATA, *LPVFS_FIND_DATA;
 
 struct ColumnDef {
     wchar_t colName [100];

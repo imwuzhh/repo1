@@ -175,6 +175,12 @@ HRESULT CNseFileItem::GetProperty(REFPROPERTYKEY pkey, CComPropVariant& v)
    if( pkey == PKEY_DateAccessed ) {
       return ::InitPropVariantFromFileTime(&m_pWfd->ftLastAccessTime, &v);
    }
+   if( pkey == PKEY_Author ){
+       return ::InitPropVariantFromString(m_pWfd->creatorName, &v);
+   }
+   if( pkey == PKEY_FileVersion ){
+       return ::InitPropVariantFromString(m_pWfd->versionStr, &v);
+   }
    if( IsFolder() ) 
    {
       if( pkey == PKEY_PerceivedType ) {

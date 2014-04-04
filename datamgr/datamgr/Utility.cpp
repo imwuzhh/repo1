@@ -801,3 +801,8 @@ BOOL Utility::ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime2)
     SystemTimeToTzSpecificLocalTime(&tz, retTime, retTime2);
     return TRUE;
 }
+
+BOOL Utility::ParseVersion(const std::wstring & verString, DWORD * dwVersion)
+{
+    return TRUE;
+}

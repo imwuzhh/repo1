@@ -38,7 +38,7 @@ BOOL Utility::ConstructRecycleFolder(TAR_ARCHIVE * pArchive, VFS_FIND_DATA & rec
 {
     memset(&recycleFolder, 0, sizeof(recycleFolder));
     recycleFolder.dwId.category = RecycleCat;
-    recycleFolder.dwId.id = 0;
+    recycleFolder.dwId.id = RecycleId;
     LoadLocalizedName(pArchive->context->configfile, pArchive->context->localeName, _T("RecycleBin"), recycleFolder.cFileName, lengthof(recycleFolder.cFileName));
     recycleFolder.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
     SYSTEMTIME stime; GetSystemTime(&stime);
@@ -51,7 +51,7 @@ BOOL Utility::ConstructSearchFolder(TAR_ARCHIVE * pArchive, VFS_FIND_DATA & sear
 {
     memset(&searchFolder, 0, sizeof(searchFolder));
     searchFolder.dwId.category = SearchCat;
-    searchFolder.dwId.id = 0;
+    searchFolder.dwId.id = SearchId;
     LoadLocalizedName(pArchive->context->configfile, pArchive->context->localeName, _T("SearchBin"), searchFolder.cFileName, lengthof(searchFolder.cFileName));
     searchFolder.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
     SYSTEMTIME stime; GetSystemTime(&stime);

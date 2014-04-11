@@ -276,6 +276,7 @@ HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
    case ID_FILE_OLDVERSION:  return _HistoryVersion(Cmd);
    case ID_FILE_VIEWLOG:     return _ViewLog(Cmd);
    case ID_FILE_EXTEDIT:     return _ExtEdit(Cmd);
+   case ID_FILE_SEARCH:      return _Search(Cmd);
    }
    return E_NOTIMPL;
 }
@@ -525,5 +526,32 @@ HRESULT CTarFileItem::_ViewLog(VFS_MENUCOMMAND & Cmd)
 HRESULT CTarFileItem::_ExtEdit(VFS_MENUCOMMAND & Cmd)
 {
     HR ( DMExtEditFile(_GetTarArchivePtr(), m_pWfd->dwId));
+    return S_OK;
+}
+
+HRESULT CTarFileItem::_Search(VFS_MENUCOMMAND & Cmd)
+{
+    HR ( DMSearch(_GetTarArchivePtr(), _T("SampleSearch")));
+
+    SHELLEXECUTEINFO sei = {0};
+    sei.cbSize = sizeof(sei);
+    sei.fMask = SEE_MASK_IDLIST;
+    sei.hwnd = ::GetActiveWindow();
+    sei.lpVerb = TEXT("explore"); // <-- not "open"
+
+    VFS_FIND_DATA wfd; memset(&wfd, 0, sizeof(wfd));
+    wfd.dwId.category = SearchCat; wfd.dwId.id = SearchId;
+    wcscpy_s(wfd.cFileName, lengthof(wfd.cFileName), _T("abc"));
+    wfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+
+    NSEFILEPIDLDATA data = { sizeof(NSEFILEPIDLDATA), TARFILE_MAGIC_ID, 1, wfd };
+    PCITEMID_CHILD pidl = GenerateITEMID(&data, sizeof(data));
+    CPidl pidlfull = m_pFolder->m_pidlRoot;
+    pidlfull.Append(pidl);
+    sei.lpIDList = pidlfull.GetData(); // <-- your pidl
+
+    sei.nShow = SW_SHOW;
+    ShellExecuteEx(&sei);
+
     return S_OK;
 }

@@ -722,6 +722,21 @@ BOOL HttpImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_D
     return TRUE;
 }
 
+BOOL HttpImpl::GetPagedSearchResults(TAR_ARCHIVE * pArchive, const std::wstring & query, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
+{
+    for (int i = 0; i < PageSize; i ++){
+        VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
+        rfd.dwId.category = VdriveCat;
+        rfd.dwId.id = 0;
+        swprintf_s(rfd.cFileName, lengthof(rfd.cFileName), _T("%s-%04d-%04d")
+            , query.c_str(), PageNo, i);
+        rfd.dwFileAttributes = (i % 2) ? FILE_ATTRIBUTE_NORMAL : FILE_ATTRIBUTE_DIRECTORY;
+        children.push_back(rfd);
+    }
+    *PageCount = 3;
+    return TRUE;
+}
+
 BOOL HttpImpl::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder)
 {
     // HarryWu, 2014.2.28

@@ -60,6 +60,7 @@ struct ServerItemInfo
     DWORD dwCurPage;
     DWORD dwTotalPage;
     wchar_t szName[MAX_PATH];
+    wchar_t szQuery[MAX_PATH];
 };
 typedef std::map<DWORD, ServerItemInfo> DBType;
 static DBType * gspGlobalDB = NULL;
@@ -302,6 +303,25 @@ HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, 
     return S_OK;
 }
 
+HRESULT DMSearch(TAR_ARCHIVE * pArchive, const wchar_t * query)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() Query=[%s]", __FUNCTION__, (const char *)CW2AEX<>(query, CP_UTF8));
+
+    if (GetDB(pArchive)->find(SearchId) == GetDB(pArchive)->end())
+    {
+        OUTPUTLOG("%s() SearchBin not initialized.", __FUNCTION__);
+        return S_FALSE;
+    }
+
+    ServerItemInfo & refItem = gspGlobalDB->find(SearchId)->second;
+
+    wcscpy_s(refItem.szQuery, lengthof(refItem.szQuery), query);
+
+    return S_OK;
+}
+
 HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** retList, int * nListCount)
 {
     OUTPUTLOG("%s(), RemoteId={%d, %d}", __FUNCTION__, dwId.category, dwId.id);
@@ -312,7 +332,7 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int Pag
         *totalPage = 1;
         return S_OK;
     }
-    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock); 
 
     std::list<std::wstring> columns;
     std::list<VFS_FIND_DATA> tmpList;
@@ -327,8 +347,9 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int Pag
             return S_FALSE;        
     }
     if (dwId.category == SearchCat){
-        // ...
-        return S_FALSE;
+        std::wstring query = _T("SampleQuery");
+        if(!GetProto(pArchive)->GetPagedSearchResults(pArchive, query, tmpList, PageSize, PageNo, totalPage))
+            return S_FALSE;
     }
     if (!tmpList.size()) return S_FALSE;
 

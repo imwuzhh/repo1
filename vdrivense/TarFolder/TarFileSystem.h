@@ -130,6 +130,7 @@ public:
    HRESULT _HistoryVersion(VFS_MENUCOMMAND & Cmd);
    HRESULT _ViewLog(VFS_MENUCOMMAND & Cmd);
    HRESULT _ExtEdit(VFS_MENUCOMMAND & Cmd);
+   HRESULT _Search(VFS_MENUCOMMAND & Cmd);
 };
 
 

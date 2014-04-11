@@ -106,6 +106,8 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Log"                           ID_FILE_VIEWLOG
 		MENUITEM SEPARATOR
+		MENUITEM "Search"                        ID_FILE_SEARCH
+		MENUITEM SEPARATOR
     END
     POPUP "CommandMenu"
     BEGIN

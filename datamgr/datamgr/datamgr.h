@@ -27,9 +27,9 @@ enum {
 	PersonCat = (2),
 	PersonId  = (0),
 	RecycleCat= (3),
-	RecycleId = (0),
+	RecycleId = (~3),
 	SearchCat = (4),
-	SearchId  = (0),
+	SearchId  = (~4),
 };
 
 struct RemoteId {
@@ -121,6 +121,8 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA **
 HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, VFS_FIND_DATA ** aList, int * nListCount);
 
 HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** aList, int * nListCount);
+
+HRESULT DMSearch(TAR_ARCHIVE * pArchive, const wchar_t * query);
 
 /**
 * Get Page size

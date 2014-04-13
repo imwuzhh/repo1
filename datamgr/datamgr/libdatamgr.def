@@ -7,7 +7,7 @@ EXPORTS
 	DMGetChildrenList 
 	DMGetChildrenListEx
 	DMGetDocInfo
-	DMSearch
+	DMSetupQuery
 	DMGetPageSize
 	
 	DMRename 

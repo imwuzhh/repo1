@@ -19,6 +19,10 @@
 #ifndef __LIB_DATAMGR_H__
 #define __LIB_DATAMGR_H__
 
+#define WM_USER_PREV_PAGE    (WM_USER + 0x1001)
+#define WM_USER_NEXT_PAGE    (WM_USER + 0x1002)
+#define WM_USER_SEARCH       (WM_USER + 0x1003)
+
 enum {
 	VdriveCat = (0),
 	VdriveId  = (0),
@@ -122,7 +126,7 @@ HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, 
 
 HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** aList, int * nListCount);
 
-HRESULT DMSearch(TAR_ARCHIVE * pArchive, const wchar_t * query);
+HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DATA * wfd);
 
 /**
 * Get Page size

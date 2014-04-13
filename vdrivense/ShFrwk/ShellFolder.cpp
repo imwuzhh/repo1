@@ -776,7 +776,7 @@ STDMETHODIMP CShellFolder::GetDetailsEx(PCUITEMID_CHILD pidl, const SHCOLUMNID* 
 
 STDMETHODIMP CShellFolder::GetDetailsOf(PCUITEMID_CHILD pidl, UINT iColumn, SHELLDETAILS* psd)
 {
-   OUTPUTLOG("%s(), Column: %d", __FUNCTION__, iColumn);
+   //OUTPUTLOG("%s(), Column: %d", __FUNCTION__, iColumn);
    ATLTRACE(L"CShellFolder::GetDetailsOf  column=%u\n", iColumn);
    ATLASSERT(psd);
    SHCOLUMNID scid = { 0 };
@@ -1150,6 +1150,32 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
 
 // IShellFolderViewCB messages
 
+static WNDPROC s_OldShellViewWndProc = NULL;
+static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if (!s_OldShellViewWndProc) return S_OK;
+
+    switch ( uMsg )
+    {
+    case WM_USER_PREV_PAGE:
+        {
+            OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
+        }break;
+    case WM_USER_NEXT_PAGE:
+        {
+            OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
+        }break;
+    case WM_USER_SEARCH:
+        {
+            OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
+        }break;
+    default:
+        break;
+    }
+
+    return CallWindowProcA(s_OldShellViewWndProc, hWnd, uMsg, wParam, lParam);
+}
+
 LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	// Tag this window.
@@ -1177,7 +1203,18 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 
     m_spFolderItem->OnShellViewCreated((HWND)wParam);
 
+#if 0
+    if ((WNDPROC)GetWindowLongPtrA((HWND)wParam, GWLP_WNDPROC) != s_ShellViewWndProc){
+        s_OldShellViewWndProc = (WNDPROC)SetWindowLongPtrA((HWND)wParam, GWLP_WNDPROC, (LONG_PTR)s_ShellViewWndProc);
+    }
+#endif
     return 0;
+}
+
+LRESULT CShellFolder::OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+    m_spFolderItem->OnShellViewClosing((HWND)wParam);
+    return S_FALSE;
 }
 
 LRESULT CShellFolder::OnGetNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -1235,9 +1272,9 @@ LRESULT CShellFolder::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	return S_FALSE;
 }
 
-LRESULT CShellFolder::OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT CShellFolder::OnInvokeCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    m_spFolderItem->OnShellViewClosing(NULL);
+    OUTPUTLOG("%s", __FUNCTION__);
     return S_FALSE;
 }
 

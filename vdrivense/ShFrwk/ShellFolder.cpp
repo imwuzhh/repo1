@@ -1150,24 +1150,33 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
 
 // IShellFolderViewCB messages
 
+static CShellFolder * s_pFolder = NULL;
 static WNDPROC s_OldShellViewWndProc = NULL;
 static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (!s_OldShellViewWndProc) return S_OK;
+
+    VFS_MENUCOMMAND cmd; memset(&cmd, 0, sizeof(cmd));
 
     switch ( uMsg )
     {
     case WM_USER_PREV_PAGE:
         {
             OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
+            cmd.wMenuID = ID_FILE_PREV;
+            s_pFolder->ExecuteMenuCommand(cmd);
         }break;
     case WM_USER_NEXT_PAGE:
         {
             OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
+            cmd.wMenuID = ID_FILE_NEXT;
+            s_pFolder->ExecuteMenuCommand(cmd);
         }break;
     case WM_USER_SEARCH:
         {
             OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
+            cmd.wMenuID = ID_FILE_SEARCH;
+            s_pFolder->ExecuteMenuCommand(cmd);
         }break;
     default:
         break;
@@ -1203,10 +1212,11 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 
     m_spFolderItem->OnShellViewCreated((HWND)wParam);
 
-#if 0
+#if 1
     if ((WNDPROC)GetWindowLongPtrA((HWND)wParam, GWLP_WNDPROC) != s_ShellViewWndProc){
         s_OldShellViewWndProc = (WNDPROC)SetWindowLongPtrA((HWND)wParam, GWLP_WNDPROC, (LONG_PTR)s_ShellViewWndProc);
     }
+    s_pFolder = this;
 #endif
     return 0;
 }

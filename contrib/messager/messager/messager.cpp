@@ -94,16 +94,19 @@ HWND FindChildWindow(const char * classname, const char * title, DWORD userdata)
 
 int main(int argc, char * argv[])
 {
+    printf("0->Prev, 1->Next, 2->Search\n");
     while (TRUE)
     {
+        printf(">"); char c = getchar(); getchar(); // to skip 'VK_ENTER'
+        UINT cmd = WM_USER_PREV_PAGE;
+
         HWND hMsgWnd = FindChildWindow("SHELLDLL_DefView", "ShellView", 0xED0CED0C);
         if (hMsgWnd == NULL) return 0;
-        printf("0->Prev, 1->Next, 2->Search\n>");
-        char c = getchar(); UINT cmd = WM_USER_NEXT_PAGE;
+
         switch (c)
         {
-            case '0': cmd = WM_USER_NEXT_PAGE; break;
-            case '1': cmd = WM_USER_PREV_PAGE; break;
+            case '0': cmd = WM_USER_PREV_PAGE; break;
+            case '1': cmd = WM_USER_NEXT_PAGE; break;
             case '2': cmd = WM_USER_SEARCH; break;
             default: break;
         }

@@ -1150,7 +1150,7 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
 
 // IShellFolderViewCB messages
 
-static CShellFolder * s_pFolder = NULL;
+static std::map<HWND, CShellFolder *> s_ShellViewObjects;
 static WNDPROC s_OldShellViewWndProc = NULL;
 static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -1158,25 +1158,32 @@ static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
     VFS_MENUCOMMAND cmd; memset(&cmd, 0, sizeof(cmd));
 
+    CShellFolder * pFolder = NULL;
+    if (s_ShellViewObjects.find(hWnd) == s_ShellViewObjects.end())
+    {
+        return CallWindowProcA(s_OldShellViewWndProc, hWnd, uMsg, wParam, lParam);
+    }
+    pFolder = s_ShellViewObjects.find(hWnd)->second;
+
     switch ( uMsg )
     {
     case WM_USER_PREV_PAGE:
         {
             OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
             cmd.wMenuID = ID_FILE_PREV;
-            s_pFolder->ExecuteMenuCommand(cmd);
+            pFolder->ExecuteMenuCommand(cmd);
         }break;
     case WM_USER_NEXT_PAGE:
         {
             OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
             cmd.wMenuID = ID_FILE_NEXT;
-            s_pFolder->ExecuteMenuCommand(cmd);
+            pFolder->ExecuteMenuCommand(cmd);
         }break;
     case WM_USER_SEARCH:
         {
             OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
             cmd.wMenuID = ID_FILE_SEARCH;
-            s_pFolder->ExecuteMenuCommand(cmd);
+            pFolder->ExecuteMenuCommand(cmd);
         }break;
     default:
         break;
@@ -1187,8 +1194,10 @@ static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 
 LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
+    HWND hWnd = (HWND)wParam;
+
 	// Tag this window.
-	SetWindowLongPtr((HWND)wParam, GWLP_USERDATA, 0xED0CED0C);
+	SetWindowLongPtr(hWnd, GWLP_USERDATA, 0xED0CED0C);
 
 	// HarryWu, 2014.2.12
 	// To dock a window pane on DefView, 
@@ -1210,21 +1219,30 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 
     m_spFolderItem->InitCustomColumns();
 
-    m_spFolderItem->OnShellViewCreated((HWND)wParam);
+    m_spFolderItem->OnShellViewCreated(hWnd);
 
 #if 1
-    if ((WNDPROC)GetWindowLongPtrA((HWND)wParam, GWLP_WNDPROC) != s_ShellViewWndProc){
-        s_OldShellViewWndProc = (WNDPROC)SetWindowLongPtrA((HWND)wParam, GWLP_WNDPROC, (LONG_PTR)s_ShellViewWndProc);
+    if ((WNDPROC)GetWindowLongPtrA(hWnd, GWLP_WNDPROC) != s_ShellViewWndProc){
+        s_OldShellViewWndProc = (WNDPROC)SetWindowLongPtrA(hWnd, GWLP_WNDPROC, (LONG_PTR)s_ShellViewWndProc);
     }
-    s_pFolder = this;
+    CShellFolder * pFolder = this; pFolder->AddRef();
+    s_ShellViewObjects.insert(std::make_pair(hWnd, pFolder));
 #endif
     return 0;
 }
 
 LRESULT CShellFolder::OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    m_spFolderItem->OnShellViewClosing((HWND)wParam);
-    return S_FALSE;
+    HWND hWnd = (HWND)wParam;
+    m_spFolderItem->OnShellViewClosing(hWnd);
+    CShellFolder * pFolder = NULL;
+
+    if (s_ShellViewObjects.find(hWnd) == s_ShellViewObjects.end())
+        return S_FALSE;
+    pFolder = s_ShellViewObjects.find(hWnd)->second;
+    s_ShellViewObjects.erase(hWnd); 
+    pFolder->Release();
+    return S_OK;
 }
 
 LRESULT CShellFolder::OnGetNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)

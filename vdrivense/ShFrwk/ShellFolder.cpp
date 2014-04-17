@@ -1158,15 +1158,11 @@ static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 {
     if (!s_OldShellViewWndProc) return S_OK;
 
-    VFS_MENUCOMMAND cmd; memset(&cmd, 0, sizeof(cmd));
-
-    CShellFolder * pFolder = NULL;
     if (s_ShellViewObjects.find(hWnd) == s_ShellViewObjects.end())
-    {
         return CallWindowProcA(s_OldShellViewWndProc, hWnd, uMsg, wParam, lParam);
-    }
-    pFolder = s_ShellViewObjects.find(hWnd)->second;
 
+    CShellFolder * pFolder = s_ShellViewObjects.find(hWnd)->second;
+    VFS_MENUCOMMAND cmd; memset(&cmd, 0, sizeof(cmd));
     switch ( uMsg )
     {
     case WM_USER_PREV_PAGE:
@@ -1186,6 +1182,29 @@ static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
             OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
             cmd.wMenuID = ID_FILE_SEARCH;
             pFolder->ExecuteMenuCommand(cmd);
+        }break;
+    case WM_COPYDATA:
+        {
+            COPYDATASTRUCT * pCDS = (COPYDATASTRUCT *)lParam;
+            if (pCDS && pCDS->dwData == 0xED0CED0C){
+                if (!strnicmp((const char *)pCDS->lpData, "PrevPage", 8)){
+                    cmd.wMenuID = ID_FILE_PREV;
+                }else 
+                if (!strnicmp((const char *)pCDS->lpData, "NextPage", 8)){
+                    cmd.wMenuID = ID_FILE_NEXT;
+                }else
+                if (!strnicmp((const char *)pCDS->lpData, "Search://", 9)){
+                    cmd.wMenuID = ID_FILE_SEARCH;
+                    cmd.pUserData = malloc(0x200);
+                    //TODO: Bounds check of pCDS->lpData
+                    strcpy_s((char *)cmd.pUserData, 0x200, (const char *)(pCDS->lpData) + 9);
+                }else{
+                    cmd.wMenuID = 0;
+                    OUTPUTLOG("%s() undefined message.", __FUNCTION__);
+                    break;
+                }
+                if (cmd.wMenuID) pFolder->ExecuteMenuCommand(cmd);
+            }
         }break;
     default:
         break;
@@ -1228,8 +1247,10 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
     if ((WNDPROC)GetWindowLongPtrA(hWnd, GWLP_WNDPROC) != s_ShellViewWndProc){
         s_OldShellViewWndProc = (WNDPROC)SetWindowLongPtrA(hWnd, GWLP_WNDPROC, (LONG_PTR)s_ShellViewWndProc);
     }
-    s_ShellViewObjects.insert(std::make_pair(hWnd, this)); this->AddRef();
 #endif
+
+    s_ShellViewObjects.insert(std::make_pair(hWnd, this)); this->AddRef();
+
     return S_OK;
 }
 

@@ -91,9 +91,16 @@ HWND FindChildWindow(const char * classname, const char * title, DWORD userdata)
     return (HWND) ep.returnValue;
 }
 
+#define CountOf(arr) (sizeof(arr)/sizeof(arr[0]))
 
 int main(int argc, char * argv[])
 {
+    char szBuffer [0x20] = "";
+    COPYDATASTRUCT cds;
+    cds.dwData = 0xED0CED0C;
+    cds.cbData = sizeof(szBuffer);
+    cds.lpData = szBuffer;
+
     printf("0->Prev, 1->Next, 2->Search\n");
     while (TRUE)
     {
@@ -108,9 +115,15 @@ int main(int argc, char * argv[])
             case '0': cmd = WM_USER_PREV_PAGE; break;
             case '1': cmd = WM_USER_NEXT_PAGE; break;
             case '2': cmd = WM_USER_SEARCH; break;
+            case 'a': cmd = WM_USER_PREV_PAGE; strcpy_s(szBuffer, CountOf(szBuffer), "PrevPage"); break;
+            case 'b': cmd = WM_USER_NEXT_PAGE; strcpy_s(szBuffer, CountOf(szBuffer), "NextPage"); break;
+            case 'c': cmd = WM_USER_SEARCH;    strcpy_s(szBuffer, CountOf(szBuffer), "Search://hello"); break;
             default: break;
         }
-        SendMessage(hMsgWnd, cmd, (WPARAM)0x0001a220, (LPARAM)0);
+        if (isdigit(c))
+            SendMessage(hMsgWnd, cmd, (WPARAM)0x0001a220, (LPARAM)0);
+        else
+            SendMessage(hMsgWnd, WM_COPYDATA, (WPARAM)GetConsoleWindow(), (LPARAM)&cds);
     }
 	return 0;
 }

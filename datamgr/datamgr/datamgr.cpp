@@ -859,3 +859,12 @@ HRESULT DMHistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
 
     return S_OK;
 }
+
+HRESULT DMCheckMenu(TAR_ARCHIVE * pArchive, const wchar_t * idlist, MenuType * menudef)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%s], inputbits=[%llx]", __FUNCTION__, (const char *)CW2AEX<>(idlist, CP_UTF8), menudef);
+
+    return S_OK;
+}

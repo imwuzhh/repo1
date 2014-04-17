@@ -41,6 +41,27 @@ struct RemoteId {
 	DWORD id;
 };
 
+#if defined(_WIN64)
+typedef unsigned long long MenuType;
+#elif defined(_WIN32)
+typedef unsigned __int64   MenuType;
+#endif
+
+#define MenuDef_OpenFile     (0x000000000001)
+#define MenuDef_DownloadFile (0x000000000002)
+#define MenuDef_NewFolder    (0x000000000004)
+#define MenuDef_Properties   (0x000000000008)
+#define MenuDef_Share        (0x000000000010)
+#define MenuDef_Upload       (0x000000000020)
+#define MenuDef_Preview      (0x000000000040)
+#define MenuDef_Innerlink    (0x000000000080)
+#define MenuDef_Distribute   (0x000000000100)
+#define MenuDef_Lock         (0x000000000200)
+#define MenuDef_Unlock       (0x000000000400)
+#define MenuDef_OldVersion   (0x000000000800)
+#define MenuDef_Viewlog      (0x000000001000)
+#define MenuDef_ExtEdit      (0x000000002000)
+
 typedef struct _VFS_FIND_DATAW {
 	DWORD dwFileAttributes;
 	FILETIME ftCreationTime;
@@ -301,6 +322,14 @@ HRESULT DMViewLog(TAR_ARCHIVE * pArchive, RemoteId id);
 
 HRESULT DMHistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id);
 
+/**
+* Select proper menus for given items specified by `idlist' parameter.
+* Parameters:
+* [pArchive] Context handle.
+* [idlist]   items' id list, in format "type:id", such as "0:1998;1:123;", 0 for file type, 1 for folder type.
+* [menudef]  selected value of menu items.
+*/
+HRESULT DMCheckMenu(TAR_ARCHIVE * pArchive, const wchar_t * idlist, MenuType * menudef);
 
 /**
 * Malloc memory from libdatamgr, as we use /MT to build, if you get memory from this module, free it with DMFree().

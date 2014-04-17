@@ -45,6 +45,8 @@ EXPORTS
 	DMOnShellViewRefreshed
 	DMOnShellViewClosing
 	
+	DMCheckMenu
+	
 	DMMalloc
 	DMRealloc
 	DMFree

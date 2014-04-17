@@ -1148,10 +1148,12 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
    return Hr;
 }
 
-// IShellFolderViewCB messages
-
+// TODO: R/W protected in multi threads.
 static std::map<HWND, CShellFolder *> s_ShellViewObjects;
 static WNDPROC s_OldShellViewWndProc = NULL;
+
+// HarryWu, 2014.4.17
+// sub class window procedure.
 static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (!s_OldShellViewWndProc) return S_OK;
@@ -1192,6 +1194,7 @@ static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
     return CallWindowProcA(s_OldShellViewWndProc, hWnd, uMsg, wParam, lParam);
 }
 
+// IShellFolderViewCB messages
 LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     HWND hWnd = (HWND)wParam;
@@ -1225,23 +1228,20 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
     if ((WNDPROC)GetWindowLongPtrA(hWnd, GWLP_WNDPROC) != s_ShellViewWndProc){
         s_OldShellViewWndProc = (WNDPROC)SetWindowLongPtrA(hWnd, GWLP_WNDPROC, (LONG_PTR)s_ShellViewWndProc);
     }
-    CShellFolder * pFolder = this; pFolder->AddRef();
-    s_ShellViewObjects.insert(std::make_pair(hWnd, pFolder));
+    s_ShellViewObjects.insert(std::make_pair(hWnd, this)); this->AddRef();
 #endif
-    return 0;
+    return S_OK;
 }
 
 LRESULT CShellFolder::OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     HWND hWnd = (HWND)wParam;
     m_spFolderItem->OnShellViewClosing(hWnd);
-    CShellFolder * pFolder = NULL;
 
     if (s_ShellViewObjects.find(hWnd) == s_ShellViewObjects.end())
         return S_FALSE;
-    pFolder = s_ShellViewObjects.find(hWnd)->second;
-    s_ShellViewObjects.erase(hWnd); 
-    pFolder->Release();
+
+    s_ShellViewObjects.find(hWnd)->second->Release(); s_ShellViewObjects.erase(hWnd); 
     return S_OK;
 }
 

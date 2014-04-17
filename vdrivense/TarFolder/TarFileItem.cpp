@@ -531,7 +531,13 @@ HRESULT CTarFileItem::_ExtEdit(VFS_MENUCOMMAND & Cmd)
 
 HRESULT CTarFileItem::_Search(VFS_MENUCOMMAND & Cmd)
 {
-    HR ( DMSearch(_GetTarArchivePtr(), _T("SampleSearch")));
+    VFS_FIND_DATA searchItem;
+    // HarryWu, 2014.4.13
+    // TODO: Prompt user to input a query, while the 2nd parameter is empty.
+    // ...
+    HR ( DMSetupQuery(_GetTarArchivePtr(), m_pWfd->cFileName, &searchItem));
+    NSEFILEPIDLDATA data = { sizeof(NSEFILEPIDLDATA), TARFILE_MAGIC_ID, 1, searchItem };
+    PCITEMID_CHILD pidlChild = GenerateITEMID(&data, sizeof(data));
 
     SHELLEXECUTEINFO sei = {0};
     sei.cbSize = sizeof(sei);
@@ -539,16 +545,9 @@ HRESULT CTarFileItem::_Search(VFS_MENUCOMMAND & Cmd)
     sei.hwnd = ::GetActiveWindow();
     sei.lpVerb = TEXT("explore"); // <-- not "open"
 
-    VFS_FIND_DATA wfd; memset(&wfd, 0, sizeof(wfd));
-    wfd.dwId.category = SearchCat; wfd.dwId.id = SearchId;
-    wcscpy_s(wfd.cFileName, lengthof(wfd.cFileName), _T("abc"));
-    wfd.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
-
-    NSEFILEPIDLDATA data = { sizeof(NSEFILEPIDLDATA), TARFILE_MAGIC_ID, 1, wfd };
-    PCITEMID_CHILD pidl = GenerateITEMID(&data, sizeof(data));
-    CPidl pidlfull = m_pFolder->m_pidlRoot;
-    pidlfull.Append(pidl);
-    sei.lpIDList = pidlfull.GetData(); // <-- your pidl
+    CPidl searchPidl = m_pFolder->m_pidlRoot;
+    searchPidl.Append(pidlChild); CoTaskMemFree((LPVOID)pidlChild);
+    sei.lpIDList = searchPidl.GetData(); // <-- your pidl
 
     sei.nShow = SW_SHOW;
     ShellExecuteEx(&sei);

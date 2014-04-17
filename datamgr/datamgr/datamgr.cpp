@@ -303,7 +303,7 @@ HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, 
     return S_OK;
 }
 
-HRESULT DMSearch(TAR_ARCHIVE * pArchive, const wchar_t * query)
+HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DATA * pWfd)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
@@ -318,6 +318,11 @@ HRESULT DMSearch(TAR_ARCHIVE * pArchive, const wchar_t * query)
     ServerItemInfo & refItem = gspGlobalDB->find(SearchId)->second;
 
     wcscpy_s(refItem.szQuery, lengthof(refItem.szQuery), query);
+
+    memset(pWfd, 0, sizeof(*pWfd));
+    pWfd->dwId.category = SearchCat; pWfd->dwId.id = SearchId;
+    pWfd->dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+    wcscpy_s(pWfd->cFileName, lengthof(pWfd->cFileName), refItem.szName);
 
     return S_OK;
 }
@@ -347,7 +352,13 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int Pag
             return S_FALSE;        
     }
     if (dwId.category == SearchCat){
-        std::wstring query = _T("SampleQuery");
+        std::wstring query = _T("");
+        if (GetDB(pArchive)->end() == GetDB(pArchive)->find(SearchId)){
+            return S_FALSE;
+        }
+        const ServerItemInfo & refItem = GetDB(pArchive)->find(SearchId)->second;
+        query = refItem.szQuery;
+
         if(!GetProto(pArchive)->GetPagedSearchResults(pArchive, query, tmpList, PageSize, PageNo, totalPage))
             return S_FALSE;
     }

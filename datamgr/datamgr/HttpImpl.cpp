@@ -785,7 +785,7 @@ BOOL HttpImpl::RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const
     // "http://localhost/EDoc2WebApi/api/Doc/FolderRead/ChangeFolderName?token=7c370032-078b-41df-bd1e-0ba5cdeb9976&folderId=562296484&newName=newFolderName"
     // "http://localhost/EDoc2WebApi/api/Doc/FileRead/ChanageFileName?token=7c370032-078b-41df-bd1e-0ba5cdeb9976&fileId=1023596&newFileName=newFilename&newRemark="
     wchar_t url [MaxUrlLength] = _T("");
-    std::string strNewName = Utility::UrlEncode((const char *)CW2A(newName));
+    std::string strNewName = Utility::UrlEncode((const char *)CW2AEX<>(newName, CP_UTF8));
     wsprintf(url
         , isFolder 
         ?  _T("%s/EDoc2WebApi/api/Doc/FolderRead/ChangeFolderName?token=%s&folderId=%d&newName=%s")

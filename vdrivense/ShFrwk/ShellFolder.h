@@ -38,7 +38,8 @@ class ATL_NO_VTABLE CShellFolder :
    public IContextMenuCB,
    public IShellFolder2,
    public IShellIcon,
-   public IStorage
+   public IStorage,
+   public IFileOperationProgressSink
 {
 public:
    CRefPtr<CNseFileSystem> m_spFS;               // Reference to the file-system implementation
@@ -70,6 +71,7 @@ public:
       COM_INTERFACE_ENTRY(IFolderViewSettings)
       COM_INTERFACE_ENTRY(IExplorerPaneVisibility)
       COM_INTERFACE_ENTRY(IThumbnailHandlerFactory)
+      COM_INTERFACE_ENTRY(IFileOperationProgressSink)
    END_COM_MAP()
 
    BEGIN_MSG_MAP(CShellFolder)
@@ -191,6 +193,24 @@ public:
    // IContextMenuCB
 
    STDMETHOD(CallBack)(IShellFolder* psf, HWND hwndOwner, IDataObject* pdtobj, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+   // IFileOperationProgressSink
+   STDMETHOD(StartOperations)( void) ;
+   STDMETHOD(FinishOperations)(HRESULT hrResult) ;
+   STDMETHOD(PreRenameItem)( DWORD dwFlags, IShellItem *psiItem, LPCWSTR pszNewName) ;
+   STDMETHOD(PostRenameItem)( DWORD dwFlags,IShellItem *psiItem,LPCWSTR pszNewName,HRESULT hrRename,IShellItem *psiNewlyCreated) ;
+   STDMETHOD(PreMoveItem)( DWORD dwFlags,IShellItem *psiItem,IShellItem *psiDestinationFolder, LPCWSTR pszNewName) ;
+   STDMETHOD(PostMoveItem)( DWORD dwFlags,IShellItem *psiItem,IShellItem *psiDestinationFolder, LPCWSTR pszNewName,HRESULT hrMove,IShellItem *psiNewlyCreated) ;
+   STDMETHOD(PreCopyItem)( DWORD dwFlags,IShellItem *psiItem,IShellItem *psiDestinationFolder,LPCWSTR pszNewName) ;
+   STDMETHOD(PostCopyItem)( DWORD dwFlags,IShellItem *psiItem,IShellItem *psiDestinationFolder, LPCWSTR pszNewName,HRESULT hrCopy,IShellItem *psiNewlyCreated) ;
+   STDMETHOD(PreDeleteItem)( DWORD dwFlags, IShellItem *psiItem) ;
+   STDMETHOD(PostDeleteItem)( DWORD dwFlags, IShellItem *psiItem,HRESULT hrDelete,IShellItem *psiNewlyCreated) ;
+   STDMETHOD(PreNewItem)( DWORD dwFlags,IShellItem *psiDestinationFolder, LPCWSTR pszNewName) ;
+   STDMETHOD(PostNewItem)( DWORD dwFlags, IShellItem *psiDestinationFolder, LPCWSTR pszNewName, LPCWSTR pszTemplateName, DWORD dwFileAttributes,HRESULT hrNew,IShellItem *psiNewItem) ;
+   STDMETHOD(UpdateProgress)(  UINT iWorkTotal,UINT iWorkSoFar) ;
+   STDMETHOD(ResetTimer)( void) ;
+   STDMETHOD(PauseTimer)( void) ;
+   STDMETHOD(ResumeTimer)( void) ;
 
    // IShellFolderViewCB messages
 

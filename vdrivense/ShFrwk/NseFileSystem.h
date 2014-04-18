@@ -375,7 +375,7 @@ public:
    HRESULT _RefreshItemInView();
    HRESULT _DoShowProperties(VFS_MENUCOMMAND& Cmd);
    HRESULT _DoNewFolder(VFS_MENUCOMMAND& Cmd, UINT uLabelRes);
-   HRESULT _AddSelectEdit(const VFS_MENUCOMMAND& Cmd, LPCWSTR pszLabel, DWORD dwFlags = SVSI_DESELECTOTHERS | SVSI_ENSUREVISIBLE | SVSI_SELECT | SVSI_EDIT);
+   HRESULT _AddSelectEdit(IUnknown * punkSite, LPCWSTR pszLabel, DWORD dwFlags = SVSI_DESELECTOTHERS | SVSI_ENSUREVISIBLE | SVSI_SELECT | SVSI_EDIT);
 
    // Static members
 

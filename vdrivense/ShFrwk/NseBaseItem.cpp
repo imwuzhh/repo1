@@ -610,14 +610,15 @@ HRESULT CNseBaseItem::_DoNewFolder(VFS_MENUCOMMAND& Cmd, UINT uLabelRes)
 	   , &spFO) );
    CComPtr<IShellItem> spTargetFolder;
    HR( ::SHCreateItemFromIDList(m_pFolder->m_pidlMonitor, IID_PPV_ARGS(&spTargetFolder)) );
-   spFO->NewItem(spTargetFolder, FILE_ATTRIBUTE_DIRECTORY, bstrLabel, NULL, NULL);
+
+   spFO->NewItem(spTargetFolder, FILE_ATTRIBUTE_DIRECTORY, bstrLabel, NULL, m_pFolder);
    HR( spFO->PerformOperations() );
 
    // HarryWu, 2014.2.6
    // if do NOT go into edit mode, whatever. 
    // ----------------------------------
    //// Go into edit-mode for new item
-   //HR( _AddSelectEdit(Cmd, bstrLabel) );
+   // HR( _AddSelectEdit(Cmd.punkSite, bstrLabel) );
 
    // We handled this operation successfully for all items in selection
    return NSE_S_ALL_DONE;
@@ -629,13 +630,13 @@ HRESULT CNseBaseItem::_DoNewFolder(VFS_MENUCOMMAND& Cmd, UINT uLabelRes)
  * in the virtual file-system, we add the item temporarily to the Shell view and
  * go right into edit-mode, allowing the user to rename the item.
  */
-HRESULT CNseBaseItem::_AddSelectEdit(const VFS_MENUCOMMAND& Cmd, LPCWSTR pszLabel, DWORD dwFlags /*= SVSI_DESELECTOTHERS | SVSI_ENSUREVISIBLE | SVSI_SELECT | SVSI_EDIT*/)
+HRESULT CNseBaseItem::_AddSelectEdit(IUnknown * punkSite, LPCWSTR pszLabel, DWORD dwFlags /*= SVSI_DESELECTOTHERS | SVSI_ENSUREVISIBLE | SVSI_SELECT | SVSI_EDIT*/)
 {
    ATLASSERT(IsFolder());
    // Validate label
    if( pszLabel == NULL ) pszLabel = L"";
    // Get to the IFolderView2 interface
-   CComQIPtr<IServiceProvider> spService = Cmd.punkSite;
+   CComQIPtr<IServiceProvider> spService = punkSite;
    if( spService == NULL ) return E_NOINTERFACE;
    CComPtr<IFolderView2> spFV2;
    HR( spService->QueryService(SID_SFolderView, IID_PPV_ARGS(&spFV2)) );

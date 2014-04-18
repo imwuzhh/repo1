@@ -1672,6 +1672,71 @@ HRESULT CShellFolder::_ParseDisplayNameWithBind(CNseItemPtr& spItem, PWSTR pszDi
    return S_OK;
 }
 
+HRESULT CShellFolder::StartOperations( void) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::FinishOperations(HRESULT hrResult) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::PreRenameItem( DWORD dwFlags, IShellItem *psiItem, LPCWSTR pszNewName) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::PostRenameItem( DWORD dwFlags,IShellItem *psiItem,LPCWSTR pszNewName,HRESULT hrRename,IShellItem *psiNewlyCreated) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::PreMoveItem( DWORD dwFlags,IShellItem *psiItem,IShellItem *psiDestinationFolder, LPCWSTR pszNewName) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::PostMoveItem( DWORD dwFlags,IShellItem *psiItem,IShellItem *psiDestinationFolder, LPCWSTR pszNewName,HRESULT hrMove,IShellItem *psiNewlyCreated) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::PreCopyItem( DWORD dwFlags,IShellItem *psiItem,IShellItem *psiDestinationFolder,LPCWSTR pszNewName) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::PostCopyItem( DWORD dwFlags,IShellItem *psiItem,IShellItem *psiDestinationFolder, LPCWSTR pszNewName,HRESULT hrCopy,IShellItem *psiNewlyCreated) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::PreDeleteItem( DWORD dwFlags, IShellItem *psiItem) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::PostDeleteItem( DWORD dwFlags, IShellItem *psiItem,HRESULT hrDelete,IShellItem *psiNewlyCreated) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::PreNewItem( DWORD dwFlags,IShellItem *psiDestinationFolder, LPCWSTR pszNewName) 
+{
+    return S_OK;
+}
+HRESULT CShellFolder::PostNewItem( DWORD dwFlags, IShellItem *psiDestinationFolder, LPCWSTR pszNewName, LPCWSTR pszTemplateName, DWORD dwFileAttributes,HRESULT hrNew,IShellItem *psiNewItem) 
+{
+    static_cast<CNseBaseItem *>((CNseItem *)m_spFolderItem)->_AddSelectEdit(m_spUnkSite, pszNewName, SVSI_DESELECTOTHERS | SVSI_ENSUREVISIBLE | SVSI_SELECT | SVSI_EDIT);
+    return S_OK;
+}
+HRESULT CShellFolder::UpdateProgress(  UINT iWorkTotal,UINT iWorkSoFar) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::ResetTimer( void) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::PauseTimer( void) 
+{
+    return E_NOTIMPL;
+}
+HRESULT CShellFolder::ResumeTimer( void) 
+{
+    return E_NOTIMPL;
+}
 
 OBJECT_ENTRY_AUTO(CLSID_ShellFolder, CShellFolder)
 

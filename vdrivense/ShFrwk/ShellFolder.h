@@ -239,6 +239,7 @@ public:
    HRESULT _ParseDisplayNameWithBind(CNseItemPtr& spItem, PWSTR pszDisplayName, IBindCtx* pbc, const BIND_OPTS& Opts);
    HRESULT _GetColumnDetailsOf(const SHCOLUMNID* pscid, SHELLDETAILS* psd) const;
    HRESULT _SetMenuState(HMENU hMenu, IDataObject* pDataObject);
+   HRESULT _RefineMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHILD_ARRAY rgpidl);
 };
 
 

@@ -256,6 +256,7 @@ public:
    virtual PCUITEMID_CHILD GetITEMID() = 0;
 
    virtual HMENU GetMenu() = 0;
+   virtual HRESULT SelectMenuItems(const wchar_t * idstring, MenuType * selectedMenuItems) = 0;
    virtual HRESULT SetMenuState(const VFS_MENUSTATE& State) = 0;
    virtual HRESULT ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd) = 0;
  

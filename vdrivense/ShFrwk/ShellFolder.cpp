@@ -502,6 +502,13 @@ STDMETHODIMP CShellFolder::CreateViewObject(HWND hwndOwner, REFIID riid, LPVOID*
       if( ::IsMenu(m_hMenu) ) ::DestroyMenu(m_hMenu);
       m_hMenu = m_spFolderItem->GetMenu();
       m_hContextMenu = ::GetSubMenu(m_hMenu, _T("ViewMenu"));
+
+      PCUITEMID_CHILD pidlCurrentFolder = (PCUITEMID_CHILD)::ILClone(m_pidlFolder.GetLastItem());
+      if (pidlCurrentFolder){
+          HR (_RefineMenuItems(m_hContextMenu, 1, &pidlCurrentFolder));
+          ::ILFree((PIDLIST_RELATIVE)pidlCurrentFolder);
+      }
+
       DEFCONTEXTMENU dcm = { hwndOwner, static_cast<IContextMenuCB*>(this), m_pidlMonitor, static_cast<IShellFolder*>(this), 0, NULL, NULL, 0, NULL };
       return ::SHCreateDefaultContextMenu(&dcm, riid, ppRetVal);
    }
@@ -639,8 +646,8 @@ STDMETHODIMP CShellFolder::GetUIObjectOf(HWND hwndOwner, UINT cidl, PCUITEMID_CH
 		  }
 	  }
 
-	  // HarryWu, 2014.2.20
-	  // Disable menu items here.
+      HR (_RefineMenuItems(m_hContextMenu, cidl, rgpidl));
+      
       DEFCONTEXTMENU dcm = { hwndOwner, static_cast<IContextMenuCB*>(this), m_pidlMonitor, static_cast<IShellFolder*>(this), cidl, rgpidl, NULL, 0, NULL };
       return ::SHCreateDefaultContextMenu(&dcm, riid, ppRetVal);
    }
@@ -1629,6 +1636,42 @@ HRESULT CShellFolder::_SetMenuState(HMENU hMenu, IDataObject* pDataObject)
       }
    }
    return S_OK;
+}
+
+HRESULT CShellFolder::_RefineMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHILD_ARRAY rgpidl)
+{
+    // HarryWu, 2014.2.20
+    // Disable menu items here.
+    std::wstring idstring = _T("");
+    for (int i = 0; i < cidl; i ++){
+        const NSEFILEPIDLDATA * pNseDataPtr = (const NSEFILEPIDLDATA *)(rgpidl [i]);
+        if (!pNseDataPtr) continue ;
+        wchar_t buffer[128] = _T("");
+        swprintf_s(buffer, lengthof(buffer), _T("%d:%d"), static_cast<int>(IsBitSet(pNseDataPtr->wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY)), pNseDataPtr->wfd.dwId.id);
+        idstring += buffer; idstring += _T(";");
+    }
+
+    MenuType selectedMenus = MenuDef_AllRemoved;
+    if (!idstring.empty()){
+        m_spFolderItem->SelectMenuItems(idstring.c_str(), &selectedMenus);
+    }
+
+    if (!IsBitSet(selectedMenus, MenuDef_OpenFile)) ::RemoveMenu(m_hContextMenu, ID_FILE_SHARE, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_DownloadFile)) ::RemoveMenu(m_hContextMenu, ID_FILE_EXTRACT, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_NewFolder)) ::RemoveMenu(m_hContextMenu, ID_FILE_NEWFOLDER, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_Properties)) ::RemoveMenu(m_hContextMenu, ID_FILE_PROPERTIES, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_Share)) ::RemoveMenu(m_hContextMenu, ID_FILE_SHARE, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_Upload)) ::RemoveMenu(m_hContextMenu, ID_FILE_UPLOAD, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_Preview)) ::RemoveMenu(m_hContextMenu, ID_FILE_PREVIEW, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_Innerlink)) ::RemoveMenu(m_hContextMenu, ID_FILE_INNERLINK, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_Distribute)) ::RemoveMenu(m_hContextMenu, ID_FILE_DISTRIBUTE, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_Lock)) ::RemoveMenu(m_hContextMenu, ID_FILE_LOCK, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_Unlock)) ::RemoveMenu(m_hContextMenu, ID_FILE_UNLOCK, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_OldVersion)) ::RemoveMenu(m_hContextMenu, ID_FILE_OLDVERSION, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_Viewlog)) ::RemoveMenu(m_hContextMenu, ID_FILE_VIEWLOG, MF_BYCOMMAND);
+    if (!IsBitSet(selectedMenus, MenuDef_ExtEdit)) ::RemoveMenu(m_hContextMenu, ID_FILE_EXTEDIT, MF_BYCOMMAND); 
+
+    return S_OK;
 }
 
 /**

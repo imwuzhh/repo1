@@ -47,20 +47,22 @@ typedef unsigned long long MenuType;
 typedef unsigned __int64   MenuType;
 #endif
 
-#define MenuDef_OpenFile     (0x000000000001)
-#define MenuDef_DownloadFile (0x000000000002)
-#define MenuDef_NewFolder    (0x000000000004)
-#define MenuDef_Properties   (0x000000000008)
-#define MenuDef_Share        (0x000000000010)
-#define MenuDef_Upload       (0x000000000020)
-#define MenuDef_Preview      (0x000000000040)
-#define MenuDef_Innerlink    (0x000000000080)
-#define MenuDef_Distribute   (0x000000000100)
-#define MenuDef_Lock         (0x000000000200)
-#define MenuDef_Unlock       (0x000000000400)
-#define MenuDef_OldVersion   (0x000000000800)
-#define MenuDef_Viewlog      (0x000000001000)
-#define MenuDef_ExtEdit      (0x000000002000)
+#define MenuDef_OpenFile     (0x0000000000000001)
+#define MenuDef_DownloadFile (0x0000000000000002)
+#define MenuDef_NewFolder    (0x0000000000000004)
+#define MenuDef_Properties   (0x0000000000000008)
+#define MenuDef_Share        (0x0000000000000010)
+#define MenuDef_Upload       (0x0000000000000020)
+#define MenuDef_Preview      (0x0000000000000040)
+#define MenuDef_Innerlink    (0x0000000000000080)
+#define MenuDef_Distribute   (0x0000000000000100)
+#define MenuDef_Lock         (0x0000000000000200)
+#define MenuDef_Unlock       (0x0000000000000400)
+#define MenuDef_OldVersion   (0x0000000000000800)
+#define MenuDef_Viewlog      (0x0000000000001000)
+#define MenuDef_ExtEdit      (0x0000000000002000)
+#define MenuDef_AllRemoved   (0x0000000000000000)
+#define MenuDef_AllSelected  (0xffffFFFFffffFFFF)
 
 typedef struct _VFS_FIND_DATAW {
 	DWORD dwFileAttributes;

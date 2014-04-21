@@ -252,6 +252,12 @@ HMENU CTarFileItem::GetMenu()
    return ::LoadMenu(_pModule->GetResourceInstance(), MAKEINTRESOURCE(uMenuRes));
 }
 
+HRESULT CTarFileItem::SelectMenuItems(const wchar_t* idstring, MenuType * selectedMenuItems)
+{
+    HR ( DMCheckMenu(_GetTarArchivePtr(), idstring, selectedMenuItems));
+    return S_OK;
+}
+
 /**
  * Execute a menucommand.
  */

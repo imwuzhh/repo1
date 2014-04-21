@@ -113,6 +113,7 @@ public:
    HRESULT InitCustomColumns();
 
    HMENU GetMenu();
+   HRESULT SelectMenuItems(const wchar_t* idstring, MenuType * selectedMenuItems);
    HRESULT ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd);
 
    // Implementation

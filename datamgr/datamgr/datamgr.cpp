@@ -864,7 +864,15 @@ HRESULT DMCheckMenu(TAR_ARCHIVE * pArchive, const wchar_t * idlist, MenuType * m
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-    OUTPUTLOG("%s() id=[%s], inputbits=[%llx]", __FUNCTION__, (const char *)CW2AEX<>(idlist, CP_UTF8), menudef);
+    OUTPUTLOG("%s() id=[%s], inputbits=[%llx]", __FUNCTION__, (const char *)CW2AEX<>(idlist, CP_UTF8), (*menudef));
+
+    std::wstring sIdList = idlist;
+    if (!GetProto(pArchive)->CheckMenu(pArchive, sIdList, menudef))
+    {
+        return S_FALSE;
+    }
+
+    OUTPUTLOG("%s() id=[%s], outputbits=[%llx]", __FUNCTION__, (const char *)CW2AEX<>(idlist, CP_UTF8), (*menudef));
 
     return S_OK;
 }

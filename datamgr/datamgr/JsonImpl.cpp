@@ -654,3 +654,28 @@ BOOL JsonImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, w
     // TODO: Parse result and fill in contents of <childInfo>
     return TRUE;
 }
+
+BOOL JsonImpl::CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType * selectedMenuItems)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "CheckMenu";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["idList"] = (const char *)CW2AEX<>(idlist.c_str(), CP_UTF8);
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}

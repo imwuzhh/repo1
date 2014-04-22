@@ -1328,12 +1328,6 @@ LRESULT CShellFolder::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHan
 	return S_FALSE;
 }
 
-LRESULT CShellFolder::OnInvokeCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-{
-    OUTPUTLOG("%s", __FUNCTION__);
-    return S_FALSE;
-}
-
 // Operations
 
 /**

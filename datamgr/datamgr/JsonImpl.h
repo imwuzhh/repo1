@@ -58,4 +58,18 @@ public:
     BOOL FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo);
 
     BOOL CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType * selectedMenuItems);
+
+    BOOL LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock);
+
+    BOOL InternalLink(TAR_ARCHIVE * pArchive, RemoteId id);
+
+    BOOL ShareFile(TAR_ARCHIVE * pArchive, RemoteId id);
+
+    BOOL ExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id);
+
+    BOOL DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id);
+
+    BOOL ViewLog(TAR_ARCHIVE * pArchive, RemoteId id);
+
+    BOOL HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id);
 };

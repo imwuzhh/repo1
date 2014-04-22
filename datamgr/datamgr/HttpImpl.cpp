@@ -998,3 +998,45 @@ BOOL HttpImpl::CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType
     *selectedMenuItems=MenuDef_AllSelected;
     return TRUE;
 }
+
+BOOL HttpImpl::LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock)
+{
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    return TRUE;
+}
+
+BOOL HttpImpl::InternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    return TRUE;
+}
+
+BOOL HttpImpl::ShareFile(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    return TRUE;
+}
+
+BOOL HttpImpl::ExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    return TRUE;
+}
+
+BOOL HttpImpl::DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    return TRUE;
+}
+
+BOOL HttpImpl::ViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    return TRUE;
+}
+
+BOOL HttpImpl::HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    return TRUE;
+}

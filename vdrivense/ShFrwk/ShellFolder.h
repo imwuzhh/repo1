@@ -81,7 +81,6 @@ public:
 	  MESSAGE_HANDLER(SFVM_GETNOTIFY, OnGetNotify)
 	  MESSAGE_HANDLER(SFVM_SIZE, OnSize)
       MESSAGE_HANDLER(SFVM_WINDOWCLOSING, OnWindowClosing)
-      MESSAGE_HANDLER(SFVM_INVOKECOMMAND, OnInvokeCommand)
    END_MSG_MAP()
 
    DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -219,7 +218,6 @@ public:
    LRESULT OnListRefreshed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
    LRESULT OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);   
    LRESULT OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
-   LRESULT OnInvokeCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
    LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
    // Operations

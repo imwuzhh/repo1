@@ -679,3 +679,179 @@ BOOL JsonImpl::CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType
     // TODO: Parse result and fill in contents of <childInfo>
     return TRUE;
 }
+
+BOOL JsonImpl::LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "LockFile";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["id"] = (int)id.id;
+    parameters["lock"] = toLock ? "True" : "False";
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}
+
+BOOL JsonImpl::InternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "InternalLink";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["id"] = (int)id.id;
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}
+
+BOOL JsonImpl::ShareFile(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "ShareFile";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["id"] = (int)id.id;
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}
+
+BOOL JsonImpl::ExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "ExtEditFile";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["id"] = (int)id.id;
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}
+
+BOOL JsonImpl::DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "DistributeFile";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["id"] = (int)id.id;
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}
+
+BOOL JsonImpl::ViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "ViewLog";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["id"] = (int)id.id;
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}
+
+BOOL JsonImpl::HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "HistoryVersion";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["id"] = (int)id.id;
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}

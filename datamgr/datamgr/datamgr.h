@@ -324,6 +324,8 @@ HRESULT DMViewLog(TAR_ARCHIVE * pArchive, RemoteId id);
 
 HRESULT DMHistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id);
 
+HRESULT DMSelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds);
+
 /**
 * Select proper menus for given items specified by `idlist' parameter.
 * Parameters:

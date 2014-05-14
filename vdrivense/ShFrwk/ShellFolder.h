@@ -51,6 +51,7 @@ public:
    HWND m_hwndOwner;                             // Owner window handle
    HMENU m_hMenu;                                // Handle to current context-menu
    HMENU m_hContextMenu;                         // Handle to current popup context-menu
+   IShellView * m_pShellView;
 
    BEGIN_COM_MAP(CShellFolder)
       COM_INTERFACE_ENTRY(IShellFolder)
@@ -78,6 +79,7 @@ public:
       MESSAGE_HANDLER(SFVM_WINDOWCREATED, OnWindowCreated)
 	  MESSAGE_HANDLER(SFVM_LISTREFRESHED, OnListRefreshed)
 	  MESSAGE_HANDLER(SFVM_SELECTIONCHANGED, OnSelectionChanged)
+      MESSAGE_HANDLER(SFVM_UPDATEOBJECT, OnUpdateObject)
 	  MESSAGE_HANDLER(SFVM_GETNOTIFY, OnGetNotify)
 	  MESSAGE_HANDLER(SFVM_SIZE, OnSize)
       MESSAGE_HANDLER(SFVM_WINDOWCLOSING, OnWindowClosing)
@@ -217,6 +219,7 @@ public:
    LRESULT OnGetNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
    LRESULT OnListRefreshed(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
    LRESULT OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);   
+   LRESULT OnUpdateObject(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);   
    LRESULT OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
    LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 

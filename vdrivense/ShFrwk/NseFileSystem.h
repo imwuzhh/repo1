@@ -273,6 +273,7 @@ public:
    virtual HRESULT OnShellViewSized(HWND shellViewWnd) = 0;
    virtual HRESULT OnShellViewClosing(HWND shellViewWnd) = 0;
    virtual HRESULT InitCustomColumns() = 0;
+   virtual HRESULT SelectItems(LPCWSTR itemIds) = 0;
 };
 
 

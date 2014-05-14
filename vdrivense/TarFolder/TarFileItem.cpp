@@ -242,6 +242,17 @@ HRESULT CTarFileItem::InitCustomColumns()
     return S_OK;
 }
 
+HRESULT CTarFileItem::SelectItems(LPCWSTR itemIds)
+{
+    if (itemIds){
+        OUTPUTLOG("%s(`%s')", __FUNCTION__, (const char *)CW2A(itemIds));
+    }
+    
+    HR (DMSelectItems(_GetTarArchivePtr(), itemIds));
+
+    return S_OK;
+}
+
 /**
  * Returns the menu-items for an item.
  */

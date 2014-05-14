@@ -134,6 +134,7 @@ HRESULT CShellFolder::FinalConstruct()
    ATLTRACE(L"CShellFolder::FinalConstruct\n");
    m_hwndOwner = NULL;
    m_hMenu = m_hContextMenu = NULL;
+   m_pShellView = NULL;
    return S_OK;
 }
 
@@ -141,6 +142,7 @@ void CShellFolder::FinalRelease()
 {
    ATLTRACE(L"CShellFolder::FinalRelease\n");
    if( ::IsMenu(m_hMenu) ) ::DestroyMenu(m_hMenu);
+   if (m_pShellView) {m_pShellView->Release(); m_pShellView = NULL; }
 }
 
 // IPersist
@@ -487,7 +489,13 @@ STDMETHODIMP CShellFolder::CreateViewObject(HWND hwndOwner, REFIID riid, LPVOID*
       CComQIPtr<IShellFolder> spFolder = GetUnknown();
       sfvData.psfvcb = this;
       sfvData.pshf = spFolder;
-      return ::SHCreateShellFolderView(&sfvData, (IShellView**) ppRetVal);
+      HRESULT Hr = ::SHCreateShellFolderView(&sfvData, (IShellView**)ppRetVal);
+      if (Hr == S_OK){
+          if (m_pShellView){m_pShellView->Release(); m_pShellView = NULL;}
+          m_pShellView = (IShellView *)*ppRetVal;
+          m_pShellView->AddRef();
+      }
+      return Hr;
    }
    if( riid == IID_IDropTarget ) 
    {
@@ -1299,27 +1307,55 @@ LRESULT CShellFolder::OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam
 		LPITEMIDLIST pidl;
 	};
 	SFVCB_SELECTINFO * pSelectInfo = (SFVCB_SELECTINFO *)lParam;
-	if (pSelectInfo && pSelectInfo->pidl){
-		// HarryWu, 2014.3.13
-		// This is the selected signal.
-        CNseItemPtr spItem = GenerateChildItem(static_cast<PCUITEMID_CHILD>(pSelectInfo->pidl));
-		if ((pSelectInfo->uNewState & LVIS_SELECTED) == LVIS_SELECTED ) {
-			if ( pSelectInfo->pidl && (pSelectInfo->pidl->mkid.cb)){
-				NSEFILEPIDLDATA * pNseInfo = (NSEFILEPIDLDATA *)pSelectInfo->pidl;
-				OUTPUTLOG("%s(), [Event.Selected] id=[%d], FileName=%s", __FUNCTION__, pNseInfo->wfd.dwId.id, (const char *)CW2A(pNseInfo->wfd.cFileName));
-			}
-            spItem->OnSelected(TRUE);
-		}else{
-			// HarryWu, 2014.3.13
-			// This is the un-selected signal
-			if ( pSelectInfo->pidl && (pSelectInfo->pidl->mkid.cb)){
-				NSEFILEPIDLDATA * pNseInfo = (NSEFILEPIDLDATA *)pSelectInfo->pidl;
-				OUTPUTLOG("%s(), [Event.CancelSelcted] id=[%d], FileName=%s", __FUNCTION__, pNseInfo->wfd.dwId.id, (const char *)CW2A(pNseInfo->wfd.cFileName));
-			}
-            spItem->OnSelected(FALSE);
-		}
-	}
+
+    // HarryWu, 2014.5.13
+    // Ok to get the selected object.
+    PIDLIST_ABSOLUTE pidlSelected = NULL;
+    if (m_pShellView){
+        IDataObject * pDataObject = NULL;
+        m_pShellView->GetItemObject(SVGIO_SELECTION, IID_IDataObject, (void **)&pDataObject);
+        if (pDataObject){
+            IShellItemArray * pItemArray = NULL;
+            SHCreateShellItemArrayFromDataObject(pDataObject, IID_IShellItemArray, (void **)&pItemArray);
+            if (pItemArray){
+                DWORD count = 0;
+                pItemArray->GetCount(&count);
+                count = count;
+                //OUTPUTLOG("Selected [%d] items", count);
+                std::wstring sSelectedItemIds;
+                for (int i = 0; i < count; i ++){
+                    IShellItem * pShellItem = NULL;
+                    pItemArray->GetItemAt(i, &pShellItem);
+                    if (pShellItem){
+                        PIDLIST_ABSOLUTE pidlAbs = NULL;
+                        SHGetIDListFromObject(pShellItem, &pidlAbs);
+                        CPidl oPidlAbs = pidlAbs;
+                        int itemCount = oPidlAbs.GetItemCount();
+                        //OUTPUTLOG("IDList Count [%d]\n", itemCount);
+                        PUITEMID_CHILD childPidl = oPidlAbs.GetLastItem();
+                        if (childPidl){
+                            NSEFILEPIDLDATA * pNSEInfo = (NSEFILEPIDLDATA *)childPidl;
+                            wchar_t buf [100] = _T("");
+                            wsprintf(buf, _T("%d,"), pNSEInfo->wfd.dwId.id);
+                            sSelectedItemIds += buf;
+                        }
+                        pShellItem->Release();
+                    }
+                }
+                m_spFolderItem->SelectItems(sSelectedItemIds.c_str());
+                pItemArray->Release();
+            }
+            pDataObject->Release();
+        }else{
+            m_spFolderItem->SelectItems(NULL);
+        }
+    }
 	return 0;
+}
+
+LRESULT CShellFolder::OnUpdateObject(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+    return 0;
 }
 
 LRESULT CShellFolder::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)

@@ -111,6 +111,7 @@ public:
    HRESULT OnShellViewSized(HWND shellViewWnd);
    HRESULT OnShellViewClosing(HWND shellViewWnd);
    HRESULT InitCustomColumns();
+   HRESULT SelectItems(LPCWSTR itemIds);
 
    HMENU GetMenu();
    HRESULT SelectMenuItems(const wchar_t* idstring, MenuType * selectedMenuItems);

@@ -47,6 +47,8 @@ EXPORTS
 	
 	DMCheckMenu
 	
+	DMSelectItems
+	
 	DMMalloc
 	DMRealloc
 	DMFree

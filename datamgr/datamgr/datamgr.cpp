@@ -860,6 +860,15 @@ HRESULT DMHistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
     return S_OK;
 }
 
+HRESULT DMSelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() ids=[`%s']", __FUNCTION__, (const char *)CW2A(itemIds ? itemIds : _T("")));
+
+    return S_OK;
+}
+
 HRESULT DMCheckMenu(TAR_ARCHIVE * pArchive, const wchar_t * idlist, MenuType * menudef)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);

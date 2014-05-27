@@ -31,25 +31,28 @@ BOOL HttpImpl::Login(TAR_ARCHIVE * pArchive)
 {
     // HarryWu, 2014.5.26
     // Fork a login ui, and read user/pass from file, created by exited ui.
-    wchar_t * pwszModPath = wcsdup(pArchive->context->modulepath);
-    std::wstring wstrAppPath = pwszModPath;
-    wstrAppPath += _T("\\login.exe");
-    STARTUPINFOW startInfo;  memset(&startInfo, 0, sizeof(startInfo));
-    startInfo.cb = sizeof(startInfo);
-    PROCESS_INFORMATION ProcInfo; memset(&ProcInfo, 0, sizeof(ProcInfo));
-    std::wstring wstrConfPath = pwszModPath;
-    wstrConfPath += _T("\\login.conf");
-    if (CreateProcessW(NULL, (LPWSTR)wstrAppPath.c_str(), NULL, NULL, FALSE, 0, NULL, pwszModPath, &startInfo, &ProcInfo))
-    {
-       WaitForSingleObject(ProcInfo.hProcess, INFINITE);
-       free(pwszModPath);
-       GetPrivateProfileStringW(_T("Login"), _T("addr"), _T(""), pArchive->context->service, 128, wstrConfPath.c_str());
-       GetPrivateProfileStringW(_T("Login"), _T("user"), _T(""), pArchive->context->username, 32, wstrConfPath.c_str());
-       GetPrivateProfileStringW(_T("Login"), _T("pass"), _T(""), pArchive->context->password, 32, wstrConfPath.c_str());
-    }else{
-        OUTPUTLOG("Failed to create login ui, error=%d", GetLastError());
-        free(pwszModPath);
-        return FALSE;
+    if (!pArchive->context->service[0] || !pArchive->context->username[0] || !pArchive->context->password[0]){
+        wchar_t * pwszModPath = wcsdup(pArchive->context->modulepath);
+        std::wstring wstrAppPath = pwszModPath;
+        wstrAppPath += _T("\\login.exe");
+        STARTUPINFOW startInfo;  memset(&startInfo, 0, sizeof(startInfo));
+        startInfo.cb = sizeof(startInfo);
+        PROCESS_INFORMATION ProcInfo; memset(&ProcInfo, 0, sizeof(ProcInfo));
+        std::wstring wstrConfPath = pwszModPath;
+        wstrConfPath += _T("\\login.conf");
+        if (CreateProcessW(NULL, (LPWSTR)wstrAppPath.c_str(), NULL, NULL, FALSE, 0, NULL, pwszModPath, &startInfo, &ProcInfo))
+        {
+            WaitForSingleObject(ProcInfo.hProcess, INFINITE);
+            CloseHandle(ProcInfo.hThread); CloseHandle(ProcInfo.hProcess);
+            free(pwszModPath);
+            GetPrivateProfileStringW(_T("Login"), _T("addr"), _T(""), pArchive->context->service, 128, wstrConfPath.c_str());
+            GetPrivateProfileStringW(_T("Login"), _T("user"), _T(""), pArchive->context->username, 32, wstrConfPath.c_str());
+            GetPrivateProfileStringW(_T("Login"), _T("pass"), _T(""), pArchive->context->password, 32, wstrConfPath.c_str());
+        }else{
+            OUTPUTLOG("Failed to create login ui, error=%d", GetLastError());
+            free(pwszModPath);
+            return FALSE;
+        }
     }
 
     // HarryWu, 2014.2.28

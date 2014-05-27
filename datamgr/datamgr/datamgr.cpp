@@ -794,6 +794,9 @@ HRESULT DMLockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock)
 
     OUTPUTLOG("%s() id=[%d:%d], lock=[%d]", __FUNCTION__, id.category, id.id, toLock);
 
+    if (!GetProto(pArchive)->LockFile(pArchive, id, toLock))
+        return S_FALSE;
+
     return S_OK;
 }
 
@@ -802,7 +805,7 @@ HRESULT DMIsFileLocked(TAR_ARCHIVE * pArchive, RemoteId id, BOOL * isLocked)
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
-
+    
     return S_OK;
 }
 
@@ -811,6 +814,9 @@ HRESULT DMInternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    if (!GetProto(pArchive)->InternalLink(pArchive, id))
+        return S_FALSE;
 
     return S_OK;
 }
@@ -821,6 +827,9 @@ HRESULT DMShareFile(TAR_ARCHIVE * pArchive, RemoteId id)
 
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
 
+    if (!GetProto(pArchive)->ShareFile(pArchive, id))
+        return S_FALSE;
+
     return S_OK;
 }
 
@@ -829,6 +838,9 @@ HRESULT DMExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id)
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    if (!GetProto(pArchive)->ExtEditFile(pArchive, id))
+        return S_FALSE;
 
     return S_OK;
 }
@@ -839,6 +851,9 @@ HRESULT DMDistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
 
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
 
+    if (!GetProto(pArchive)->DistributeFile(pArchive, id))
+        return S_FALSE;
+
     return S_OK;
 }
 
@@ -847,6 +862,9 @@ HRESULT DMViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    if (!GetProto(pArchive)->ViewLog(pArchive, id))
+        return S_FALSE;
 
     return S_OK;
 }
@@ -857,6 +875,9 @@ HRESULT DMHistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
 
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
 
+    if (!GetProto(pArchive)->HistoryVersion(pArchive, id))
+        return S_FALSE;
+
     return S_OK;
 }
 
@@ -865,6 +886,9 @@ HRESULT DMSelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
     OUTPUTLOG("%s() ids=[`%s']", __FUNCTION__, (const char *)CW2A(itemIds ? itemIds : _T("")));
+
+    if (!GetProto(pArchive)->SelectItems(pArchive, itemIds ? itemIds : _T("")))
+        return S_FALSE;
 
     return S_OK;
 }

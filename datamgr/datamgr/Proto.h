@@ -105,4 +105,6 @@ public:
      virtual BOOL ViewLog(TAR_ARCHIVE * pArchive, RemoteId id) = 0;
 
      virtual BOOL HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id) = 0;
+
+     virtual BOOL SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds) = 0;
 };

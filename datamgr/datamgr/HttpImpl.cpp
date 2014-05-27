@@ -29,6 +29,29 @@ HttpImpl::~HttpImpl()
 
 BOOL HttpImpl::Login(TAR_ARCHIVE * pArchive)
 {
+    // HarryWu, 2014.5.26
+    // Fork a login ui, and read user/pass from file, created by exited ui.
+    wchar_t * pwszModPath = wcsdup(pArchive->context->modulepath);
+    std::wstring wstrAppPath = pwszModPath;
+    wstrAppPath += _T("\\login.exe");
+    STARTUPINFOW startInfo;  memset(&startInfo, 0, sizeof(startInfo));
+    startInfo.cb = sizeof(startInfo);
+    PROCESS_INFORMATION ProcInfo; memset(&ProcInfo, 0, sizeof(ProcInfo));
+    std::wstring wstrConfPath = pwszModPath;
+    wstrConfPath += _T("\\login.conf");
+    if (CreateProcessW(NULL, (LPWSTR)wstrAppPath.c_str(), NULL, NULL, FALSE, 0, NULL, pwszModPath, &startInfo, &ProcInfo))
+    {
+       WaitForSingleObject(ProcInfo.hProcess, INFINITE);
+       free(pwszModPath);
+       GetPrivateProfileStringW(_T("Login"), _T("addr"), _T(""), pArchive->context->service, 128, wstrConfPath.c_str());
+       GetPrivateProfileStringW(_T("Login"), _T("user"), _T(""), pArchive->context->username, 32, wstrConfPath.c_str());
+       GetPrivateProfileStringW(_T("Login"), _T("pass"), _T(""), pArchive->context->password, 32, wstrConfPath.c_str());
+    }else{
+        OUTPUTLOG("Failed to create login ui, error=%d", GetLastError());
+        free(pwszModPath);
+        return FALSE;
+    }
+
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
     const wchar_t * svcaddr = pArchive->context->service;
@@ -1038,5 +1061,11 @@ BOOL HttpImpl::ViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
 BOOL HttpImpl::HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
 {
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    return TRUE;
+}
+
+BOOL HttpImpl::SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
+{
+    OUTPUTLOG("%s() idList=`%s'", __FUNCTION__, (const char *)CW2A(itemIds));
     return TRUE;
 }

@@ -72,4 +72,7 @@ public:
      BOOL ViewLog(TAR_ARCHIVE * pArchive, RemoteId id);
 
      BOOL HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id);
+
+     BOOL SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds);
+
 };

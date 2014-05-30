@@ -917,6 +917,8 @@ BOOL Utility::SocketRequest(const wchar_t * ipv4, unsigned short port, const wch
     saddr.sin_port = htons(port);
     saddr.sin_family = AF_INET;
 
+    OUTPUTLOG("try to connect [%s:%hu]", (const char *)CW2AEX<>(ipv4, CP_ACP), port);
+
     SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == INVALID_SOCKET) return FALSE;
 
@@ -936,6 +938,7 @@ BOOL Utility::SocketRequest(const wchar_t * ipv4, unsigned short port, const wch
     struct timeval timeout = {0, 50000};
     if (select(0, 0, &r, 0, &timeout) <= 0){
         closesocket(sock); sock = NULL;
+        OUTPUTLOG("Connect timeout [%d] ms", timeout.tv_usec/1000);
         return FALSE;
     }
 
@@ -947,6 +950,7 @@ BOOL Utility::SocketRequest(const wchar_t * ipv4, unsigned short port, const wch
     }
 
     std::string req = (const char *)CW2AEX<>(_wreq, CP_ACP);
+    OUTPUTLOG("try to send reqeust: [%s]", req.c_str());
     int reqlen = req.length();
     if (reqlen != send(sock, req.c_str(), reqlen, 0))
     {
@@ -959,5 +963,6 @@ BOOL Utility::SocketRequest(const wchar_t * ipv4, unsigned short port, const wch
         closesocket(sock);
         sock = INVALID_SOCKET;
     }
+    OUTPUTLOG("successfully sent request.");
     return TRUE;
 }

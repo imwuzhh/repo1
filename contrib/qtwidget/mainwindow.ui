@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>325</width>
+    <width>347</width>
     <height>263</height>
    </rect>
   </property>
@@ -36,7 +36,7 @@
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>80</x>
+      <x>90</x>
       <y>90</y>
       <width>241</width>
       <height>111</height>
@@ -91,7 +91,7 @@
       <x>40</x>
       <y>220</y>
       <width>251</width>
-      <height>26</height>
+      <height>29</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
@@ -99,7 +99,8 @@
       <widget class="QPushButton" name="loginBtn">
        <property name="font">
         <font>
-         <family>System</family>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -119,7 +120,8 @@
       <widget class="QPushButton" name="ResetBtn">
        <property name="font">
         <font>
-         <family>System</family>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -134,9 +136,9 @@
    <widget class="QWidget" name="layoutWidget2">
     <property name="geometry">
      <rect>
-      <x>0</x>
+      <x>10</x>
       <y>90</y>
-      <width>69</width>
+      <width>70</width>
       <height>111</height>
      </rect>
     </property>
@@ -145,7 +147,8 @@
       <widget class="QLabel" name="serverLbl">
        <property name="font">
         <font>
-         <family>System</family>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -159,7 +162,8 @@
       <widget class="QLabel" name="userLbl">
        <property name="font">
         <font>
-         <family>System</family>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>
@@ -173,7 +177,8 @@
       <widget class="QLabel" name="passLbl">
        <property name="font">
         <font>
-         <family>System</family>
+         <family>Times New Roman</family>
+         <pointsize>12</pointsize>
          <weight>75</weight>
          <bold>true</bold>
         </font>

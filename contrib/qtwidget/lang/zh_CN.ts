@@ -36,7 +36,7 @@
     <message>
         <location filename="../mainwindow.ui" line="135"/>
         <source>Password</source>
-        <translation>密    码</translation>
+        <translation>密      码</translation>
     </message>
 </context>
 </TS>

@@ -10,16 +10,34 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    QFile fin("login.conf");
+    if (fin.exists()){
+        QComboBox * addr = this->findChild<QComboBox*>("serverList");
+        QLineEdit * user = this->findChild<QLineEdit*>("userEdit");
+
+        fin.open(QIODevice::ReadOnly | QIODevice::Text);
+        QTextStream finstrm(&fin);
+        do {
+            QString line = finstrm.readLine();
+            int pos = -1;
+            if ((pos = line.indexOf("addr=")) != -1){
+                QString sAddr = line.mid(pos + 5);
+                sAddr.replace("\r\n", "");
+                addr->insertItem(0, sAddr);
+            }else if ((pos = line.indexOf("user=")) != -1){
+                QString sUser = line.mid(pos + 5);
+                sUser.replace("\r\n", "");
+                user->setText(sUser);
+            }
+        }while(!finstrm.atEnd());
+        fin.close();
+    }
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::on_loginBtn_clicked()
-{
-    qDebug("");
 }
 
 bool MainWindow::close()

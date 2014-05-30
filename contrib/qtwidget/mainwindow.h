@@ -16,11 +16,8 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_loginBtn_clicked();
     bool close();
-
     void on_ResetBtn_clicked();
-
 private:
     Ui::MainWindow *ui;
 };

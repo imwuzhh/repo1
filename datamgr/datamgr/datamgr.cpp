@@ -132,6 +132,11 @@ static HRESULT DMInit(HINSTANCE hInst){
 	Utility::GetServiceUser(context.configfile, context.username, lengthof(context.username));
 	Utility::GetServicePass(context.configfile, context.password, lengthof(context.password));
 
+    // Setup JsonPort & ViewPort
+    // They are both local server to delegate vdrive to get info from remote server.
+    context.JsonPort = Utility::GetJsonPort(context.configfile);
+    context.ViewPort = Utility::GetViewPort(context.configfile);
+
     // Setup PageSize of View
     Utility::GetShellViewPageSize(context.configfile, &context.pageSize);
 

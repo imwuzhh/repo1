@@ -7,6 +7,8 @@ struct Edoc2Context {
     DWORD   dwUserId;
     BOOL    enableHttp;
     DWORD   HttpTimeoutMs;
+    DWORD   ViewPort;
+    DWORD   JsonPort;
     DWORD   pageSize;
     HINSTANCE hInst;
     Proto*  proto;

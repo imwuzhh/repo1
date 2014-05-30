@@ -1028,47 +1028,160 @@ BOOL HttpImpl::CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType
 BOOL HttpImpl::LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock)
 {
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    wchar_t wszReq [MAX_PATH] = _T("");
+    swprintf_s(wszReq, lengthof(wszReq)
+        , _T("%s/method=%s&idlist=%d&lock=%d")
+        , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
+        , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
+        , id.id
+        , toLock ? 1 : 0);
+
+    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    {
+        OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
+        return FALSE;
+    }
+
     return TRUE;
 }
 
 BOOL HttpImpl::InternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
 {
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    wchar_t wszReq [MAX_PATH] = _T("");
+    swprintf_s(wszReq, lengthof(wszReq)
+        , _T("%s/method=%s&idlist=%d")
+        , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
+        , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
+        , id.id);
+
+    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    {
+        OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
+        return FALSE;
+    }
+
     return TRUE;
 }
 
 BOOL HttpImpl::ShareFile(TAR_ARCHIVE * pArchive, RemoteId id)
 {
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    wchar_t wszReq [MAX_PATH] = _T("");
+    swprintf_s(wszReq, lengthof(wszReq)
+        , _T("%s/method=%s&idlist=%d")
+        , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
+        , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
+        , id.id);
+
+    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    {
+        OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
+        return FALSE;
+    }
+
     return TRUE;
 }
 
 BOOL HttpImpl::ExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id)
 {
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    wchar_t wszReq [MAX_PATH] = _T("");
+    swprintf_s(wszReq, lengthof(wszReq)
+        , _T("%s/method=%s&idlist=%d")
+        , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
+        , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
+        , id.id);
+
+    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    {
+        OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
+        return FALSE;
+    }
+
     return TRUE;
 }
 
 BOOL HttpImpl::DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
 {
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+    wchar_t wszReq [MAX_PATH] = _T("");
+    swprintf_s(wszReq, lengthof(wszReq)
+        , _T("%s/method=%s&idlist=%d")
+        , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
+        , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
+        , id.id);
+
+    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    {
+        OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
+        return FALSE;
+    }
+
     return TRUE;
 }
 
 BOOL HttpImpl::ViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
 {
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    
+    wchar_t wszReq [MAX_PATH] = _T("");
+    swprintf_s(wszReq, lengthof(wszReq)
+        , _T("%s/method=%s&idlist=%d")
+        , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
+        , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
+        , id.id);
+
+    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    {
+        OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
+        return FALSE;
+    }
+
     return TRUE;
 }
 
 BOOL HttpImpl::HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
 {
     OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    
+    wchar_t wszReq [MAX_PATH] = _T("");
+    swprintf_s(wszReq, lengthof(wszReq)
+        , _T("%s/method=%s&idlist=%d")
+        , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
+        , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
+        , id.id);
+
+    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    {
+        OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
+        return FALSE;
+    }
+
     return TRUE;
 }
 
 BOOL HttpImpl::SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
 {
     OUTPUTLOG("%s() idList=`%s'", __FUNCTION__, (const char *)CW2A(itemIds));
+    
+    wchar_t wszReq [MAX_PATH] = _T("");
+    swprintf_s(wszReq, lengthof(wszReq)
+        , _T("%s/method=%s&idlist=%s")
+        , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
+        , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
+        , itemIds);
+
+    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    {
+        OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
+        return FALSE;
+    }
+
     return TRUE;
 }

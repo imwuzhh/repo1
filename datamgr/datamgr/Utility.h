@@ -23,6 +23,8 @@ public:
     static BOOL GetServiceBase(const wchar_t* xmlconfigfile, wchar_t * pszSvcBase, int maxcch);
     static BOOL GetServiceUser(const wchar_t* xmlconfigfile, wchar_t * pszSvcUser, int maxcch);
     static BOOL GetServicePass(const wchar_t* xmlconfigfile, wchar_t * pszSvcPass, int maxcch);
+    static DWORD GetViewPort(const wchar_t * xmlconfigfile);
+    static DWORD GetJsonPort(const wchar_t * xmlconfigfile);
 	static unsigned char ToHex(unsigned char x);
 	static unsigned char FromHex(unsigned char x);
 	static std::string UrlEncode(const std::string& str);
@@ -32,6 +34,7 @@ public:
     static BOOL GetShellViewPageSize(const wchar_t* xmlconfigfile, DWORD * pageSize);
     static BOOL ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime);
     static BOOL ParseVersion(const std::wstring & verString, DWORD * dwVersion);
+    static BOOL SocketRequest(const wchar_t * ipv4, unsigned short port, const wchar_t * req);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

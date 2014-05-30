@@ -14,6 +14,9 @@
 #include "Edoc2Context.h"
 #include "datamgr.h"
 #include "Utility.h"
+#if defined(_MSC_VER)
+#pragma comment(lib, "ws2_32.lib")
+#endif
 
 ///////////////////////////////////////////////////////////////////////////////
 // Debug helper functions
@@ -576,6 +579,80 @@ BOOL Utility::GetServicePass(const wchar_t* xmlconfigfile, wchar_t * pszSvcPass,
     return TRUE;
 }
 
+DWORD Utility::GetViewPort(const wchar_t * xmlconfigfile)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("Net");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild("ViewPort");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    DWORD viewPort = 60688;
+    if (target->ToElement() && target->ToElement()->GetText())
+        viewPort = atoi(target->ToElement()->GetText());
+
+    delete xdoc; xdoc = NULL;
+
+    return viewPort;
+}
+
+DWORD Utility::GetJsonPort(const wchar_t * xmlconfigfile)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("Net");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild("ViewPort");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    DWORD jsonPort = 60684;
+    if (target->ToElement() && target->ToElement()->GetText())
+        jsonPort = atoi(target->ToElement()->GetText());
+
+    delete xdoc; xdoc = NULL;
+
+    return jsonPort;
+}
+
 unsigned char Utility::ToHex(unsigned char x) 
 { 
 	return  x > 9 ? x + 55 : x + 48; 
@@ -827,5 +904,39 @@ BOOL Utility::ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime2)
 
 BOOL Utility::ParseVersion(const std::wstring & verString, DWORD * dwVersion)
 {
+    return TRUE;
+}
+
+BOOL Utility::SocketRequest(const wchar_t * ipv4, unsigned short port, const wchar_t * _wreq)
+{
+    // HarryWu, 2014.5.30
+    // WSAStartup() should be called already.
+
+    sockaddr_in saddr;
+    saddr.sin_addr.s_addr = inet_addr((const char *)CW2AEX<>(ipv4, CP_ACP));
+    saddr.sin_port = htons(port);
+    saddr.sin_family = AF_INET;
+
+    SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock == INVALID_SOCKET) return FALSE;
+
+    if (connect(sock, (sockaddr *)&saddr, sizeof(saddr))) {
+        closesocket(sock);
+        return FALSE;
+    }
+
+    std::string req = (const char *)CW2AEX<>(_wreq, CP_ACP);
+    int reqlen = req.length();
+    if (reqlen != send(sock, req.c_str(), reqlen, 0))
+    {
+        closesocket(sock); sock = INVALID_SOCKET;
+        return FALSE;
+    }
+
+    if (sock != INVALID_SOCKET)
+    {
+        closesocket(sock);
+        sock = INVALID_SOCKET;
+    }
     return TRUE;
 }

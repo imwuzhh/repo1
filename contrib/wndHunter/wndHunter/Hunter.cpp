@@ -100,11 +100,11 @@ void CALLBACK Hunter::TimerProc(HWND hWnd, UINT, UINT_PTR, DWORD){
 	// And aslo, Windows ie7 diffs with ie11 on titile,
 	// "Internet Explorer", "Windows Internet Explorer"
 	// :(
-	HWND hDlg = FindChildWindow("TabWindowClass", "Эјвз - Internet Explorer", 0x00000000);
+	HWND hDlg = FindChildWindow(TARGET_CLASS, TARGET_WINDOW, 0x00000000);
 	if (hDlg == NULL) return ;
 	s_ChildWindow = hDlg;
 
-	HWND hView = FindChildWindow("SHELLDLL_DefView", "ShellView", 0x00000000 /*SHOULDBE 0xED0CED0C*/);
+	HWND hView = FindChildWindow("SHELLDLL_DefView", "ShellView", 0xED0CED0C);
 	if (hView == NULL) return ;
 
 	s_ParentWindow = GetParent(GetParent(hView));

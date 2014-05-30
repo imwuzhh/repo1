@@ -1,5 +1,12 @@
 #pragma once
 
+//#define TARGET_CLASS   "TabWindowClass"
+//#define TARGET_WINDOW  "Эјвз - Internet Explorer"
+
+#define TARGET_CLASS   "QWidget"
+#define TARGET_WINDOW  "InfoView"
+
+
 struct EnumParam {
 	char * className;
 	char * title;

@@ -3,7 +3,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 
-Dialog::Dialog(QWidget *parent) :
+Dialog::Dialog(unsigned short viewPort, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
@@ -18,7 +18,7 @@ Dialog::Dialog(QWidget *parent) :
     connect(wv, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 
     sv = new QTcpServer();
-    sv->listen(QHostAddress::LocalHost, 60688);
+    sv->listen(QHostAddress::LocalHost, viewPort);
     connect(sv, SIGNAL(newConnection()), this, SLOT(newConnection()));
 }
 

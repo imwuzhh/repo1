@@ -6,9 +6,12 @@
 #include <stdio.h>
 #include <time.h>
 #include <string>
+#include <ShellAPI.h>
 #include "Hunter.h"
 
 #define MAX_LOADSTRING 100
+#define WM_USER_ICON_NOTIFY WM_USER + 0x7001
+static NOTIFYICONDATAA nid;
 
 // 全局变量:
 HINSTANCE hInst;								// 当前实例
@@ -126,7 +129,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    // First setup a timer to hunt.
    SetTimer(hWnd, EMBEDDED_TIMER_ID, 1000/* 1 Second */, Hunter::TimerProc);
 
-   ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);
 
    return TRUE;
@@ -152,6 +154,37 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
+    case WM_CREATE:
+        {
+            // HarryWu, 2014.5.30
+            // Add a shell notification icon
+            nid.cbSize=sizeof(NOTIFYICONDATAA);
+            nid.hWnd=hWnd;
+            nid.uID=IDI_EDOC2TOOL;
+            nid.uFlags=NIF_ICON | NIF_MESSAGE | NIF_TIP ;
+            nid.uCallbackMessage=WM_USER_ICON_NOTIFY;
+            nid.hIcon=LoadIcon(hInst, MAKEINTRESOURCE(IDI_EDOC2TOOL));
+            strcpy(nid.szTip, "WindowHunter is hunting!\r\n"
+                "Click to open Main window.\r\n"
+                "Right-click to hide.\r\n"
+                "Double-click to exit.\r\n");
+            Shell_NotifyIconA(NIM_ADD, &nid);
+            ::ShowWindow(hWnd, SW_HIDE);
+        }break;
+    case WM_USER_ICON_NOTIFY:
+        {
+            if (wParam == IDI_EDOC2TOOL){
+                if (lParam == WM_LBUTTONDOWN){
+                    ::ShowWindow(hWnd, SW_SHOW);
+                }
+                if (lParam == WM_RBUTTONDOWN){
+                    ::ShowWindow(hWnd, SW_HIDE);
+                }
+                if (lParam == WM_LBUTTONDBLCLK){
+                    DestroyWindow(hWnd);
+                }
+            }
+        }break;
 	case WM_COMMAND:
 		wmId    = LOWORD(wParam);
 		wmEvent = HIWORD(wParam);
@@ -181,6 +214,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			// ...
 			KillTimer(hWnd, EMBEDDED_TIMER_ID);
 			Hunter::ReleaseChild(hWnd, Hunter::s_ChildWindow);
+            // HarryWu, 2014.5.30
+            // Remove shell notification icon
+            Shell_NotifyIconA(NIM_DELETE, &nid);
 		}
 		PostQuitMessage(0);
 		break;

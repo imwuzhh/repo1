@@ -35,9 +35,9 @@ void Hunter::ResizeChild(HWND hParent, HWND hView, HWND hChild){
 	GetClientRect(hParent, &ParentRect);
 	GetWindowRect(hParent, &wpRect);
 	SetWindowPos(hChild, HWND_TOP
-		, (ParentRect.right - ParentRect.left)*0.75
+		, max((ParentRect.right - ParentRect.left)*0.75, (ParentRect.right - ParentRect.left) - 320)
 		, (wvRect.top - wpRect.top)
-		, (ParentRect.right - ParentRect.left)/4
+		, min(320, (ParentRect.right - ParentRect.left)/4)
 		, (ViewRect.bottom - ViewRect.top), 0);
 }
 

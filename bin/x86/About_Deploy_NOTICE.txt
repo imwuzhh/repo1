@@ -1,0 +1,6 @@
+1) qt utilities are using /MD compiled dlls, e.g. qtgui4.dll qtcore4.dll, which need 
+msvcr90.dll, msvcp90.dll present in this directory.
+
+2) qt utilities use webkit to view info, and webkit depends libeay32 & libssl to 
+build tls connection, and these two crypto dlls should be prebuilt with /MD, and 
+placed in this directory.

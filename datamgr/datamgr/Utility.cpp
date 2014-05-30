@@ -920,8 +920,29 @@ BOOL Utility::SocketRequest(const wchar_t * ipv4, unsigned short port, const wch
     SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == INVALID_SOCKET) return FALSE;
 
+    unsigned long ul = 1;
+    if (ioctlsocket(sock, FIONBIO, (unsigned long*)&ul))
+    {
+        closesocket(sock); sock = INVALID_SOCKET;
+        return FALSE;
+    }
+
     if (connect(sock, (sockaddr *)&saddr, sizeof(saddr))) {
-        closesocket(sock);
+        //closesocket(sock);
+        //return FALSE;
+    }
+
+    fd_set r; FD_ZERO(&r); FD_SET(sock, &r);
+    struct timeval timeout = {0, 50000};
+    if (select(0, 0, &r, 0, &timeout) <= 0){
+        closesocket(sock); sock = NULL;
+        return FALSE;
+    }
+
+    unsigned long ul1= 0 ;
+    if (ioctlsocket(sock, FIONBIO, (unsigned long*)&ul1))
+    {
+        closesocket(sock); sock = INVALID_SOCKET;
         return FALSE;
     }
 

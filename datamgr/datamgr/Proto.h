@@ -106,5 +106,11 @@ public:
 
      virtual BOOL HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id) = 0;
 
+	 /**
+	 * Notify json proxy about shell items is selected or selection cancelled.
+	 * Parameters:
+	 * 1) pArchive: context
+	 * 2) itemIds: selected items' id, with format `id1:flag1,id2:flag2,...', if directory selected, flag is 1, otherwise flag is 0.
+	 */
      virtual BOOL SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds) = 0;
 };

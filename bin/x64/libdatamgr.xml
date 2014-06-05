@@ -6,11 +6,14 @@
     <Pass></Pass>
     <HttpEnable>Yes</HttpEnable>
     <HttpConnectioTimeoutMilliSeconds>5000</HttpConnectioTimeoutMilliSeconds>
-	<ViewPort>60688</ViewPort>
+    <ViewPort>60688</ViewPort>
     <JsonPort>60684</JsonPort>
   </Net>
+  <API>
+      <FastCheck>Yes</FastCheck>
+  </API>
   <View>
-    <PageSize>3</PageSize>
+    <PageSize>5</PageSize>
   </View>
   <Locale>
     <RecycleBin>

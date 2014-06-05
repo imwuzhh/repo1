@@ -75,4 +75,5 @@ public:
 
      BOOL SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds);
 
+     BOOL CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token);
 };

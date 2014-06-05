@@ -107,4 +107,14 @@ public:
      virtual BOOL HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id) = 0;
 
      virtual BOOL SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds) = 0;
+
+     /**
+     * Function: check available of old token. 
+     * Parameters:
+     * 1) pArchive, session context.
+     * 2) token, old token.
+     * Return:
+     * if available return TRUE, otherwise return FALSE.
+     */
+     virtual BOOL CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token) = 0;
 };

@@ -74,4 +74,6 @@ public:
     BOOL HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id);
 
     BOOL SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds);
+
+    BOOL CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token);
 };

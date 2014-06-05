@@ -880,3 +880,28 @@ BOOL JsonImpl::SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
     // TODO: Parse result and fill in contents of <childInfo>
     return TRUE;
 }
+
+BOOL JsonImpl::CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = 60684;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "CheckToken";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["oldToken"] = (const char *)CW2AEX<>(token, CP_UTF8);
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}

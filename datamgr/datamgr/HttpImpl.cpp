@@ -1185,3 +1185,8 @@ BOOL HttpImpl::SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
 
     return TRUE;
 }
+
+BOOL HttpImpl::CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token)
+{
+    return TRUE;
+}

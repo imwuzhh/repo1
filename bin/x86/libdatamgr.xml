@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config>
+  <Net>
+    <Service>http://7.25.25.112</Service>
+    <User>admin</User>
+    <Pass></Pass>
+    <HttpEnable>Yes</HttpEnable>
+    <HttpConnectioTimeoutMilliSeconds>5000</HttpConnectioTimeoutMilliSeconds>
+    <ViewPort>60688</ViewPort>
+    <JsonPort>60684</JsonPort>
+  </Net>
+  <API>
+      <FastCheck>Yes</FastCheck>
+  </API>
+  <View>
+    <PageSize>5</PageSize>
+  </View>
+  <Locale>
+    <RecycleBin>
+      <en-US>RecycleBin</en-US>
+      <zh-CN>回收站</zh-CN>
+      <zh-TW>廢舊中心</zh-TW>
+    </RecycleBin>
+    <SearchBin>
+      <en-US>SearchBin</en-US>
+      <zh-CN>搜索结果</zh-CN>
+      <zh-TW>搜羅結果</zh-TW>
+    </SearchBin>
+  </Locale>
+</config>

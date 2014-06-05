@@ -91,26 +91,25 @@ HRESULT CTarFileItem::GetChild(LPCWSTR pwstrName, SHGNO ParseType, CNseItem** pI
    
    RemoteId parentId;
    HR( _GetIdQuick(m_pidlItem, &parentId));
-   VFS_FIND_DATA wfd = { 0 };
-   VFS_FIND_DATA * childList = NULL; int childCount = 0;
-   DMGetChildrenList(_GetTarArchivePtr(), *(RemoteId *)&parentId, &childList, &childCount);
-   for (int i = 0; i < childCount; i++)
-   {
-	   if (!_wcsicmp(pwstrName, childList[i].cFileName)){
-		   wfd = *(VFS_FIND_DATA *)&childList[i];
-		   *pItem = GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, wfd);
-		   DMFree((LPBYTE)childList);
-		   return *pItem != NULL ? S_OK : E_OUTOFMEMORY;
-	   }
+
+   // HarryWu, 2014.6.5
+   // there are two different policy, directy call FileExists() to query, 
+   // or use Enum() api to get full list and then check it's presence.
+   if (DMFastCheckIsEnable()){
+       VFS_FIND_DATA wfd = { 0 };
+       if (FAILED(DMFindChild(_GetTarArchivePtr(), parentId, pwstrName, &wfd)))
+           return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
+   }else{
+       return CNseBaseItem::GetChild(pwstrName, ParseType, pItem); 
    }
-   DMFree((LPBYTE)childList);
+
    return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
 }
 
 /**
  * Retrieve the list of children of the current folder item.
  */
-HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aItems)
+HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aItems, BOOL paged)
 {
    // Only directories have sub-items
    if( !IsFolder() ) return E_HANDLE;
@@ -137,7 +136,7 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    // use /MD to genereate these modules.
    VFS_FIND_DATA * aList = NULL; int nListCount = 0;
    ViewSettings vs; memset(&vs, 0, sizeof(vs));
-   if (dwPageSize){
+   if (dwPageSize && paged){
        DWORD dwTotalPage = 0;
        //HR( DMGetChildrenListEx(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &aList, &nListCount));
        HR( DMGetDocInfo(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &vs, &aList, &nListCount));

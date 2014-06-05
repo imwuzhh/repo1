@@ -373,7 +373,7 @@ HRESULT CNseBaseItem::GetChild(LPCWSTR pstrName, SHGNO ParseType, CNseItem** pIt
    ATLASSERT(*pItem==NULL);
    ATLASSERT(IsFolder());
    CNseItemArray aChildren;
-   HR( EnumChildren(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, aChildren) );
+   HR( EnumChildren(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS, aChildren, FALSE) );
    REFPROPERTYKEY pkey = IsBitSet(ParseType, SHGDN_FORPARSING) ? PKEY_ParsingName : PKEY_ItemName;
    for( int i = 0; i < aChildren.GetSize(); i++ ) {
       CComPropVariant v;
@@ -389,7 +389,7 @@ HRESULT CNseBaseItem::GetChild(LPCWSTR pstrName, SHGNO ParseType, CNseItem** pIt
 /**
  * Return a list of child items.
  */
-HRESULT CNseBaseItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aList)
+HRESULT CNseBaseItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aList, BOOL paged)
 {
    // TODO: You're a folder; override and implement this...
    ATLASSERT(false);

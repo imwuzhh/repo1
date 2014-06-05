@@ -134,7 +134,7 @@ STDMETHODIMP CEnumIDList::Clone(IEnumIDList** ppEnum)
 HRESULT CEnumIDList::_PopulateList()
 {
    ATLASSERT(m_pidl.IsNull());
-   HRESULT Hr = m_spFolder->m_spFolderItem->EnumChildren(m_hWnd, m_grfFlags, m_aChildren);
+   HRESULT Hr = m_spFolder->m_spFolderItem->EnumChildren(m_hWnd, m_grfFlags, m_aChildren, TRUE);
    ATLASSERT(Hr==S_OK || Hr==E_PENDING);
    if( Hr != S_OK && Hr != E_PENDING ) return Hr;
    for( int i = 0; i < m_aChildren.GetSize(); i++ ) m_pidl.Append( m_aChildren[i]->GetITEMID() );

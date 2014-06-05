@@ -14,7 +14,7 @@
 #include "CommandProvider.h"
 #include "CategoryProvider.h"
 
-#pragma warning( disable : 4510 4610 )
+#pragma warning( disable : 4510 4610 4996)
 
 
 //////////////////////////////////////////////////////////////////////
@@ -1323,7 +1323,7 @@ LRESULT CShellFolder::OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam
                 count = count;
                 //OUTPUTLOG("Selected [%d] items", count);
                 std::wstring sSelectedItemIds;
-                for (int i = 0; i < count; i ++){
+                for (size_t i = 0; i < count; i ++){
                     IShellItem * pShellItem = NULL;
                     pItemArray->GetItemAt(i, &pShellItem);
                     if (pShellItem){
@@ -1336,7 +1336,7 @@ LRESULT CShellFolder::OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam
                         if (childPidl){
                             NSEFILEPIDLDATA * pNSEInfo = (NSEFILEPIDLDATA *)childPidl;
                             wchar_t buf [100] = _T("");
-                            wsprintf(buf, _T("%d,"), pNSEInfo->wfd.dwId.id);
+							wsprintf(buf, _T("%d:%d,"), pNSEInfo->wfd.dwId.id, (pNSEInfo->wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) ? 1 : 0);
                             sSelectedItemIds += buf;
                         }
                         pShellItem->Release();

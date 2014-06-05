@@ -403,7 +403,7 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int Pag
 HRESULT DMGetPageSize(TAR_ARCHIVE * pArchive, DWORD * pdwPageSize)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-    *pdwPageSize = pArchive->context->pageSize ? pArchive->context->pageSize : 2;
+    *pdwPageSize = (pArchive->context->pageSize >= 0) ? pArchive->context->pageSize : 2;
     OUTPUTLOG("%s(), PageSize=[%d]", __FUNCTION__, *pdwPageSize);
     return S_OK;
 }

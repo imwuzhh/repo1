@@ -556,7 +556,7 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
         // Parse _infoItems
         Json::Value _infoItems = root.get("_infoItems", "");
         if (!_infoItems.empty() && _infoItems.isArray()){
-            for (int i = 0; i < _infoItems.size(); i++)
+            for (size_t i = 0; i < _infoItems.size(); i++)
             {
                 Json::Value item = _infoItems[i].get("_title", "");
                 if (!item.empty()){
@@ -1037,7 +1037,7 @@ BOOL HttpImpl::LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock)
         , id.id
         , toLock ? 1 : 0);
 
-    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {
         OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
         return FALSE;
@@ -1057,7 +1057,7 @@ BOOL HttpImpl::InternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
         , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
         , id.id);
 
-    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {
         OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
         return FALSE;
@@ -1077,7 +1077,7 @@ BOOL HttpImpl::ShareFile(TAR_ARCHIVE * pArchive, RemoteId id)
         , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
         , id.id);
 
-    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {
         OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
         return FALSE;
@@ -1097,7 +1097,7 @@ BOOL HttpImpl::ExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id)
         , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
         , id.id);
 
-    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {
         OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
         return FALSE;
@@ -1117,7 +1117,7 @@ BOOL HttpImpl::DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
         , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
         , id.id);
 
-    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {
         OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
         return FALSE;
@@ -1137,7 +1137,7 @@ BOOL HttpImpl::ViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
         , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
         , id.id);
 
-    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {
         OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
         return FALSE;
@@ -1157,7 +1157,7 @@ BOOL HttpImpl::HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
         , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
         , id.id);
 
-    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {
         OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
         return FALSE;
@@ -1177,7 +1177,7 @@ BOOL HttpImpl::SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
         , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
         , itemIds);
 
-    if (!Utility::SocketRequest(_T("127.0.0.1"), pArchive->context->ViewPort, wszReq))
+    if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {
         OUTPUTLOG("Failed to request view port, %s()", __FUNCTION__);
         return FALSE;

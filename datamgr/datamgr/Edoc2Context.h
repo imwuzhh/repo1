@@ -10,6 +10,7 @@ struct Edoc2Context {
     DWORD   ViewPort;
     DWORD   JsonPort;
     DWORD   pageSize;
+    BOOL    fastCheck;
     HINSTANCE hInst;
     Proto*  proto;
     wchar_t modulepath    [1024];

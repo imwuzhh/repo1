@@ -86,9 +86,21 @@ public:
 
      virtual BOOL OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd) = 0;
 
-     virtual BOOL FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo) = 0;
+     virtual BOOL FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo) = 0;
 
-     virtual BOOL FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo) = 0;
+     virtual BOOL FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo) = 0;
+
+     /**
+     * Find child folder/file with parent id and child's name.
+     * Parameters:
+     * 1) pArchive: context.
+     * 2) parentId: parent's id.
+     * 3) childName: child file/folder's name.
+     * 4) childInfo: return info of found child.
+     * Notice:
+     * if this api works, then the above two FileExists()/FolderExists() should be deprecated.
+     */
+     virtual BOOL FindChild(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo) = 0;
 
      virtual BOOL CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType * selectedMenuItems) = 0;
 

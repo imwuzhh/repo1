@@ -94,7 +94,7 @@ BOOL HttpImpl::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & t
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
-    if (pArchive->context->AccessToken[0] == _T('\0')){
+    if (!HttpImpl::CheckToken(pArchive, pArchive->context->AccessToken)){
         if (!Login(pArchive)){
             OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
             return FALSE;
@@ -146,7 +146,7 @@ BOOL HttpImpl::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> &
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
-    if (pArchive->context->AccessToken[0] == _T('\0')){
+    if (!HttpImpl::CheckToken(pArchive, pArchive->context->AccessToken)){
         if (!Login(pArchive)){
             OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
             return FALSE;
@@ -197,7 +197,7 @@ BOOL HttpImpl::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
-    if (pArchive->context->AccessToken[0] == _T('\0')){
+    if (!HttpImpl::CheckToken(pArchive, pArchive->context->AccessToken)){
         if (!Login(pArchive)){
             OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
             return FALSE;
@@ -250,7 +250,7 @@ BOOL HttpImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, 
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
-    if (pArchive->context->AccessToken[0] == _T('\0')){
+    if (!HttpImpl::CheckToken(pArchive, pArchive->context->AccessToken)){
         if (!Login(pArchive)){
             OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
             return FALSE;
@@ -309,7 +309,7 @@ BOOL HttpImpl::GetChildFolderAndFiles(TAR_ARCHIVE * pArchive, const RemoteId & r
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
-    if (pArchive->context->AccessToken[0] == _T('\0')){
+    if (!HttpImpl::CheckToken(pArchive, pArchive->context->AccessToken)){
         if (!Login(pArchive)){
             OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
             return FALSE;
@@ -417,7 +417,7 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
-    if (pArchive->context->AccessToken[0] == _T('\0')){
+    if (!HttpImpl::CheckToken(pArchive, pArchive->context->AccessToken)){
         if (!Login(pArchive)){
             OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
             return FALSE;
@@ -572,7 +572,7 @@ BOOL HttpImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_D
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
-    if (pArchive->context->AccessToken[0] == _T('\0')){
+    if (!HttpImpl::CheckToken(pArchive, pArchive->context->AccessToken)){
         if (!Login(pArchive)){
             OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
             return FALSE;
@@ -767,7 +767,7 @@ BOOL HttpImpl::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL 
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
-    if (pArchive->context->AccessToken[0] == _T('\0')){
+    if (!HttpImpl::CheckToken(pArchive, pArchive->context->AccessToken)){
         if (!Login(pArchive)){
             OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
             return FALSE;
@@ -802,7 +802,7 @@ BOOL HttpImpl::RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
-    if (pArchive->context->AccessToken[0] == _T('\0')){
+    if (!HttpImpl::CheckToken(pArchive, pArchive->context->AccessToken)){
         if (!Login(pArchive)){
             OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
             return FALSE;
@@ -839,7 +839,7 @@ BOOL HttpImpl::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, c
 
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
-    if (pArchive->context->AccessToken[0] == _T('\0')){
+    if (!HttpImpl::CheckToken(pArchive, pArchive->context->AccessToken)){
         if (!Login(pArchive)){
             OUTPUTLOG("Failed to login, user=%s, pass=%s", (char *)CW2A(pArchive->context->username), (char *)CW2A(pArchive->context->password));
             return FALSE;
@@ -1009,12 +1009,12 @@ BOOL HttpImpl::OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
     return FALSE;
 }
 
-BOOL HttpImpl::FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo)
+BOOL HttpImpl::FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
 {
     return FALSE;
 }
 
-BOOL HttpImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo)
+BOOL HttpImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
 {
     return FALSE;
 }
@@ -1188,5 +1188,12 @@ BOOL HttpImpl::SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
 
 BOOL HttpImpl::CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token)
 {
-    return TRUE;
+    // HarryWu, 2014.6.5
+    // simple implementation.
+    return (pArchive->context->AccessToken[0] != _T('\0'));
+}
+
+BOOL HttpImpl::FindChild(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
+{
+    return FALSE;
 }

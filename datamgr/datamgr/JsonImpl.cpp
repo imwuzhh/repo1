@@ -32,7 +32,7 @@ BOOL JsonImpl::Login(TAR_ARCHIVE * pArchive)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "Login";
@@ -61,7 +61,7 @@ BOOL JsonImpl::GetTopPublic(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & t
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "GetTopPublic";
@@ -86,7 +86,7 @@ BOOL JsonImpl::GetTopPersonal(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> &
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "GetTopPersonal";
@@ -111,7 +111,7 @@ BOOL JsonImpl::GetChildFolders(TAR_ARCHIVE * pArchive, const RemoteId & remoteId
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "GetChildFolders";
@@ -137,7 +137,7 @@ BOOL JsonImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, 
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "GetChildFiles";
@@ -162,7 +162,7 @@ BOOL JsonImpl::GetChildFolderAndFiles(TAR_ARCHIVE *pArchive, const RemoteId &fol
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "GetChildFolderAndFiles";
@@ -191,7 +191,7 @@ BOOL JsonImpl::GetDocInfo(TAR_ARCHIVE *pArchive, const RemoteId &folderId, std::
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "GetDocInfo";
@@ -220,7 +220,7 @@ BOOL JsonImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_D
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "GetPagedRecycleItems";
@@ -246,7 +246,7 @@ BOOL JsonImpl::GetPagedSearchResults(TAR_ARCHIVE * pArchive, const std::wstring 
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "GetPagedSearchResults";
@@ -269,7 +269,7 @@ BOOL JsonImpl::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL 
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "DeleteItem";
@@ -293,7 +293,7 @@ BOOL JsonImpl::RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "Rename";
@@ -317,7 +317,7 @@ BOOL JsonImpl::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, c
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "CreateFolder";
@@ -345,7 +345,7 @@ BOOL JsonImpl::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & viewId, const
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "UploadFile";
@@ -372,7 +372,7 @@ BOOL JsonImpl::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, con
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "DownloadFile";
@@ -396,7 +396,7 @@ BOOL JsonImpl::UploadFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentFolde
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "UploadFolder";
@@ -420,7 +420,7 @@ BOOL JsonImpl::DownloadFolder(TAR_ARCHIVE * pArchive, const RemoteId & itemId, c
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "DownloadFolder";
@@ -444,7 +444,7 @@ BOOL JsonImpl::Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL sele
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "Select";
@@ -467,7 +467,7 @@ BOOL JsonImpl::GetColumnInfo(TAR_ARCHIVE * pArchive, const RemoteId & viewId, wc
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "GetColumnInfo";
@@ -489,7 +489,7 @@ BOOL JsonImpl::PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "PreviewFile";
@@ -512,7 +512,7 @@ BOOL JsonImpl::OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "OnShellViewCreated";
@@ -536,7 +536,7 @@ BOOL JsonImpl::OnShellViewSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "OnShellViweSized";
@@ -560,7 +560,7 @@ BOOL JsonImpl::OnShellViewRefreshed(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "OnShellViewRefreshed";
@@ -584,7 +584,7 @@ BOOL JsonImpl::OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "OnShellViewClosing";
@@ -603,12 +603,12 @@ BOOL JsonImpl::OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
     return TRUE;
 }
 
-BOOL JsonImpl::FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo)
+BOOL JsonImpl::FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
 {
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "FileExists";
@@ -629,12 +629,12 @@ BOOL JsonImpl::FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wch
     return TRUE;
 }
 
-BOOL JsonImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo)
+BOOL JsonImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const  wchar_t * childName, VFS_FIND_DATA & childInfo)
 {
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "FolderExists";
@@ -660,7 +660,7 @@ BOOL JsonImpl::CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "CheckMenu";
@@ -685,7 +685,7 @@ BOOL JsonImpl::LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "LockFile";
@@ -711,7 +711,7 @@ BOOL JsonImpl::InternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "InternalLink";
@@ -736,7 +736,7 @@ BOOL JsonImpl::ShareFile(TAR_ARCHIVE * pArchive, RemoteId id)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "ShareFile";
@@ -761,7 +761,7 @@ BOOL JsonImpl::ExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "ExtEditFile";
@@ -786,7 +786,7 @@ BOOL JsonImpl::DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "DistributeFile";
@@ -811,7 +811,7 @@ BOOL JsonImpl::ViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "ViewLog";
@@ -836,7 +836,7 @@ BOOL JsonImpl::HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "HistoryVersion";
@@ -861,7 +861,7 @@ BOOL JsonImpl::SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "SelectItems";
@@ -886,7 +886,7 @@ BOOL JsonImpl::CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token)
     Json::StyledWriter writer;
     Json::Value  root;
     root ["Server"] = (const char *)CW2A(pArchive->context->service);
-    root ["Port"]   = 60684;
+    root ["Port"]   = (int)pArchive->context->JsonPort;
     root ["Version"]= "1.0.0.1";
     root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
     root ["Method"] = "CheckToken";
@@ -894,6 +894,32 @@ BOOL JsonImpl::CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token)
     Json::Value parameters; 
     // In windows, window handle is global handle of x-processes.
     parameters["oldToken"] = (const char *)CW2AEX<>(token, CP_UTF8);
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    // TODO: Parse result and fill in contents of <childInfo>
+    return TRUE;
+}
+
+BOOL JsonImpl::FindChild(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = (int)pArchive->context->JsonPort;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "FindChild";
+
+    Json::Value parameters; 
+    // In windows, window handle is global handle of x-processes.
+    parameters["parentId"] = (int)parentId.id;
+    parameters["childName"]= (const char *)CW2AEX<>(childName, CP_UTF8);
 
     root ["Params"] = parameters;
     std::string jsonString = writer.write(root);

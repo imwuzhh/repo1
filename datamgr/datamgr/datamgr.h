@@ -109,6 +109,8 @@ extern "C" {
 */
 BOOL DMHttpIsEnable();
 
+BOOL DMFastCheckIsEnable();
+
 /**
 * Create an context for consequent api invoke.
 * Parameters:
@@ -325,6 +327,8 @@ HRESULT DMViewLog(TAR_ARCHIVE * pArchive, RemoteId id);
 HRESULT DMHistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id);
 
 HRESULT DMSelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds);
+
+HRESULT DMFindChild(TAR_ARCHIVE * pArchive, RemoteId parentId, LPCWSTR childName, VFS_FIND_DATA * pInfo);
 
 /**
 * Select proper menus for given items specified by `idlist' parameter.

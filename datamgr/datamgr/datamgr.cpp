@@ -137,6 +137,9 @@ static HRESULT DMInit(HINSTANCE hInst){
     context.JsonPort = Utility::GetJsonPort(context.configfile);
     context.ViewPort = Utility::GetViewPort(context.configfile);
 
+    // Setup api feature
+    context.fastCheck = Utility::FastCheckIsEnable(context.configfile);
+
     // Setup PageSize of View
     Utility::GetShellViewPageSize(context.configfile, &context.pageSize);
 
@@ -175,6 +178,11 @@ BOOL WINAPI DllMain(_In_  HINSTANCE hinstDLL,
 BOOL DMHttpIsEnable()
 {
     return gspEdoc2Context && gspEdoc2Context->enableHttp;
+}
+
+BOOL DMFastCheckIsEnable()
+{
+    return gspEdoc2Context && gspEdoc2Context->fastCheck;
 }
 
 /**
@@ -893,6 +901,18 @@ HRESULT DMSelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
     OUTPUTLOG("%s() ids=[`%s']", __FUNCTION__, (const char *)CW2A(itemIds ? itemIds : _T("")));
 
     if (!GetProto(pArchive)->SelectItems(pArchive, itemIds ? itemIds : _T("")))
+        return S_FALSE;
+
+    return S_OK;
+}
+
+HRESULT DMFindChild(TAR_ARCHIVE * pArchive, RemoteId parentId, LPCWSTR childName, VFS_FIND_DATA * pInfo)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() parentId=[`%d:%d'], childName=`%s'", __FUNCTION__, parentId.category, parentId.id, (const char *)CW2A(childName ? childName : _T("")));
+
+    if (!GetProto(pArchive)->FindChild(pArchive, parentId, childName, *pInfo))
         return S_FALSE;
 
     return S_OK;

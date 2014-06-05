@@ -1,5 +1,6 @@
 EXPORTS
 	DMHttpIsEnable
+	DMFastCheckIsEnable
 	
 	DMOpen 
 	DMClose 
@@ -48,6 +49,7 @@ EXPORTS
 	DMCheckMenu
 	
 	DMSelectItems
+	DMFindChild
 	
 	DMMalloc
 	DMRealloc

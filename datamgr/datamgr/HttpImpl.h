@@ -53,9 +53,11 @@ public:
 
      BOOL OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd);
      
-     BOOL FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo);
+     BOOL FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo);
 
-     BOOL FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, wchar_t * childName, VFS_FIND_DATA & childInfo);
+     BOOL FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo);
+
+     BOOL FindChild(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo);
 
      BOOL CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType * selectedMenuItems);
 

@@ -134,6 +134,11 @@ STDMETHODIMP CEnumIDList::Clone(IEnumIDList** ppEnum)
 HRESULT CEnumIDList::_PopulateList()
 {
    ATLASSERT(m_pidl.IsNull());
+   // HarryWu, 2014.6.5
+   // Can not known the caller's context, two cases:
+   // 1) list paged items to populate view;
+   // 2) get all children to storage operations etc.
+   // support page feature by default, storage operations will be posted to external exe.
    HRESULT Hr = m_spFolder->m_spFolderItem->EnumChildren(m_hWnd, m_grfFlags, m_aChildren, TRUE);
    ATLASSERT(Hr==S_OK || Hr==E_PENDING);
    if( Hr != S_OK && Hr != E_PENDING ) return Hr;

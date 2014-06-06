@@ -314,15 +314,15 @@ HRESULT DMLockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock);
 
 HRESULT DMIsFileLocked(TAR_ARCHIVE * pArchive, RemoteId id, BOOL * isLocked);
 
-HRESULT DMInternalLink(TAR_ARCHIVE * pArchive, RemoteId id);
+HRESULT DMInternalLink(TAR_ARCHIVE * pArchive, LPCWSTR idlist);
 
-HRESULT DMShareFile(TAR_ARCHIVE * pArchive, RemoteId id);
+HRESULT DMShareFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist);
 
 HRESULT DMExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id);
 
-HRESULT DMDistributeFile(TAR_ARCHIVE * pArchive, RemoteId id);
+HRESULT DMDistributeFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist);
 
-HRESULT DMViewLog(TAR_ARCHIVE * pArchive, RemoteId id);
+HRESULT DMViewLog(TAR_ARCHIVE * pArchive, LPCWSTR idlist);
 
 HRESULT DMHistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id);
 

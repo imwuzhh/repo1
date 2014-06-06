@@ -106,15 +106,15 @@ public:
 
      virtual BOOL LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock) = 0;
 
-     virtual BOOL InternalLink(TAR_ARCHIVE * pArchive, RemoteId id) = 0;
+     virtual BOOL InternalLink(TAR_ARCHIVE * pArchive, LPCWSTR idlist) = 0;
 
-     virtual BOOL ShareFile(TAR_ARCHIVE * pArchive, RemoteId id) = 0;
+     virtual BOOL ShareFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist) = 0;
 
      virtual BOOL ExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id) = 0;
 
-     virtual BOOL DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id) = 0;
+     virtual BOOL DistributeFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist) = 0;
 
-     virtual BOOL ViewLog(TAR_ARCHIVE * pArchive, RemoteId id) = 0;
+     virtual BOOL ViewLog(TAR_ARCHIVE * pArchive, LPCWSTR idlist) = 0;
 
      virtual BOOL HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id) = 0;
 

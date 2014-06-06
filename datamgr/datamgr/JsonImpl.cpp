@@ -706,7 +706,7 @@ BOOL JsonImpl::LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock)
     return TRUE;
 }
 
-BOOL JsonImpl::InternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
+BOOL JsonImpl::InternalLink(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
     Json::StyledWriter writer;
     Json::Value  root;
@@ -718,7 +718,7 @@ BOOL JsonImpl::InternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
 
     Json::Value parameters; 
     // In windows, window handle is global handle of x-processes.
-    parameters["id"] = (int)id.id;
+    parameters["idlist"] = (const char *)CW2A(idlist);
 
     root ["Params"] = parameters;
     std::string jsonString = writer.write(root);
@@ -731,7 +731,7 @@ BOOL JsonImpl::InternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
     return TRUE;
 }
 
-BOOL JsonImpl::ShareFile(TAR_ARCHIVE * pArchive, RemoteId id)
+BOOL JsonImpl::ShareFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
     Json::StyledWriter writer;
     Json::Value  root;
@@ -743,7 +743,7 @@ BOOL JsonImpl::ShareFile(TAR_ARCHIVE * pArchive, RemoteId id)
 
     Json::Value parameters; 
     // In windows, window handle is global handle of x-processes.
-    parameters["id"] = (int)id.id;
+    parameters["idlist"] = (const char *)CW2A(idlist);
 
     root ["Params"] = parameters;
     std::string jsonString = writer.write(root);
@@ -781,7 +781,7 @@ BOOL JsonImpl::ExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id)
     return TRUE;
 }
 
-BOOL JsonImpl::DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
+BOOL JsonImpl::DistributeFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
     Json::StyledWriter writer;
     Json::Value  root;
@@ -793,7 +793,7 @@ BOOL JsonImpl::DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
 
     Json::Value parameters; 
     // In windows, window handle is global handle of x-processes.
-    parameters["id"] = (int)id.id;
+    parameters["idlist"] = (const char *)CW2A(idlist);
 
     root ["Params"] = parameters;
     std::string jsonString = writer.write(root);
@@ -806,7 +806,7 @@ BOOL JsonImpl::DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
     return TRUE;
 }
 
-BOOL JsonImpl::ViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
+BOOL JsonImpl::ViewLog(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
     Json::StyledWriter writer;
     Json::Value  root;
@@ -818,7 +818,7 @@ BOOL JsonImpl::ViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
 
     Json::Value parameters; 
     // In windows, window handle is global handle of x-processes.
-    parameters["id"] = (int)id.id;
+    parameters["idlist"] = (const char *)CW2A(idlist);
 
     root ["Params"] = parameters;
     std::string jsonString = writer.write(root);

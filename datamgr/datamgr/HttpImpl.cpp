@@ -1046,16 +1046,16 @@ BOOL HttpImpl::LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock)
     return TRUE;
 }
 
-BOOL HttpImpl::InternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
+BOOL HttpImpl::InternalLink(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
-    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    OUTPUTLOG("%s() id=[%s]", __FUNCTION__, (const char *)CW2A(idlist));
 
     wchar_t wszReq [MAX_PATH] = _T("");
     swprintf_s(wszReq, lengthof(wszReq)
-        , _T("%s/method=%s&idlist=%d")
+        , _T("%s/method=%s&idlist=%s")
         , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
         , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
-        , id.id);
+        , idlist);
 
     if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {
@@ -1066,16 +1066,16 @@ BOOL HttpImpl::InternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
     return TRUE;
 }
 
-BOOL HttpImpl::ShareFile(TAR_ARCHIVE * pArchive, RemoteId id)
+BOOL HttpImpl::ShareFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
-    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    OUTPUTLOG("%s() id=[%s]", __FUNCTION__, (const char *)CW2A(idlist));
 
     wchar_t wszReq [MAX_PATH] = _T("");
     swprintf_s(wszReq, lengthof(wszReq)
-        , _T("%s/method=%s&idlist=%d")
+        , _T("%s/method=%s&idlist=%s")
         , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
         , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
-        , id.id);
+        , idlist);
 
     if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {
@@ -1106,16 +1106,16 @@ BOOL HttpImpl::ExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id)
     return TRUE;
 }
 
-BOOL HttpImpl::DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
+BOOL HttpImpl::DistributeFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
-    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    OUTPUTLOG("%s() id=[%s]", __FUNCTION__, (const char *)CW2A(idlist));
 
     wchar_t wszReq [MAX_PATH] = _T("");
     swprintf_s(wszReq, lengthof(wszReq)
-        , _T("%s/method=%s&idlist=%d")
+        , _T("%s/method=%s&idlist=%s")
         , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
         , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
-        , id.id);
+        , idlist);
 
     if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {
@@ -1126,16 +1126,16 @@ BOOL HttpImpl::DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
     return TRUE;
 }
 
-BOOL HttpImpl::ViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
+BOOL HttpImpl::ViewLog(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
-    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    OUTPUTLOG("%s() id=[%s]", __FUNCTION__, (const char *)CW2A(idlist));
     
     wchar_t wszReq [MAX_PATH] = _T("");
     swprintf_s(wszReq, lengthof(wszReq)
-        , _T("%s/method=%s&idlist=%d")
+        , _T("%s/method=%s&idlist=%s")
         , pArchive->context->service[0] ? pArchive->context->service : _T("http://www.baidu.com/")
         , (const wchar_t *)CA2WEX<>(__FUNCTION__, CP_ACP)
-        , id.id);
+        , idlist);
 
     if (!Utility::SocketRequest(_T("127.0.0.1"), static_cast<unsigned short>(pArchive->context->ViewPort), wszReq))
     {

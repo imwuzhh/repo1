@@ -822,25 +822,25 @@ HRESULT DMIsFileLocked(TAR_ARCHIVE * pArchive, RemoteId id, BOOL * isLocked)
     return S_OK;
 }
 
-HRESULT DMInternalLink(TAR_ARCHIVE * pArchive, RemoteId id)
+HRESULT DMInternalLink(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    OUTPUTLOG("%s() id=[%s]", __FUNCTION__, (const char *)CW2A(idlist));
 
-    if (!GetProto(pArchive)->InternalLink(pArchive, id))
+    if (!GetProto(pArchive)->InternalLink(pArchive, idlist))
         return S_FALSE;
 
     return S_OK;
 }
 
-HRESULT DMShareFile(TAR_ARCHIVE * pArchive, RemoteId id)
+HRESULT DMShareFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    OUTPUTLOG("%s() id=[%s]", __FUNCTION__, (const char *)CW2A(idlist));
 
-    if (!GetProto(pArchive)->ShareFile(pArchive, id))
+    if (!GetProto(pArchive)->ShareFile(pArchive, idlist))
         return S_FALSE;
 
     return S_OK;
@@ -858,25 +858,25 @@ HRESULT DMExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id)
     return S_OK;
 }
 
-HRESULT DMDistributeFile(TAR_ARCHIVE * pArchive, RemoteId id)
+HRESULT DMDistributeFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    OUTPUTLOG("%s() id=[%s]", __FUNCTION__, (const char *)CW2A(idlist));
 
-    if (!GetProto(pArchive)->DistributeFile(pArchive, id))
+    if (!GetProto(pArchive)->DistributeFile(pArchive, idlist))
         return S_FALSE;
 
     return S_OK;
 }
 
-HRESULT DMViewLog(TAR_ARCHIVE * pArchive, RemoteId id)
+HRESULT DMViewLog(TAR_ARCHIVE * pArchive, LPCWSTR idlist)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-    OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+    OUTPUTLOG("%s() id=[%s]", __FUNCTION__, (const char *)CW2A(idlist));
 
-    if (!GetProto(pArchive)->ViewLog(pArchive, id))
+    if (!GetProto(pArchive)->ViewLog(pArchive, idlist))
         return S_FALSE;
 
     return S_OK;

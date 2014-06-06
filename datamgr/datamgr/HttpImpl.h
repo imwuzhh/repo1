@@ -63,15 +63,15 @@ public:
 
      BOOL LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock);
 
-     BOOL InternalLink(TAR_ARCHIVE * pArchive, RemoteId id);
+     BOOL InternalLink(TAR_ARCHIVE * pArchive, LPCWSTR idlist);
 
-     BOOL ShareFile(TAR_ARCHIVE * pArchive, RemoteId id);
+     BOOL ShareFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist);
 
      BOOL ExtEditFile(TAR_ARCHIVE * pArchive, RemoteId id);
 
-     BOOL DistributeFile(TAR_ARCHIVE * pArchive, RemoteId id);
+     BOOL DistributeFile(TAR_ARCHIVE * pArchive, LPCWSTR idlist);
 
-     BOOL ViewLog(TAR_ARCHIVE * pArchive, RemoteId id);
+     BOOL ViewLog(TAR_ARCHIVE * pArchive, LPCWSTR idlist);
 
      BOOL HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id);
 

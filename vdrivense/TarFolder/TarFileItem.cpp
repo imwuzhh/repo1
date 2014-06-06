@@ -126,23 +126,23 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    DWORD dwPageSize = 0;
    HR (DMGetPageSize(_GetTarArchivePtr(), &dwPageSize));
 
-   DWORD dwCurrPage = 0;
-   if (dwId.category != VdriveCat){
-       HR (DMGetCurrentPageNumber(_GetTarArchivePtr(), dwId, &dwCurrPage));
-   }
-
    // HarryWu, 2014.1.29
    // Note!, it is NOT safe to pass c++ objects array between modules.
-   // use /MD to genereate these modules.
+   // use /MD to generate these modules.
    VFS_FIND_DATA * aList = NULL; int nListCount = 0;
-   ViewSettings vs; memset(&vs, 0, sizeof(vs));
-   if (dwPageSize && paged){
+
+   if (paged && dwPageSize){
+       DWORD dwCurrPage = 0;
+       if (dwId.category != VdriveCat){
+           HR (DMGetCurrentPageNumber(_GetTarArchivePtr(), dwId, &dwCurrPage));
+       }
+
        DWORD dwTotalPage = 0;
-       //HR( DMGetChildrenListEx(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &aList, &nListCount));
+       ViewSettings vs; memset(&vs, 0, sizeof(vs));
        HR( DMGetDocInfo(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &vs, &aList, &nListCount));
        if (dwId.id != VdriveId){
            HR( DMSetTotalPageNumber(_GetTarArchivePtr(), dwId, dwTotalPage));
-       }       
+       }  
    }else{
        HR( DMGetChildrenList(_GetTarArchivePtr(), *(RemoteId*)&dwId, &aList, &nListCount) );
    } 
@@ -535,6 +535,16 @@ HRESULT CTarFileItem::_HistoryVersion(VFS_MENUCOMMAND & Cmd)
 
 HRESULT CTarFileItem::_ViewLog(VFS_MENUCOMMAND & Cmd)
 {
+    if (Cmd.pShellItems){
+        DWORD selectedCnt = 0;
+        Cmd.pShellItems->GetCount(&selectedCnt);
+        for (int i = 0; i < selectedCnt; i ++)
+        {
+            CComPtr<IShellItem> spShellItem;
+            HR( Cmd.pShellItems->GetItemAt(i, &spShellItem) );
+            CPidl pidl; pidl.CreateFromObject(spShellItem);
+        }
+    }
     HR ( DMViewLog(_GetTarArchivePtr(), m_pWfd->dwId));
     return S_OK;
 }

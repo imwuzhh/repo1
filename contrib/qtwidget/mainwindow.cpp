@@ -33,6 +33,12 @@ MainWindow::MainWindow(QWidget *parent) :
         }while(!finstrm.atEnd());
         fin.close();
     }
+
+    QPushButton * loginBtn = this->findChild<QPushButton*>("loginBtn");
+    if (loginBtn){
+        loginBtn->setFocus();
+        loginBtn->setShortcut(Qt::Key_Return);
+    }
 }
 
 MainWindow::~MainWindow()

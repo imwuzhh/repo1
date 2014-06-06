@@ -39,41 +39,11 @@
      <enum>QLayout::SetNoConstraint</enum>
     </property>
     <item>
-     <widget class="QLabel" name="label">
-      <property name="font">
-       <font>
-        <family>System</family>
-        <pointsize>12</pointsize>
-        <weight>75</weight>
-        <italic>true</italic>
-        <bold>true</bold>
-        <underline>true</underline>
-       </font>
-      </property>
-      <property name="text">
-       <string>Url</string>
-      </property>
-     </widget>
-    </item>
-    <item>
      <widget class="QWebView" name="webView">
       <property name="url">
        <url>
         <string>about:blank</string>
        </url>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QProgressBar" name="progressBar">
-      <property name="value">
-       <number>0</number>
-      </property>
-      <property name="textVisible">
-       <bool>false</bool>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
       </property>
      </widget>
     </item>

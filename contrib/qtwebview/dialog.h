@@ -40,8 +40,8 @@ public:
 private:
     Ui::Dialog *ui;
     QWebView * wv;
-    QProgressBar *qb;
-    QLabel * lb;
+    //QProgressBar *qb;
+    //QLabel * lb;
     QTcpServer * sv;
     QList<ClientConnection*> m_clients;
 public slots:

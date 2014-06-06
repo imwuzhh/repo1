@@ -9,10 +9,10 @@ Dialog::Dialog(unsigned short viewPort, QWidget *parent) :
 {
     ui->setupUi(this);
     wv = this->findChild<QWebView*>("webView");
-    qb = this->findChild<QProgressBar *>("progressBar");
-    lb = this->findChild<QLabel*>("label");
+    //qb = this->findChild<QProgressBar *>("progressBar");
+    //lb = this->findChild<QLabel*>("label");
 
-    qb->setValue(0);
+    //qb->setValue(0);
     connect(wv, SIGNAL(loadProgress(int)), this, SLOT(loadProgress(int)));
     connect(wv, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClicked(QUrl)));
     connect(wv, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
@@ -29,7 +29,8 @@ Dialog::~Dialog()
 
 void Dialog::loadProgress(int progress)
 {
-    qb->setValue(progress);
+    progress = progress;
+    //qb->setValue(progress);
 }
 
 void Dialog::linkClicked(QUrl url)
@@ -58,10 +59,18 @@ void Dialog::done(ClientConnection * conn, const QString & req)
     delete conn;
 }
 
-void Dialog::browse(const QUrl &url)
+void Dialog::browse(const QUrl & _url)
 {
-    lb->setText(url.toString());
-    wv->setUrl(QUrl(url));
+    //lb->setText(url.toString());
+    //wv->setUrl(QUrl(url));
+    QString url = "<html>";
+    url += "<body><a href='";
+    url += _url.toString();
+    url += "'>";
+    url += _url.toString();
+    url += "</a></body>";
+    url += "</html>";
+    wv->setHtml(url);
 }
 
 ClientConnection::ClientConnection(QTcpSocket * sock)

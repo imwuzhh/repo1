@@ -1570,6 +1570,9 @@ HRESULT CShellFolder::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
          HRESULT Hr = spItem->ExecuteMenuCommand(Cmd);
          if( Hr != E_NOTIMPL ) HrRes = Hr;
          if( HrRes != S_OK ) break;
+         // HarryWu, 2014.6.5
+         // Just Execute once on a selection.
+         break;
       }
    }
    // Any item can abort if they performed the entire operation alone

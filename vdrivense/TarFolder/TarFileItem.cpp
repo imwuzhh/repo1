@@ -505,19 +505,22 @@ HRESULT CTarFileItem::_NextPage( VFS_MENUCOMMAND & Cmd)
 
 HRESULT CTarFileItem::_Share(VFS_MENUCOMMAND & Cmd)
 {
-    HR ( DMShareFile(_GetTarArchivePtr(), m_pWfd->dwId));
+    std::wstring idlist = GetSelectedIdList(Cmd);
+    HR ( DMShareFile(_GetTarArchivePtr(), idlist.c_str()));
     return S_OK;
 }
 
 HRESULT CTarFileItem::_InternalLink(VFS_MENUCOMMAND & Cmd)
 {
-    HR ( DMInternalLink(_GetTarArchivePtr(), m_pWfd->dwId));
+    std::wstring idlist = GetSelectedIdList(Cmd);
+    HR ( DMInternalLink(_GetTarArchivePtr(), idlist.c_str()));
     return S_OK;
 }
 
 HRESULT CTarFileItem::_Distribute(VFS_MENUCOMMAND & Cmd)
 {
-    HR ( DMDistributeFile(_GetTarArchivePtr(), m_pWfd->dwId));
+    std::wstring idlist = GetSelectedIdList(Cmd);
+    HR ( DMDistributeFile(_GetTarArchivePtr(), idlist.c_str()));
     return S_OK;
 }
 
@@ -535,17 +538,8 @@ HRESULT CTarFileItem::_HistoryVersion(VFS_MENUCOMMAND & Cmd)
 
 HRESULT CTarFileItem::_ViewLog(VFS_MENUCOMMAND & Cmd)
 {
-    if (Cmd.pShellItems){
-        DWORD selectedCnt = 0;
-        Cmd.pShellItems->GetCount(&selectedCnt);
-        for (int i = 0; i < selectedCnt; i ++)
-        {
-            CComPtr<IShellItem> spShellItem;
-            HR( Cmd.pShellItems->GetItemAt(i, &spShellItem) );
-            CPidl pidl; pidl.CreateFromObject(spShellItem);
-        }
-    }
-    HR ( DMViewLog(_GetTarArchivePtr(), m_pWfd->dwId));
+    std::wstring idlist = GetSelectedIdList(Cmd);
+    HR ( DMViewLog(_GetTarArchivePtr(), idlist.c_str()));
     return S_OK;
 }
 
@@ -584,4 +578,29 @@ HRESULT CTarFileItem::_Search(VFS_MENUCOMMAND & Cmd)
     ShellExecuteEx(&sei);
 
     return S_OK;
+}
+
+std::wstring CTarFileItem::GetSelectedIdList(VFS_MENUCOMMAND & Cmd)
+{
+    std::wstring idlist;
+    if (Cmd.pShellItems){
+        DWORD selectedCnt = 0;
+        Cmd.pShellItems->GetCount(&selectedCnt);
+        for (int i = 0; i < selectedCnt; i ++)
+        {
+            CComPtr<IShellItem> spShellItem;
+            if (S_OK != Cmd.pShellItems->GetItemAt(i, &spShellItem) )
+            {
+                return idlist;
+            }
+            CPidl pidl; pidl.CreateFromObject(spShellItem);
+            NSEFILEPIDLDATA * pInfo = (NSEFILEPIDLDATA *)pidl.GetLastItem();
+            if (pInfo){
+                wchar_t buf [100] = _T("");
+                swprintf_s(buf, 100, _T("%d:%d,"), pInfo->wfd.dwId.id, IsBitSet(pInfo->wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY) ? 1 : 0);
+                idlist += buf;
+            }
+        }
+    }
+    return idlist;
 }

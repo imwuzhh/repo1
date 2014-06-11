@@ -134,14 +134,14 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    if (paged && dwPageSize){
        DWORD dwCurrPage = 0;
        if (dwId.category != VdriveCat){
-           HR (DMGetCurrentPageNumber(_GetTarArchivePtr(), dwId, &dwCurrPage));
+           /*HR*/ (DMGetCurrentPageNumber(_GetTarArchivePtr(), dwId, &dwCurrPage));
        }
 
        DWORD dwTotalPage = 0;
        ViewSettings vs; memset(&vs, 0, sizeof(vs));
        HR( DMGetDocInfo(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &vs, &aList, &nListCount));
        if (dwId.id != VdriveId){
-           HR( DMSetTotalPageNumber(_GetTarArchivePtr(), dwId, dwTotalPage));
+           /*HR*/( DMSetTotalPageNumber(_GetTarArchivePtr(), dwId, dwTotalPage));
        }  
    }else{
        HR( DMGetChildrenList(_GetTarArchivePtr(), *(RemoteId*)&dwId, &aList, &nListCount) );

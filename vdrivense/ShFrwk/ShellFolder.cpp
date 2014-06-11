@@ -1681,7 +1681,7 @@ HRESULT CShellFolder::_RefineMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHILD_AR
         const NSEFILEPIDLDATA * pNseDataPtr = (const NSEFILEPIDLDATA *)(rgpidl [i]);
         if (!pNseDataPtr) continue ;
         wchar_t buffer[128] = _T("");
-        swprintf_s(buffer, lengthof(buffer), _T("%d:%d"), static_cast<int>(IsBitSet(pNseDataPtr->wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY)), pNseDataPtr->wfd.dwId.id);
+        swprintf_s(buffer, lengthof(buffer), _T("%d:%d.%d"), static_cast<int>(IsBitSet(pNseDataPtr->wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY)), pNseDataPtr->wfd.dwId.category, pNseDataPtr->wfd.dwId.id);
         idstring += buffer; idstring += _T(";");
     }
 

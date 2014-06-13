@@ -750,6 +750,7 @@ BOOL HttpImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_D
 
 BOOL HttpImpl::GetPagedSearchResults(TAR_ARCHIVE * pArchive, const std::wstring & query, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
 {
+    // http://192.168.253.242/api/api/files/Search?token=9c5323a6-dab1-4704-8703-4dbae644bfa7&pageNum=1&pageSize=50&searchKey=test
     for (int i = 0; i < PageSize; i ++){
         VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
         rfd.dwId.category = VdriveCat;
@@ -1011,11 +1012,13 @@ BOOL HttpImpl::OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
 
 BOOL HttpImpl::FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
 {
+    // http://192.168.253.242/api/api/files/ExistFile?token=9c5323a6-dab1-4704-8703-4dbae644bfa7&folderId=1&fileName=678.jpg
     return FALSE;
 }
 
 BOOL HttpImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
 {
+    // http://192.168.253.242/api/api/files/ExistFolder?token=9c5323a6-dab1-4704-8703-4dbae644bfa7&folderId=1&folderName=test
     return FALSE;
 }
 
@@ -1190,6 +1193,8 @@ BOOL HttpImpl::CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token)
 {
     // HarryWu, 2014.6.5
     // simple implementation.
+    // http://192.168.253.242/api/api/files/islogin?token=9c5323a6-dab1-4704-8703-4dbae644bfa7
+
     return (pArchive->context->AccessToken[0] != _T('\0'));
 }
 

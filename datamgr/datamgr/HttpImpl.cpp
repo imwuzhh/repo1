@@ -762,6 +762,27 @@ BOOL HttpImpl::GetPagedSearchResults(TAR_ARCHIVE * pArchive, const std::wstring 
     }
     *PageCount = 3;
     return TRUE;
+
+    // http://192.168.253.242/api/api/files/Search?token=9c5323a6-dab1-4704-8703-4dbae644bfa7&pageNum=1&pageSize=50&searchKey=test
+    wchar_t url [MaxUrlLength] = _T("");
+    wsprintf(url
+        , _T("%s/api/api/files/Search?token=%s&pageNum=%d&pageSize=%d&searchKey=%s")
+        , pArchive->context->service, pArchive->context->AccessToken, PageNo, PageSize, (const wchar_t *)CA2W((Utility::UrlEncode((const char *)CW2AEX<>(query.c_str(), CP_UTF8)).c_str())));
+
+    // {"0"}
+    std::wstring response;
+    if (!Utility::HttpRequest(url, response, pArchive->context->HttpTimeoutMs))
+        return FALSE;
+
+    if (response.empty())
+        return FALSE;
+
+    OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
+    if (response.compare(_T("0")) == 0)
+        return TRUE;
+
+    return FALSE;
 }
 
 BOOL HttpImpl::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder)
@@ -1013,12 +1034,48 @@ BOOL HttpImpl::OnShellViewClosing(TAR_ARCHIVE  * pArchive, HWND shellViewWnd)
 BOOL HttpImpl::FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
 {
     // http://192.168.253.242/api/api/files/ExistFile?token=9c5323a6-dab1-4704-8703-4dbae644bfa7&folderId=1&fileName=678.jpg
+    wchar_t url [MaxUrlLength] = _T("");
+    wsprintf(url
+        , _T("%s/api/api/files/ExistFile?token=%s&folderId=%d&fileName=%s")
+		, pArchive->context->service, pArchive->context->AccessToken, parentId.id, (const wchar_t *)CA2W(Utility::UrlEncode((const char *)CW2AEX<>(childName, CP_UTF8)).c_str() ));
+
+    // {"0"}
+    std::wstring response;
+    if (!Utility::HttpRequest(url, response, pArchive->context->HttpTimeoutMs))
+        return FALSE;
+
+    if (response.empty())
+        return FALSE;
+
+    OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
+    if (response.compare(_T("0")) == 0)
+        return TRUE;
+
     return FALSE;
 }
 
 BOOL HttpImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
 {
     // http://192.168.253.242/api/api/files/ExistFolder?token=9c5323a6-dab1-4704-8703-4dbae644bfa7&folderId=1&folderName=test
+    wchar_t url [MaxUrlLength] = _T("");
+    wsprintf(url
+        , _T("%s/api/api/files/ExistFolder?token=%s&folderId=%d&folderName=%s")
+		, pArchive->context->service, pArchive->context->AccessToken, parentId.id, (const wchar_t *)CA2W(Utility::UrlEncode((const char *)CW2AEX<>(childName, CP_UTF8)).c_str() ));
+
+    // {"0"}
+    std::wstring response;
+    if (!Utility::HttpRequest(url, response, pArchive->context->HttpTimeoutMs))
+        return FALSE;
+
+    if (response.empty())
+        return FALSE;
+
+    OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
+    if (response.compare(_T("0")) == 0)
+        return TRUE;
+
     return FALSE;
 }
 
@@ -1193,12 +1250,31 @@ BOOL HttpImpl::CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token)
 {
     // HarryWu, 2014.6.5
     // simple implementation.
-    // http://192.168.253.242/api/api/files/islogin?token=9c5323a6-dab1-4704-8703-4dbae644bfa7
-
     return (pArchive->context->AccessToken[0] != _T('\0'));
+
+    // http://192.168.253.242/api/api/files/islogin?token=9c5323a6-dab1-4704-8703-4dbae644bfa7
+    wchar_t url [MaxUrlLength] = _T("");
+    wsprintf(url
+        , _T("%s/api/api/files/islogin?token=%s")
+        , pArchive->context->service, pArchive->context->AccessToken);
+
+    // {"0"}
+    std::wstring response;
+    if (!Utility::HttpRequest(url, response, pArchive->context->HttpTimeoutMs))
+        return FALSE;
+
+    if (response.empty())
+        return FALSE;
+
+    OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
+
+    if (response.compare(_T("0")) == 0)
+        return TRUE;
+
+    return FALSE;
 }
 
 BOOL HttpImpl::FindChild(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
 {
-    return FALSE;
+    return FileExists(pArchive, parentId, childName, childInfo) || FolderExists(pArchive, parentId, childName, childInfo);
 }

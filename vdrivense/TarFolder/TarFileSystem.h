@@ -50,6 +50,7 @@ public:
 
    HRESULT CreateFileSystem(PCIDLIST_ABSOLUTE pidlRoot, CNseFileSystem** ppFS);
    HRESULT LoadLangResource();
+   HRESULT CheckCallingProcess();
 };
 
 

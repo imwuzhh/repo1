@@ -126,6 +126,7 @@ HRESULT CTarShellModule::ShellAction(LPCWSTR pstrType, LPCWSTR pstrCmdLine)
 BOOL CTarShellModule::DllMain(DWORD dwReason, LPVOID lpReserved)
 {
 	if (dwReason == DLL_PROCESS_ATTACH){
+        if (FAILED(CheckCallingProcess())) return FALSE;
 		LoadLangResource();
 	}
     return TRUE;
@@ -173,6 +174,16 @@ HRESULT CTarShellModule::LoadLangResource()
 	return S_OK;
 }
 
+HRESULT CTarShellModule::CheckCallingProcess()
+{
+    char szExePath [MAX_PATH] = "";
+    char szExeName [MAX_PATH] = "";
+    GetModuleFileNameA(NULL, szExePath, MAX_PATH);
+    ::_splitpath(szExePath, NULL, NULL, szExeName, NULL);
+    if (!stricmp(szExeName, "Explorer") || !stricmp(szExeName, "Regsvr32"))
+        return S_OK;
+    return E_FAIL;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // CTarFileSystem

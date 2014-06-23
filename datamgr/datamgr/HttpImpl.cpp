@@ -1049,7 +1049,7 @@ BOOL HttpImpl::FileExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, con
 
     OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
 
-    if (response.compare(_T("0")) == 0)
+    if (response.compare(_T("true")) == 0)
         return TRUE;
 
     return FALSE;
@@ -1073,7 +1073,7 @@ BOOL HttpImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, c
 
     OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
 
-    if (response.compare(_T("0")) == 0)
+    if (response.compare(_T("true")) == 0)
         return TRUE;
 
     return FALSE;
@@ -1250,9 +1250,8 @@ BOOL HttpImpl::CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token)
 {
     // HarryWu, 2014.6.5
     // simple implementation.
-    return (pArchive->context->AccessToken[0] != _T('\0'));
 
-    // http://192.168.253.242/api/api/files/islogin?token=9c5323a6-dab1-4704-8703-4dbae644bfa7
+	// http://192.168.253.242/api/api/files/islogin?token=9c5323a6-dab1-4704-8703-4dbae644bfa7
     wchar_t url [MaxUrlLength] = _T("");
     wsprintf(url
         , _T("%s/api/api/files/islogin?token=%s")
@@ -1268,8 +1267,8 @@ BOOL HttpImpl::CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token)
 
     OUTPUTLOG("Json response: %s", (const char *)CW2A(response.c_str()));
 
-    if (response.compare(_T("0")) == 0)
-        return TRUE;
+    if (response.compare(_T("true")) == 0)
+		return TRUE;
 
     return FALSE;
 }

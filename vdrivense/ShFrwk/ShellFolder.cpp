@@ -1166,68 +1166,7 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
 
 // TODO: R/W protected in multi threads.
 static std::map<HWND, CShellFolder *> s_ShellViewObjects;
-static WNDPROC s_OldShellViewWndProc = NULL;
-
-// HarryWu, 2014.4.17
-// sub class window procedure.
-static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    if (!s_OldShellViewWndProc) return S_OK;
-
-    if (s_ShellViewObjects.find(hWnd) == s_ShellViewObjects.end())
-        return CallWindowProcA(s_OldShellViewWndProc, hWnd, uMsg, wParam, lParam);
-
-    CShellFolder * pFolder = s_ShellViewObjects.find(hWnd)->second;
-    VFS_MENUCOMMAND cmd; memset(&cmd, 0, sizeof(cmd));
-    switch ( uMsg )
-    {
-    case WM_USER_PREV_PAGE:
-        {
-            OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
-            cmd.wMenuID = ID_FILE_PREV;
-            pFolder->ExecuteMenuCommand(cmd);
-        }break;
-    case WM_USER_NEXT_PAGE:
-        {
-            OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
-            cmd.wMenuID = ID_FILE_NEXT;
-            pFolder->ExecuteMenuCommand(cmd);
-        }break;
-    case WM_USER_SEARCH:
-        {
-            OUTPUTLOG("%s(), uMsg=%x", __FUNCTION__, uMsg);
-            cmd.wMenuID = ID_FILE_SEARCH;
-            pFolder->ExecuteMenuCommand(cmd);
-        }break;
-    case WM_COPYDATA:
-        {
-            COPYDATASTRUCT * pCDS = (COPYDATASTRUCT *)lParam;
-            if (pCDS && pCDS->dwData == 0xED0CED0C){
-                if (!strnicmp((const char *)pCDS->lpData, "PrevPage", 8)){
-                    cmd.wMenuID = ID_FILE_PREV;
-                }else 
-                if (!strnicmp((const char *)pCDS->lpData, "NextPage", 8)){
-                    cmd.wMenuID = ID_FILE_NEXT;
-                }else
-                if (!strnicmp((const char *)pCDS->lpData, "Search://", 9)){
-                    cmd.wMenuID = ID_FILE_SEARCH;
-                    cmd.pUserData = malloc(0x200);
-                    //TODO: Bounds check of pCDS->lpData
-                    strcpy_s((char *)cmd.pUserData, 0x200, (const char *)(pCDS->lpData) + 9);
-                }else{
-                    cmd.wMenuID = 0;
-                    OUTPUTLOG("%s() undefined message.", __FUNCTION__);
-                    break;
-                }
-                if (cmd.wMenuID) pFolder->ExecuteMenuCommand(cmd);
-            }
-        }break;
-    default:
-        break;
-    }
-
-    return CallWindowProcA(s_OldShellViewWndProc, hWnd, uMsg, wParam, lParam);
-}
+static CRITICAL_SECTION * s_lock = NULL;
 
 // IShellFolderViewCB messages
 LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -1259,13 +1198,14 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 
     m_spFolderItem->OnShellViewCreated(hWnd);
 
-#if 1
-    if ((WNDPROC)GetWindowLongPtrA(hWnd, GWLP_WNDPROC) != s_ShellViewWndProc){
-        s_OldShellViewWndProc = (WNDPROC)SetWindowLongPtrA(hWnd, GWLP_WNDPROC, (LONG_PTR)s_ShellViewWndProc);
-    }
-#endif
+	if (s_lock == NULL) {
+		s_lock = new CRITICAL_SECTION;
+		InitializeCriticalSection(s_lock);
+	}
 
+	EnterCriticalSection(s_lock);
     s_ShellViewObjects.insert(std::make_pair(hWnd, this)); this->AddRef();
+	LeaveCriticalSection(s_lock);
 
     return S_OK;
 }
@@ -1275,10 +1215,13 @@ LRESULT CShellFolder::OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, B
     HWND hWnd = (HWND)wParam;
     m_spFolderItem->OnShellViewClosing(hWnd);
 
-    if (s_ShellViewObjects.find(hWnd) == s_ShellViewObjects.end())
-        return S_FALSE;
+	EnterCriticalSection(s_lock);
+	if (s_ShellViewObjects.find(hWnd) != s_ShellViewObjects.end()){
+		s_ShellViewObjects.find(hWnd)->second->Release();
+		s_ShellViewObjects.erase(hWnd); 
+	}
+	LeaveCriticalSection(s_lock);
 
-    s_ShellViewObjects.find(hWnd)->second->Release(); s_ShellViewObjects.erase(hWnd); 
     return S_OK;
 }
 

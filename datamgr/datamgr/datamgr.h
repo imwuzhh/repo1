@@ -136,8 +136,6 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive);
 */
 HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA ** aList, int * nListCount);
 
-
-
 HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** aList, int * nListCount);
 
 HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DATA * wfd);

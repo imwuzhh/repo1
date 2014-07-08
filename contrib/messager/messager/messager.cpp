@@ -101,7 +101,7 @@ int main(int argc, char * argv[])
     cds.cbData = sizeof(szBuffer);
     cds.lpData = szBuffer;
 
-    printf("0->Prev, 1->Next, 2->Search\n");
+    printf("a->Prev, b->Next, c->Search\n");
     while (TRUE)
     {
         printf(">"); char c = getchar(); getchar(); // to skip 'VK_ENTER'
@@ -112,18 +112,12 @@ int main(int argc, char * argv[])
 
         switch (c)
         {
-            case '0': cmd = WM_USER_PREV_PAGE; break;
-            case '1': cmd = WM_USER_NEXT_PAGE; break;
-            case '2': cmd = WM_USER_SEARCH; break;
             case 'a': cmd = WM_USER_PREV_PAGE; strcpy_s(szBuffer, CountOf(szBuffer), "PrevPage"); break;
             case 'b': cmd = WM_USER_NEXT_PAGE; strcpy_s(szBuffer, CountOf(szBuffer), "NextPage"); break;
             case 'c': cmd = WM_USER_SEARCH;    strcpy_s(szBuffer, CountOf(szBuffer), "Search://hello"); break;
             default: break;
         }
-        if (isdigit(c))
-            SendMessage(hMsgWnd, cmd, (WPARAM)0x0001a220, (LPARAM)0);
-        else
-            SendMessage(hMsgWnd, WM_COPYDATA, (WPARAM)GetConsoleWindow(), (LPARAM)&cds);
+        SendMessage(hMsgWnd, WM_COPYDATA, (WPARAM)GetConsoleWindow(), (LPARAM)&cds);
     }
 	return 0;
 }

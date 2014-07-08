@@ -276,46 +276,6 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA **
    return S_OK;
 }
 
-HRESULT DMGetChildrenListEx(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, VFS_FIND_DATA ** retList, int * nListCount)
-{
-    OUTPUTLOG("%s(), RemoteId={%d, %d}", __FUNCTION__, dwId.category, dwId.id);
-    *retList = NULL; *nListCount = 0;
-    // TODO, not implemented for root/search/recycle, use default NON-PAGED version.
-    if (dwId.category == VdriveCat || dwId.category == SearchCat || dwId.category == RecycleCat){
-        HR(DMGetChildrenList(pArchive, dwId, retList, nListCount));
-        *totalPage = 1;
-        return S_OK;
-    }
-    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-
-    std::list<VFS_FIND_DATA> tmpList;
-    if (dwId.category == PublicCat || dwId.category == PersonCat)
-    {
-        if(!GetProto(pArchive)->GetChildFolderAndFiles(pArchive, dwId, tmpList, PageSize, PageNo, totalPage))
-            return S_FALSE;
-    }
-    if (!tmpList.size()) return S_FALSE;
-
-    if (S_OK != DMMalloc((LPBYTE *)retList, tmpList.size() * sizeof(VFS_FIND_DATA))){
-        return E_OUTOFMEMORY;
-    }
-    VFS_FIND_DATA *aList = (VFS_FIND_DATA *)(*retList);
-
-    int index = 0;
-    for(std::list<VFS_FIND_DATA>::iterator it = tmpList.begin(); 
-        it != tmpList.end(); it ++){ aList [index] = *it;
-        // refine the attributes.
-        VFS_FIND_DATA * pData = &aList[index];
-        pData->dwFileAttributes |= FILE_ATTRIBUTE_NOT_CONTENT_INDEXED;   
-        pData->dwFileAttributes |= FILE_ATTRIBUTE_REPARSE_POINT;
-        if (!IsBitSet(pData->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY))
-            pData->dwFileAttributes |= FILE_ATTRIBUTE_VIRTUAL;
-        index ++;
-    }
-    *nListCount = tmpList.size();
-    return S_OK;
-}
-
 HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DATA * pWfd)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);

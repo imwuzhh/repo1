@@ -6,7 +6,6 @@ EXPORTS
 	DMClose 
 	 
 	DMGetChildrenList 
-	DMGetChildrenListEx
 	DMGetDocInfo
 	DMSetupQuery
 	DMGetPageSize

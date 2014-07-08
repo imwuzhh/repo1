@@ -510,7 +510,7 @@ STDMETHODIMP CShellFolder::CreateViewObject(HWND hwndOwner, REFIID riid, LPVOID*
       if( ::IsMenu(m_hMenu) ) ::DestroyMenu(m_hMenu);
       m_hMenu = m_spFolderItem->GetMenu();
       m_hContextMenu = ::GetSubMenu(m_hMenu, _T("ViewMenu"));
-      if (m_pidlFolder == NULL) return E_FAIL;
+      if (m_pidlFolder.IsEmpty()) return E_FAIL;
 
       PCUITEMID_CHILD pidlCurrentFolder = (PCUITEMID_CHILD)::ILClone(m_pidlFolder.GetLastItem());
       if (pidlCurrentFolder){

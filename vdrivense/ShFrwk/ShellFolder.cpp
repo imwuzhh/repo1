@@ -1165,8 +1165,69 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
 }
 
 // TODO: R/W protected in multi threads.
-static std::map<HWND, CShellFolder *> s_ShellViewObjects;
 static CRITICAL_SECTION * s_lock = NULL;
+static std::map<HWND, CShellFolder *> s_ShellViewObjects;
+static CShellFolder * GetShellFolder(HWND hWnd)
+{
+    EnterCriticalSection(s_lock);
+    if (s_ShellViewObjects.find(hWnd) == s_ShellViewObjects.end()){
+        LeaveCriticalSection(s_lock);
+        return NULL;
+    }
+    CShellFolder * pFolder = s_ShellViewObjects.find(hWnd)->second;
+    LeaveCriticalSection(s_lock);  
+    return pFolder;
+}
+static void AddShellFolder(HWND hWnd, CShellFolder * pFolder)
+{
+    EnterCriticalSection(s_lock);
+    pFolder->AddRef(); s_ShellViewObjects.insert(std::make_pair(hWnd, pFolder));
+    LeaveCriticalSection(s_lock);
+}
+static void RemoveShellFolder(HWND hWnd)
+{
+    EnterCriticalSection(s_lock);
+    if (s_ShellViewObjects.find(hWnd) == s_ShellViewObjects.end()){
+        LeaveCriticalSection(s_lock);
+        return ;
+    }
+    CShellFolder * pFolder = s_ShellViewObjects.find(hWnd)->second;
+    s_ShellViewObjects.erase(hWnd); pFolder->Release();
+    LeaveCriticalSection(s_lock);  
+}
+
+// HarryWu, 2014.4.17
+// sub class window procedure.
+static WNDPROC s_OldShellViewWndProc = NULL;
+static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    if (!s_OldShellViewWndProc) return S_OK;
+    COPYDATASTRUCT * pCDS = (COPYDATASTRUCT *)lParam;
+    if ( uMsg != WM_COPYDATA || !pCDS || pCDS->dwData != 0xED0CED0C){
+        return CallWindowProcA(s_OldShellViewWndProc, hWnd, uMsg, wParam, lParam);
+    }
+
+    VFS_MENUCOMMAND cmd; memset(&cmd, 0, sizeof(cmd));
+
+    if (!strnicmp((const char *)pCDS->lpData, "PrevPage", 8))
+        cmd.wMenuID = ID_FILE_PREV;
+    else if (!strnicmp((const char *)pCDS->lpData, "NextPage", 8))
+        cmd.wMenuID = ID_FILE_NEXT;
+    else if (!strnicmp((const char *)pCDS->lpData, "Search://", 9))
+    {
+        cmd.wMenuID = ID_FILE_SEARCH;
+        cmd.pUserData = malloc(0x200);
+        //TODO: Bounds check of pCDS->lpData
+        strcpy_s((char *)cmd.pUserData, 0x200, (const char *)(pCDS->lpData) + 9);
+    }else{
+        cmd.wMenuID = 0;
+        OUTPUTLOG("%s() undefined message.", __FUNCTION__);
+    }
+
+    CShellFolder * pFolder = GetShellFolder(hWnd);
+    if (cmd.wMenuID && pFolder) pFolder->ExecuteMenuCommand(cmd);
+    return S_OK;
+}
 
 // IShellFolderViewCB messages
 LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -1198,14 +1259,15 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 
     m_spFolderItem->OnShellViewCreated(hWnd);
 
-	if (s_lock == NULL) {
-		s_lock = new CRITICAL_SECTION;
-		InitializeCriticalSection(s_lock);
-	}
+    if (s_lock == NULL) {
+        s_lock = new CRITICAL_SECTION; InitializeCriticalSection(s_lock);
+    }
 
-	EnterCriticalSection(s_lock);
-    s_ShellViewObjects.insert(std::make_pair(hWnd, this)); this->AddRef();
-	LeaveCriticalSection(s_lock);
+    if ((WNDPROC)GetWindowLongPtrA(hWnd, GWLP_WNDPROC) != s_ShellViewWndProc){
+        s_OldShellViewWndProc = (WNDPROC)SetWindowLongPtrA(hWnd, GWLP_WNDPROC, (LONG_PTR)s_ShellViewWndProc);
+    }
+
+    AddShellFolder(hWnd, this);
 
     return S_OK;
 }
@@ -1215,12 +1277,7 @@ LRESULT CShellFolder::OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, B
     HWND hWnd = (HWND)wParam;
     m_spFolderItem->OnShellViewClosing(hWnd);
 
-	EnterCriticalSection(s_lock);
-	if (s_ShellViewObjects.find(hWnd) != s_ShellViewObjects.end()){
-		s_ShellViewObjects.find(hWnd)->second->Release();
-		s_ShellViewObjects.erase(hWnd); 
-	}
-	LeaveCriticalSection(s_lock);
+    RemoveShellFolder(hWnd);
 
     return S_OK;
 }

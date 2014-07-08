@@ -427,11 +427,11 @@ BOOL Utility::FastCheckIsEnable(const wchar_t * xmlconfigfile)
         return FALSE;
     }
 
-    BOOL legacyAPI = !strnicmp(target->ToElement()->GetText(), "Yes", 3);
+    BOOL fastCheck = !strnicmp(target->ToElement()->GetText(), "Yes", 3);
 
     delete xdoc; xdoc = NULL;
 
-    return legacyAPI;
+    return fastCheck;
 }
 
 

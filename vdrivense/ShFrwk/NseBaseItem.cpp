@@ -383,7 +383,7 @@ HRESULT CNseBaseItem::GetChild(LPCWSTR pstrName, SHGNO ParseType, CNseItem** pIt
          return aChildren.RemoveAt(i) ? S_OK : E_UNEXPECTED;
       }
    }
-   return E_FAIL;
+   return S_OK;
 }
 
 /**

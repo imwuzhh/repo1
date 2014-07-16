@@ -739,6 +739,7 @@ STDMETHODIMP CShellFolder::SetNameOf(HWND hwnd, PCUITEMID_CHILD pidl, LPCWSTR ps
    if( ppidlOut != NULL ) {
       CNseItemPtr spNewItem;
       HR( m_spFolderItem->GetChild(wszOutputName, SHGDN_FORPARSING, &spNewItem) );
+      if ((CNseItem *)spNewItem == NULL) return S_OK;
       *ppidlOut = ::ILCloneChild( spNewItem->GetITEMID() );
       // Notify Shell directly about the rename operation...
       CPidl pidlOld = m_pidlMonitor + pidl;

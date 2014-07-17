@@ -9,10 +9,7 @@
 #define ID_FILE_PREV                    16
 #define ID_FILE_NEXT                    17
 #define ID_FILE_SEARCH                  18
-
-#define WM_USER_PREV_PAGE    (WM_USER + 0x1001)
-#define WM_USER_NEXT_PAGE    (WM_USER + 0x1002)
-#define WM_USER_SEARCH       (WM_USER + 0x1003)
+#define ID_FILE_GOTO                    19
 
 struct EnumParam {
     char * className;
@@ -101,20 +98,21 @@ int main(int argc, char * argv[])
     cds.cbData = sizeof(szBuffer);
     cds.lpData = szBuffer;
 
-    printf("a->Prev, b->Next, c->Search\n");
+    printf("a->Prev, b->Next, c->Search, g->GotoPage\n");
     while (TRUE)
     {
-        printf(">"); char c = getchar(); getchar(); // to skip 'VK_ENTER'
-        UINT cmd = WM_USER_PREV_PAGE;
+        printf(">"); char c = getchar(); if (c == '\r' || c == '\n') continue;
+        UINT cmd = ID_FILE_NEXT;
 
         HWND hMsgWnd = FindChildWindow("SHELLDLL_DefView", "ShellView", 0xED0CED0C);
         if (hMsgWnd == NULL) return 0;
 
         switch (c)
         {
-            case 'a': cmd = WM_USER_PREV_PAGE; strcpy_s(szBuffer, CountOf(szBuffer), "PrevPage"); break;
-            case 'b': cmd = WM_USER_NEXT_PAGE; strcpy_s(szBuffer, CountOf(szBuffer), "NextPage"); break;
-            case 'c': cmd = WM_USER_SEARCH;    strcpy_s(szBuffer, CountOf(szBuffer), "Search://hello"); break;
+            case 'a': cmd = ID_FILE_PREV; strcpy_s(szBuffer, CountOf(szBuffer), "PrevPage"); break;
+			case 'b': cmd = ID_FILE_NEXT; strcpy_s(szBuffer, CountOf(szBuffer), "NextPage"); break;
+			case 'g': cmd = ID_FILE_GOTO; strcpy_s(szBuffer, CountOf(szBuffer), "GotoPage://2"); break;
+            case 'c': cmd = ID_FILE_SEARCH;    strcpy_s(szBuffer, CountOf(szBuffer), "Search://hello"); break;
             default: break;
         }
         SendMessage(hMsgWnd, WM_COPYDATA, (WPARAM)GetConsoleWindow(), (LPARAM)&cds);

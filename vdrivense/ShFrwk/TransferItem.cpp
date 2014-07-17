@@ -110,7 +110,8 @@ STDMETHODIMP CTransferSource::RenameItem(IShellItem* psiSource, LPCWSTR pszNewNa
    HR( spItem->Rename(pszNewName, wszOutputName) );
    // Lookup the new item and send change notifications...
    CNseItemPtr spNewItem;
-   HR( m_spFolder->m_spFolderItem->GetChild(wszOutputName, SHGDN_FORPARSING, &spNewItem) );
+   HRESULT hr = ( m_spFolder->m_spFolderItem->GetChild(wszOutputName, SHGDN_FORPARSING, &spNewItem) );
+   if ( hr != S_OK ) return hr;
    HR( _SendShellNotify(SHCNE_RENAMEITEM, dwFlags, spItem, spNewItem) );
    CComQIPtr<IShellFolder> spShellFolder = m_spFolder;
    HR( ::SHCreateItemWithParent(NULL, spShellFolder, spNewItem->GetITEMID(), IID_PPV_ARGS(ppsiNewDest)) );
@@ -322,7 +323,8 @@ STDMETHODIMP CTransferDestination::CreateItem(LPCWSTR pszName, DWORD dwAttribute
       if( bIsFolder && spPrevItem == NULL ) {
          HR( spItem->CreateFolder() );
          spItem.Free();
-         HR( m_spFolder->m_spFolderItem->GetChild(wfd.cFileName, SHGDN_FORPARSING, &spItem) );
+         HRESULT hr = ( m_spFolder->m_spFolderItem->GetChild(wfd.cFileName, SHGDN_FORPARSING, &spItem) );
+		 if (hr != S_OK ) return hr;
          HR( _SendShellNotify(SHCNE_CREATE, dwFlags, spItem) );
       }
       CComQIPtr<IShellFolder> spShellFolder = m_spFolder;

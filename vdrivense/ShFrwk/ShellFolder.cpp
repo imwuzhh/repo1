@@ -1214,7 +1214,7 @@ static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
         cmd.wMenuID = ID_FILE_PREV;
     else if (!strnicmp((const char *)pCDS->lpData, "NextPage", 8))
         cmd.wMenuID = ID_FILE_NEXT;
-	else if (!strnicmp((const char *)pCDS->lpData, "GotoPage", 8)){
+	else if (!strnicmp((const char *)pCDS->lpData, "GotoPage://", 11)){
 		cmd.wMenuID = ID_FILE_GOTO;
 		cmd.pUserData = malloc(sizeof(DWORD));
 		// assume that pCDS->lpData is null-terminated string.

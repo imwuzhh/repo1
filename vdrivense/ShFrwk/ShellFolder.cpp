@@ -1214,11 +1214,18 @@ static LRESULT CALLBACK s_ShellViewWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
         cmd.wMenuID = ID_FILE_PREV;
     else if (!strnicmp((const char *)pCDS->lpData, "NextPage", 8))
         cmd.wMenuID = ID_FILE_NEXT;
+	else if (!strnicmp((const char *)pCDS->lpData, "GotoPage", 8)){
+		cmd.wMenuID = ID_FILE_GOTO;
+		cmd.pUserData = malloc(sizeof(DWORD));
+		// assume that pCDS->lpData is null-terminated string.
+		*(DWORD *)cmd.pUserData = atoi((const char *)pCDS->lpData + 11);
+	}
     else if (!strnicmp((const char *)pCDS->lpData, "Search://", 9))
     {
         cmd.wMenuID = ID_FILE_SEARCH;
         cmd.pUserData = malloc(0x200);
         //TODO: Bounds check of pCDS->lpData
+		// assume that pCDS->lpData is null-terminated string.
         strcpy_s((char *)cmd.pUserData, 0x200, (const char *)(pCDS->lpData) + 9);
     }else{
         cmd.wMenuID = 0;

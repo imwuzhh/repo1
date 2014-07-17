@@ -289,6 +289,8 @@ HRESULT DMOnShellViewClosing(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
 */
 HRESULT DMGetCurrentPageNumber(TAR_ARCHIVE * pArchive, RemoteId id, DWORD * retPageNo);
 
+HRESULT DMSetPageNumber(TAR_ARCHIVE * pArchive, RemoteId id, DWORD dwNewPageNo);
+
 HRESULT DMIncCurrentPageNumber(TAR_ARCHIVE * pArchive, RemoteId id);
 
 HRESULT DMDecCurrentPageNumber(TAR_ARCHIVE * pArchive, RemoteId id);

@@ -695,6 +695,22 @@ HRESULT DMGetCurrentPageNumber(TAR_ARCHIVE * pArchive, RemoteId id, DWORD * retP
     return S_OK;
 }
 
+HRESULT DMSetPageNumber(TAR_ARCHIVE * pArchive, RemoteId id, DWORD dwNewPageNo)
+{
+	CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+	OUTPUTLOG("%s() id=[%d:%d]", __FUNCTION__, id.category, id.id);
+
+	if (GetDB(pArchive)->find(id.id) == GetDB(pArchive)->end())
+		return E_FAIL;
+
+	ServerItemInfo & refItem = gspGlobalDB->find(id.id)->second;
+
+	if (dwNewPageNo < refItem.dwTotalPage) refItem.dwCurPage = dwNewPageNo;
+
+	return S_OK;
+}
+
 HRESULT DMIncCurrentPageNumber(TAR_ARCHIVE * pArchive, RemoteId id)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);

@@ -126,6 +126,7 @@ public:
    HRESULT _PreviewFile(PCITEMID_CHILD pidl);
    HRESULT _PrevPage(VFS_MENUCOMMAND & Cmd);
    HRESULT _NextPage(VFS_MENUCOMMAND & Cmd);
+   HRESULT _GotoPage(VFS_MENUCOMMAND & Cmd);
    HRESULT _Share(VFS_MENUCOMMAND & Cmd);
    HRESULT _InternalLink(VFS_MENUCOMMAND & Cmd);
    HRESULT _Distribute(VFS_MENUCOMMAND & Cmd);

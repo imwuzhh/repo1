@@ -284,6 +284,7 @@ HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
    case ID_FILE_PROPERTIES:  return _DoShowProperties(Cmd);
    case ID_FILE_PREV:        return _PrevPage(Cmd);
    case ID_FILE_NEXT:        return _NextPage(Cmd);
+   case ID_FILE_GOTO:        return _GotoPage(Cmd);
    case ID_FILE_SHARE:       return _Share(Cmd);
    case ID_FILE_INNERLINK:   return _InternalLink(Cmd);
    case ID_FILE_DISTRIBUTE:  return _Distribute(Cmd);
@@ -501,6 +502,17 @@ HRESULT CTarFileItem::_NextPage( VFS_MENUCOMMAND & Cmd)
     HR( DMIncCurrentPageNumber(_GetTarArchivePtr(), m_pWfd->dwId));
     _RefreshFolderView();
     return S_OK;
+}
+
+HRESULT CTarFileItem::_GotoPage( VFS_MENUCOMMAND & Cmd)
+{
+	DWORD dwNewPageNo = 0;
+	if (Cmd.pUserData){
+		dwNewPageNo = *(DWORD *)Cmd.pUserData;
+	}
+	HR( DMSetPageNumber(_GetTarArchivePtr(), m_pWfd->dwId, dwNewPageNo));
+	_RefreshFolderView();
+	return S_OK;
 }
 
 HRESULT CTarFileItem::_Share(VFS_MENUCOMMAND & Cmd)

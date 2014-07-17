@@ -23,6 +23,7 @@ EXPORTS
 	DMSelect
 	DMGetCustomColumns
 	
+	DMSetPageNumber
 	DMGetCurrentPageNumber
 	DMIncCurrentPageNumber
 	DMDecCurrentPageNumber

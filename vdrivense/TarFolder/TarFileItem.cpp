@@ -5,6 +5,7 @@
 #include "ShellFolder.h"
 #include "LaunchFile.h"
 #include "EnumIDList.h"
+#include "DataObject.h"
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -279,13 +280,14 @@ HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
    case ID_FILE_EXTRACT:     return _ExtractToFolder(Cmd);
    case ID_COMMAND_EXTRACT:  return _ExtractToFolder(Cmd);
    case DFM_CMD_PASTE:       return _DoPasteFiles(Cmd);
-   case DFM_CMD_NEWFOLDER:   return _DoNewFolder(Cmd, IDS_NEWFOLDER);
+   case DFM_CMD_NEWFOLDER:   //return _DoNewFolder(Cmd, IDS_NEWFOLDER);
    case ID_FILE_NEWFOLDER:   return _DoNewFolder(Cmd, IDS_NEWFOLDER);
    case ID_FILE_PROPERTIES:  return _DoShowProperties(Cmd);
    case ID_FILE_PREV:        return _PrevPage(Cmd);
    case ID_FILE_NEXT:        return _NextPage(Cmd);
    case ID_FILE_GOTO:        return _GotoPage(Cmd);
    case ID_FILE_SHARE:       return _Share(Cmd);
+   case ID_FILE_UPLOAD:      return _Upload(Cmd);
    case ID_FILE_INNERLINK:   return _InternalLink(Cmd);
    case ID_FILE_DISTRIBUTE:  return _Distribute(Cmd);
    case ID_FILE_LOCK:        return _LockFile(Cmd, TRUE);
@@ -392,38 +394,45 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 		fmtec.tymed    = TYMED_HGLOBAL;
 
 		STGMEDIUM medium;
-		HR( Cmd.pDataObject->GetData(&fmtec, &medium) );
+		/*HR*/( Cmd.pDataObject->GetData(&fmtec, &medium) );
 		
-		if (medium.hGlobal == NULL) return S_FALSE;
-
-		int fileCount = DragQueryFile((HDROP)medium.hGlobal, -1, NULL, 0);
-
-		std::wstring strFileList = _T("");
-
-		for (int i = 0; i < fileCount; i++){
-			int pathlen = DragQueryFile((HDROP)medium.hGlobal, i, NULL, 0);
-			if (pathlen <= 0) continue ;
-
-			TCHAR * szFullPath = (TCHAR *)malloc(sizeof(TCHAR) * (pathlen + 1));
-			szFullPath [pathlen ] = _T('\0');
-
-			pathlen = DragQueryFile((HDROP) medium.hGlobal, i, szFullPath, pathlen + 1);
-			if (pathlen <= 0) {
-				free(szFullPath);
-				continue ;
-			}
-
-			// HarryWu, 2014.3.14
-			// Post task to external tool
-			DMUpload(_GetTarArchivePtr(), szFullPath, *(RemoteId *)&ItemId, Cmd.dwDropEffect == DROPEFFECT_MOVE );
-			
-			strFileList += szFullPath;
-			strFileList += _T(";");
-			free(szFullPath);
+		if (medium.hGlobal == NULL) {
+			fmtec.cfFormat = CDataObject::s_cfFILEDESCRIPTOR;
+			fmtec.dwAspect = DVASPECT_CONTENT;
+			fmtec.lindex   = -1;
+			fmtec.ptd      = NULL;
+			fmtec.tymed    = TYMED_HGLOBAL;
+			Cmd.pDataObject->GetData(&fmtec, &medium);
+			if (medium.hGlobal == NULL) return S_FALSE;
 		}
 
-		//DMUpload(_GetTarArchivePtr(), strFileList.c_str(), *(RemoteId *)&ItemId);
-        //OUTPUTLOG("%s(), Copying `%s\' to [%d:%d]", __FUNCTION__, (const char *)CW2A(strFileList.c_str()), ItemId.category, ItemId.id);
+		if (fmtec.cfFormat == CF_HDROP){
+			int fileCount = DragQueryFile((HDROP)medium.hGlobal, -1, NULL, 0);
+			std::wstring strFileList = _T("");
+			for (int i = 0; i < fileCount; i++){
+				int pathlen = DragQueryFile((HDROP)medium.hGlobal, i, NULL, 0);
+				if (pathlen <= 0) continue ;
+				TCHAR * szFullPath = (TCHAR *)malloc(sizeof(TCHAR) * (pathlen + 1));
+				szFullPath [pathlen ] = _T('\0');
+				pathlen = DragQueryFile((HDROP) medium.hGlobal, i, szFullPath, pathlen + 1);
+				if (pathlen <= 0) {
+					free(szFullPath);continue ;
+				}
+				// HarryWu, 2014.3.14
+				// Post task to external tool
+				DMUpload(_GetTarArchivePtr(), szFullPath, *(RemoteId *)&ItemId, Cmd.dwDropEffect == DROPEFFECT_MOVE );			
+				strFileList += szFullPath; strFileList += _T(";");
+				free(szFullPath);
+			}
+		}
+		if (fmtec.cfFormat == CDataObject::s_cfFILEDESCRIPTOR){
+			FILEGROUPDESCRIPTOR * pFgd = (FILEGROUPDESCRIPTOR *)GlobalLock(medium.hGlobal);
+			for (int i = 0; i < pFgd->cItems; i ++){
+				std::wstring filepath = pFgd->fgd[i].cFileName;
+				OUTPUTLOG("%s(), file=%s", __FUNCTION__, (const char *)(CW2A(filepath.c_str())));
+			}
+			GlobalUnlock(medium.hGlobal);
+		}
         return S_OK;
     }
 
@@ -520,6 +529,11 @@ HRESULT CTarFileItem::_Share(VFS_MENUCOMMAND & Cmd)
     std::wstring idlist = GetSelectedIdList(Cmd);
     HR ( DMShareFile(_GetTarArchivePtr(), idlist.c_str()));
     return S_OK;
+}
+
+HRESULT CTarFileItem::_Upload(VFS_MENUCOMMAND & Cmd)
+{
+	return S_OK;
 }
 
 HRESULT CTarFileItem::_InternalLink(VFS_MENUCOMMAND & Cmd)

@@ -288,7 +288,13 @@ HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DAT
     if (GetDB(pArchive)->find(SearchId) == GetDB(pArchive)->end())
     {
         OUTPUTLOG("%s() SearchBin not initialized.", __FUNCTION__);
-        return S_FALSE;
+
+        lock.Unlock();
+        if (Utility::ConstructSearchFolder(pArchive, *pWfd)){
+            DMAddItemToDB(pArchive, pWfd->dwId, pWfd->cFileName, IsBitSet(pWfd->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
+            OUTPUTLOG("%s() SearchBin constructed and add into DB now.", __FUNCTION__);
+        }
+        lock.Lock();
     }
 
     ServerItemInfo & refItem = gspGlobalDB->find(SearchId)->second;

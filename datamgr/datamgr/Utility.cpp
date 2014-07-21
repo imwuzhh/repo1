@@ -954,12 +954,12 @@ BOOL Utility::GetRootChildMask(const wchar_t* xmlconfigfile, DWORD * mask)
         }
     }
 
-    *mask &= ~PersonCat;
+    *mask |= PersonCat;
     target= local->FirstChild("PersonBin");
     if (target && target->ToElement() && target->ToElement()->GetText()){
         DWORD dwTest = atoi(target->ToElement()->GetText());
-        if (dwTest){
-            *mask |= PersonCat;
+        if (dwTest == 0){
+            *mask &= ~PersonCat;
         }
     }
     
@@ -972,12 +972,12 @@ BOOL Utility::GetRootChildMask(const wchar_t* xmlconfigfile, DWORD * mask)
         }
     }
 
-    *mask &= ~RecycleCat;
+    *mask |= RecycleCat;
     target= local->FirstChild("RecycleBin");
     if (target && target->ToElement() && target->ToElement()->GetText()){
         DWORD dwTest = atoi(target->ToElement()->GetText());
-        if (dwTest){
-            *mask |= RecycleCat;
+        if (dwTest == 0){
+            *mask &= ~RecycleCat;
         }
     }
 

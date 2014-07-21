@@ -330,7 +330,7 @@ HRESULT CTarFileItem::_ExtractToFolder(VFS_MENUCOMMAND& Cmd)
       Cmd.pUserData = pstrTarget;
    }
    
-   if (!DMHttpIsEnable())
+   if (!DMHttpTransferIsEnable())
    {
        // HarryWu, 2014.3.14
        // Task: here is a chance to post the task to external tool.
@@ -382,7 +382,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
     // HarryWu, 2014.3.14
     // Task: Hook upload, EVENT_OBJECT_DRAGDROPPED
     // http://msdn.microsoft.com/en-us/library/windows/desktop/dd318066(v=vs.85).aspx
-    if (!DMHttpIsEnable())
+    if (!DMHttpTransferIsEnable())
     {
         RemoteId ItemId; _GetIdQuick(m_pidlItem, &ItemId);
 

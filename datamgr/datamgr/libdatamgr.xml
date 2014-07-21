@@ -14,6 +14,10 @@
   </API>
   <View>
     <PageSize>0</PageSize>
+    <PublicBin>1</PublicBin>
+    <PersonBin>1</PersonBin>
+    <SearchBin>1</SearchBin>
+    <RecycleBin>1</RecycleBin>
   </View>
   <Locale>
     <RecycleBin>

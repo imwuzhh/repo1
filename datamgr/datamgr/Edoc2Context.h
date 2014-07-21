@@ -6,11 +6,13 @@ class Proto;
 struct Edoc2Context {
     DWORD   dwUserId;
     BOOL    enableHttp;
+    BOOL    enableHttpTransfer;
     DWORD   HttpTimeoutMs;
     DWORD   ViewPort;
     DWORD   JsonPort;
     DWORD   pageSize;
     BOOL    fastCheck;
+    DWORD   dwRootMask;
     HINSTANCE hInst;
     Proto*  proto;
     wchar_t modulepath    [1024];

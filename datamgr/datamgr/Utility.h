@@ -19,6 +19,7 @@ public:
 	static BOOL JsonRequest(const wchar_t * reqJson, std::wstring & response);
 	static BOOL LoadLocalizedName(const wchar_t * xmlconfigfile, const wchar_t * localeName, const wchar_t * key, wchar_t * retVaule, int cchMax);
     static BOOL CheckHttpEnable(const wchar_t * xmlconfigfile);
+    static BOOL CheckHttpTransferEnable(const wchar_t * xmlconfigfile);
     static BOOL FastCheckIsEnable(const wchar_t * xmlconfigfile);
     static DWORD GetHttpTimeoutMs(const WCHAR * xmlconfigfile);
     static BOOL GetServiceBase(const wchar_t* xmlconfigfile, wchar_t * pszSvcBase, int maxcch);
@@ -33,6 +34,7 @@ public:
     static BOOL GenerateTempFilePath(wchar_t * pwszTempFilePath, int cchMax, const wchar_t * templatename);
     static BOOL HttpPostForm(const wchar_t * url, const wchar_t * httpform, const std::wstring & cookie, std::stringstream & response, int timeoutMs);
     static BOOL GetShellViewPageSize(const wchar_t* xmlconfigfile, DWORD * pageSize);
+    static BOOL GetRootChildMask(const wchar_t* xmlconfigfile, DWORD * mask);    
     static BOOL ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime);
     static BOOL ParseVersion(const std::wstring & verString, DWORD * dwVersion);
     static BOOL SocketRequest(const wchar_t * ipv4, unsigned short port, const wchar_t * req);

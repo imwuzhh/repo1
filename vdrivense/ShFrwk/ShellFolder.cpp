@@ -1713,6 +1713,11 @@ HRESULT CShellFolder::_RefineMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHILD_AR
     if (!IsBitSet(selectedMenus, MenuDef_Viewlog)) ::RemoveMenu(m_hContextMenu, ID_FILE_VIEWLOG, MF_BYCOMMAND);
     if (!IsBitSet(selectedMenus, MenuDef_ExtEdit)) ::RemoveMenu(m_hContextMenu, ID_FILE_EXTEDIT, MF_BYCOMMAND); 
 
+    if (!DMHttpIsEnable()){
+        ::RemoveMenu(m_hContextMenu, ID_FILE_PREV, MF_BYCOMMAND); 
+        ::RemoveMenu(m_hContextMenu, ID_FILE_NEXT, MF_BYCOMMAND); 
+    }
+
     return S_OK;
 }
 

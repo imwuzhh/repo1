@@ -434,7 +434,6 @@ BOOL Utility::FastCheckIsEnable(const wchar_t * xmlconfigfile)
     return fastCheck;
 }
 
-
 BOOL Utility::CheckHttpEnable(const wchar_t * xmlconfigfile)
 {
     TiXmlDocument * xdoc = new TiXmlDocument();
@@ -468,6 +467,41 @@ BOOL Utility::CheckHttpEnable(const wchar_t * xmlconfigfile)
     delete xdoc; xdoc = NULL;
 
     return enablehttp;
+}
+
+BOOL Utility::CheckHttpTransferEnable(const wchar_t * xmlconfigfile)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("Net");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild("HttpTransferEnable");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    BOOL enablehttptransfer = !strnicmp(target->ToElement()->GetText(), "Yes", 3);
+
+    delete xdoc; xdoc = NULL;
+
+    return enablehttptransfer;
 }
 
 DWORD Utility::GetHttpTimeoutMs(const wchar_t * xmlconfigfile)
@@ -918,6 +952,70 @@ BOOL Utility::GetShellViewPageSize(const wchar_t* xmlconfigfile, DWORD * pageSiz
 
     delete xdoc; xdoc = NULL;
 
+    return TRUE;
+}
+
+BOOL Utility::GetRootChildMask(const wchar_t* xmlconfigfile, DWORD * mask)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("View");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target = NULL;
+
+    *mask &= ~PublicCat;
+    target= local->FirstChild("PublicBin");
+    if (target && target->ToElement() && target->ToElement()->GetText()){
+        DWORD dwTest = atoi(target->ToElement()->GetText());
+        if (dwTest){
+            *mask |= PublicCat;
+        }
+    }
+
+    *mask |= PersonCat;
+    target= local->FirstChild("PersonBin");
+    if (target && target->ToElement() && target->ToElement()->GetText()){
+        DWORD dwTest = atoi(target->ToElement()->GetText());
+        if (dwTest == 0){
+            *mask &= ~PersonCat;
+        }
+    }
+    
+    *mask &= ~SearchCat;
+    target= local->FirstChild("SearchBin");
+    if (target && target->ToElement() && target->ToElement()->GetText()){
+        DWORD dwTest = atoi(target->ToElement()->GetText());
+        if (dwTest){
+            *mask |= SearchCat;
+        }
+    }
+
+    *mask |= RecycleCat;
+    target= local->FirstChild("RecycleBin");
+    if (target && target->ToElement() && target->ToElement()->GetText()){
+        DWORD dwTest = atoi(target->ToElement()->GetText());
+        if (dwTest == 0){
+            *mask &= ~RecycleCat;
+        }
+    }
+
+    delete xdoc; xdoc = NULL;
     return TRUE;
 }
 

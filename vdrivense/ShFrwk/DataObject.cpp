@@ -203,7 +203,9 @@ HRESULT CDataObject::_CollectFiles(IShellFolder* pShellFolder, PCIDLIST_RELATIVE
       if( !m_aFiles.Add(fd) ) return E_OUTOFMEMORY;
 
       // Recurse into sub-folders...
-      if( IsBitSet(wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY) )
+      // HarryWu, 2014.7.21
+      // it is high-cost and terrible, and not need for non-http mode.
+      if( FALSE && IsBitSet(wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY) )
       {
          CComPtr<IShellFolder> spSubFolder;
          HR( pShellFolder->BindToObject(pidlItem, NULL, IID_PPV_ARGS(&spSubFolder)) );

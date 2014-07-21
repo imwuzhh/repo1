@@ -32,6 +32,7 @@ public:
    CRefPtr<CShellFolder> m_spFolder;                      // Reference to folder
    CComDynamicUnkArray m_aSinks;                          // List of Advise sinks
    CInterfaceArray<IPropertyChangeArray> m_aPropChanges;  // List of Property Changes
+   std::wstring m_sDestPath;                               // Destination corresponding with this source
 
    BEGIN_COM_MAP(CTransferSource)
       COM_INTERFACE_ENTRY(ITransferSource)

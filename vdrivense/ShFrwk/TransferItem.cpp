@@ -51,11 +51,6 @@ STDMETHODIMP CTransferSource::SetProperties(IPropertyChangeArray* pPropArray)
 STDMETHODIMP CTransferSource::OpenItem(IShellItem* psiSource, DWORD dwFlags, REFIID riid, LPVOID* ppv)
 {
     ATLTRACE(L"CTransferSource::OpenItem  riid=%s flags=0x%X\n", DbgGetIID(riid), dwFlags);
-
-    // HarryWu, 2014.3.18
-    // TODO: pretend to cancel it.
-    if (!DMHttpIsEnable()) return COPYENGINE_S_USER_IGNORED;
-
     CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
     if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
     CComObject<CShellItemResources>* pItemResources = NULL;
@@ -68,13 +63,14 @@ STDMETHODIMP CTransferSource::OpenItem(IShellItem* psiSource, DWORD dwFlags, REF
 
 STDMETHODIMP CTransferSource::MoveItem(IShellItem* psiSource, IShellItem* psiParentDst, LPCWSTR pszNameDst, DWORD dwFlags, IShellItem** ppsiNew)
 {
-    OUTPUTLOG("CTransferSource::MoveItem  flags=0x%X\n", dwFlags);
-
-    if (!DMHttpIsEnable()) return S_OK;
-
+   OUTPUTLOG("CTransferSource::MoveItem  flags=0x%X\n", dwFlags);
    // Tell caller that he should convert this to a "copy and delete" operation instead...
    CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
    if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
+   VFS_FIND_DATA wfd = spItem->GetFindData();
+   if (!m_sDestPath.empty()){
+       OUTPUTLOG("%s(), src=%d:%d, dest=%s", __FUNCTION__, wfd.dwId.category, wfd.dwId.id, (const char *)CW2A(m_sDestPath.c_str()));
+   }   
    if( spItem->IsFolder() ) return E_NOINTERFACE;
    return AtlHresultFromWin32(ERROR_NOT_SAME_DEVICE);
 }
@@ -155,31 +151,13 @@ STDMETHODIMP CTransferSource::GetDefaultDestinationName(IShellItem* psiSource, I
 
 	// HarryWu, 2014.3.17
 	// Here is a chance to post download task by d-n-d.
-    if (!DMHttpIsEnable()){
+    if (!DMHttpTransferIsEnable()){
         if (!psiParentDest) return E_INVALIDARG;
-
         LPTSTR pszName = NULL;
         psiParentDest->GetDisplayName(SIGDN_FILESYSPATH, &pszName);
         if (!pszName) return E_FAIL;
-
-        CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
-        if( spItem == NULL ) {
-            CoTaskMemFree(pszName);
-            return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
-        }
-        VFS_FIND_DATA vfd = spItem->GetFindData();
-
-        OUTPUTLOG("%s(), copying [%d:%d] to TargetParent=`%s\'"
-            , __FUNCTION__
-            , vfd.dwId.category, vfd.dwId.id
-            , (const char *)CW2A(pszName));
-
-        CComPtr<IShellItemArray> spItems;
-        HR (::SHCreateShellItemArrayFromShellItem(psiSource, IID_PPV_ARGS(&spItems)));
-        VFS_MENUCOMMAND Cmd = { NULL, ID_FILE_EXTRACT, VFS_MNUCMD_NOVERB, DROPEFFECT_COPY, (IDataObject *)NULL, (IShellItemArray *)spItems, NULL, NULL, wcsdup(pszName) };
-        HR (m_spFolder->ExecuteMenuCommand(Cmd));
-
-        CoTaskMemFree(pszName);
+        m_sDestPath = pszName;
+        CoTaskMemFree(pszName);pszName = NULL;
     }
 
    // We need to return the name we eventually wish our file should have.

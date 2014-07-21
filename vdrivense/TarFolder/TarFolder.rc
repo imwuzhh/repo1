@@ -99,10 +99,7 @@ BEGIN
         MENUITEM "Distribute"                    ID_FILE_DISTRIBUTE
         MENUITEM SEPARATOR
 		MENUITEM "&Upload",                      ID_FILE_UPLOAD
-        POPUP "&New"
-        BEGIN
-            MENUITEM "&Folder",                  ID_FILE_NEWFOLDER
-        END
+        MENUITEM "New &Folder",                  ID_FILE_NEWFOLDER
 		MENUITEM SEPARATOR
 		MENUITEM "Log"                           ID_FILE_VIEWLOG
 		MENUITEM SEPARATOR
@@ -132,7 +129,8 @@ BEGIN
         MENUITEM "Distribute"                    ID_FILE_DISTRIBUTE
         MENUITEM SEPARATOR
         MENUITEM "Edit"                          ID_FILE_EXTEDIT
-		MENUITEM "Lock/Unlock"                   ID_FILE_LOCK
+		MENUITEM "Lock"                          ID_FILE_LOCK
+		MENUITEM "Unlock"                        ID_FILE_UNLOCK
         MENUITEM "History"                       ID_FILE_OLDVERSION
         MENUITEM SEPARATOR
 		MENUITEM "Log"                           ID_FILE_VIEWLOG

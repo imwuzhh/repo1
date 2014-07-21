@@ -105,6 +105,8 @@ extern "C" {
 */
 BOOL DMHttpIsEnable();
 
+BOOL DMHttpTransferIsEnable();
+
 BOOL DMFastCheckIsEnable();
 
 BOOL DMHasRootChild(DWORD dwCat);

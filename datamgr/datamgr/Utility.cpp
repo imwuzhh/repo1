@@ -434,7 +434,6 @@ BOOL Utility::FastCheckIsEnable(const wchar_t * xmlconfigfile)
     return fastCheck;
 }
 
-
 BOOL Utility::CheckHttpEnable(const wchar_t * xmlconfigfile)
 {
     TiXmlDocument * xdoc = new TiXmlDocument();
@@ -468,6 +467,41 @@ BOOL Utility::CheckHttpEnable(const wchar_t * xmlconfigfile)
     delete xdoc; xdoc = NULL;
 
     return enablehttp;
+}
+
+BOOL Utility::CheckHttpTransferEnable(const wchar_t * xmlconfigfile)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("Net");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild("HttpTransferEnable");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    BOOL enablehttptransfer = !strnicmp(target->ToElement()->GetText(), "Yes", 3);
+
+    delete xdoc; xdoc = NULL;
+
+    return enablehttptransfer;
 }
 
 DWORD Utility::GetHttpTimeoutMs(const wchar_t * xmlconfigfile)

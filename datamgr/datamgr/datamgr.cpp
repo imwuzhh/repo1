@@ -106,6 +106,8 @@ static HRESULT DMInit(HINSTANCE hInst){
     // otherwise, use the internal http impl.
     context.enableHttp = Utility::CheckHttpEnable(context.configfile);
 
+    context.enableHttpTransfer = Utility::CheckHttpTransferEnable(context.configfile);
+
     // Setup Http Timeout in milliseconds.
     context.HttpTimeoutMs = Utility::GetHttpTimeoutMs(context.configfile);
 
@@ -180,6 +182,11 @@ BOOL WINAPI DllMain(_In_  HINSTANCE hinstDLL,
 BOOL DMHttpIsEnable()
 {
     return gspEdoc2Context && gspEdoc2Context->enableHttp;
+}
+
+BOOL DMHttpTransferIsEnable()
+{
+    return gspEdoc2Context && gspEdoc2Context->enableHttpTransfer;
 }
 
 BOOL DMFastCheckIsEnable()

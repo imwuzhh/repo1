@@ -1,5 +1,6 @@
 EXPORTS
 	DMHttpIsEnable
+	DMHttpTransferIsEnable
 	DMFastCheckIsEnable
 	DMHasRootChild
 	

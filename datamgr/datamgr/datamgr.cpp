@@ -143,6 +143,8 @@ static HRESULT DMInit(HINSTANCE hInst){
     // Setup PageSize of View
     Utility::GetShellViewPageSize(context.configfile, &context.pageSize);
 
+    Utility::GetRootChildMask(context.configfile, &context.dwRootMask);
+
 	// Cleanup AccessToken
 	context.AccessToken [0] = _T('\0');
 
@@ -185,6 +187,11 @@ BOOL DMFastCheckIsEnable()
     return gspEdoc2Context && gspEdoc2Context->fastCheck;
 }
 
+BOOL DMHasRootChild(DWORD dwCat){
+    if (!gspEdoc2Context) return FALSE;
+    return dwCat & gspEdoc2Context->dwRootMask;
+}
+
 /**
  * Opens an existing .tar archive.
  * Here we basically memorize the filename of the .tar achive, and we only
@@ -214,7 +221,7 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive)
 /**
  * Return the list of children of a sub-folder.
  */
-HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA ** retList, int * nListCount)
+HRESULT DMGetRootChildren(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA ** retList, int * nListCount)
 {
    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
    OUTPUTLOG("%s(), RemoteId={%d, %d}", __FUNCTION__, dwId.category, dwId.id);
@@ -222,33 +229,29 @@ HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA **
    std::list<VFS_FIND_DATA> tmpList;
 
    if (dwId.category == VdriveCat && dwId.id == VdriveId){
-	   std::list<VFS_FIND_DATA> publicList;
-       GetProto(pArchive)->GetTopPublic(pArchive, publicList);
-	   tmpList.merge(publicList, Utility::RfsComparation);
+       if (DMHasRootChild(PublicCat)){
+           std::list<VFS_FIND_DATA> publicList;
+           GetProto(pArchive)->GetTopPublic(pArchive, publicList);
+           tmpList.merge(publicList, Utility::RfsComparation);
+       }
 
-	   std::list<VFS_FIND_DATA> personalList;
-       GetProto(pArchive)->GetTopPersonal(pArchive, personalList);
-	   tmpList.merge(personalList, Utility::RfsComparation);
+       if (DMHasRootChild(PersonCat)){
+           std::list<VFS_FIND_DATA> personalList;
+           GetProto(pArchive)->GetTopPersonal(pArchive, personalList);
+           tmpList.merge(personalList, Utility::RfsComparation);
+       }
 
-	   VFS_FIND_DATA recycleBin;
-	   Utility::ConstructRecycleFolder(pArchive, recycleBin);
-	   tmpList.push_back(recycleBin);
+       if (DMHasRootChild(RecycleCat)){
+           VFS_FIND_DATA recycleBin;
+           Utility::ConstructRecycleFolder(pArchive, recycleBin);
+           tmpList.push_back(recycleBin);
+       }
 
-	   VFS_FIND_DATA searchBin;
-	   Utility::ConstructSearchFolder(pArchive, searchBin);
-	   tmpList.push_back(searchBin);
-   }else if (dwId.category == RecycleCat){
-
-   }else if (dwId.category == SearchCat){
-
-   }else if (dwId.category == PublicCat || dwId.category == PersonCat){
-	   std::list<VFS_FIND_DATA> childFolders;
-       GetProto(pArchive)->GetChildFolders(pArchive, dwId, childFolders);
-	   tmpList.merge(childFolders, Utility::RfsComparation);
-
-	   std::list<VFS_FIND_DATA> childFiles;
-       GetProto(pArchive)->GetChildFiles(pArchive, dwId, childFiles);
- 	   tmpList.merge(childFiles, Utility::RfsComparation);
+       if (DMHasRootChild(SearchCat)){
+           VFS_FIND_DATA searchBin;
+           Utility::ConstructSearchFolder(pArchive, searchBin);
+           tmpList.push_back(searchBin);
+       }
    }else{
 	   OUTPUTLOG("Invalid RemoteId{%d,%d}", dwId.category, dwId.id);
 	   return S_FALSE;
@@ -306,7 +309,7 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int Pag
     *retList = NULL; *nListCount = 0;
     // TODO, not implemented for root/search/recycle, use default NON-PAGED version.
     if (dwId.category == VdriveCat){
-        HR(DMGetChildrenList(pArchive, dwId, retList, nListCount));
+        HR(DMGetRootChildren(pArchive, dwId, retList, nListCount));
         *totalPage = 1;
         return S_OK;
     }

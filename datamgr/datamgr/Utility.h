@@ -33,6 +33,7 @@ public:
     static BOOL GenerateTempFilePath(wchar_t * pwszTempFilePath, int cchMax, const wchar_t * templatename);
     static BOOL HttpPostForm(const wchar_t * url, const wchar_t * httpform, const std::wstring & cookie, std::stringstream & response, int timeoutMs);
     static BOOL GetShellViewPageSize(const wchar_t* xmlconfigfile, DWORD * pageSize);
+    static BOOL GetRootChildMask(const wchar_t* xmlconfigfile, DWORD * mask);    
     static BOOL ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime);
     static BOOL ParseVersion(const std::wstring & verString, DWORD * dwVersion);
     static BOOL SocketRequest(const wchar_t * ipv4, unsigned short port, const wchar_t * req);

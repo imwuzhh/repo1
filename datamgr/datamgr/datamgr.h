@@ -19,20 +19,16 @@
 #ifndef __LIB_DATAMGR_H__
 #define __LIB_DATAMGR_H__
 
-#define WM_USER_PREV_PAGE    (WM_USER + 0x1001)
-#define WM_USER_NEXT_PAGE    (WM_USER + 0x1002)
-#define WM_USER_SEARCH       (WM_USER + 0x1003)
-
 enum {
 	VdriveCat = (0),
 	VdriveId  = (0),
-	PublicCat = (1),
+	PublicCat = (0x00000001),
 	PublicId  = (0),
-	PersonCat = (2),
+	PersonCat = (0x00000002),
 	PersonId  = (0),
-	RecycleCat= (3),
+	RecycleCat= (0x00000004),
 	RecycleId = (~3),
-	SearchCat = (4),
+	SearchCat = (0x00000008),
 	SearchId  = (~4),
 };
 
@@ -111,6 +107,8 @@ BOOL DMHttpIsEnable();
 
 BOOL DMFastCheckIsEnable();
 
+BOOL DMHasRootChild(DWORD dwCat);
+
 /**
 * Create an context for consequent api invoke.
 * Parameters:
@@ -134,7 +132,7 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive);
 * [aList] pointer to hold the array of children, it's DMAllocat-ed internally, so free it with DMFree().
 * [nListCount] pointer to get number of the total children.
 */
-HRESULT DMGetChildrenList(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA ** aList, int * nListCount);
+HRESULT DMGetRootChildren(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA ** aList, int * nListCount);
 
 HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** aList, int * nListCount);
 

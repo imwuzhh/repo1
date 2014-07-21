@@ -1,11 +1,12 @@
 EXPORTS
 	DMHttpIsEnable
 	DMFastCheckIsEnable
+	DMHasRootChild
 	
 	DMOpen 
 	DMClose 
 	 
-	DMGetChildrenList 
+	DMGetRootChildren 
 	DMGetDocInfo
 	DMSetupQuery
 	DMGetPageSize

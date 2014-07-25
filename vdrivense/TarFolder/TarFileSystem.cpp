@@ -65,7 +65,7 @@ LONG CTarShellModule::GetConfigInt(VFS_CONFIG Item)
               | SFGAO_CANMOVE 
               | SFGAO_CANRENAME 
               | SFGAO_DROPTARGET
-              | SFGAO_STREAM
+              //| SFGAO_STREAM
               | SFGAO_BROWSABLE 
               | SFGAO_HASSUBFOLDER 
               | SFGAO_FILESYSANCESTOR

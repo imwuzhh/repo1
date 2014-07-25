@@ -722,7 +722,7 @@ HRESULT DMSetPageNumber(TAR_ARCHIVE * pArchive, RemoteId id, DWORD dwNewPageNo)
 
 	ServerItemInfo & refItem = gspGlobalDB->find(id.id)->second;
 
-	if (dwNewPageNo < refItem.dwTotalPage) refItem.dwCurPage = dwNewPageNo;
+    if (dwNewPageNo <= refItem.dwTotalPage) refItem.dwCurPage = dwNewPageNo;
 
 	return S_OK;
 }

@@ -284,7 +284,7 @@ SFGAOF CNseFileItem::GetSFGAOF(SFGAOF dwMask)
    if( IsBitSet(m_pWfd->dwFileAttributes, FILE_ATTRIBUTE_READONLY) ) Flags |= SFGAO_READONLY;
    if( IsBitSet(m_pWfd->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY) ) Flags |= SFGAO_DROPTARGET;
    if( IsBitSet(m_pWfd->dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY) ) Flags |= SFGAO_FOLDER | SFGAO_HASSUBFOLDER | SFGAO_BROWSABLE | SFGAO_FILESYSANCESTOR;
-   if( IsBitSet(m_pWfd->dwFileAttributes, FILE_ATTRIBUTE_REPARSE_POINT) ) Flags |= SFGAO_LINK;
+   //if( IsBitSet(m_pWfd->dwFileAttributes, FILE_ATTRIBUTE_REPARSE_POINT) ) Flags |= SFGAO_LINK;
    // We bump to FILESYSTEM mode when entering the SaveAs hack
    if( m_pWfd->cAlternateFileName[1] == VFS_HACK_SAVEAS_JUNCTION ) Flags |= SFGAO_FILESYSTEM;
    // We support IStream for files and IStorage for folders

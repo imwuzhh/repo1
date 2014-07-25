@@ -96,10 +96,14 @@ HRESULT CTarFileItem::GetChild(LPCWSTR pwstrName, SHGNO ParseType, CNseItem** pI
    // HarryWu, 2014.6.5
    // there are two different policy, directy call FileExists() to query, 
    // or use Enum() api to get full list and then check it's presence.
-   if (DMFastCheckIsEnable()){
+   if (DMFastCheckIsEnable() && parentId.id > 0){
        VFS_FIND_DATA wfd = { 0 };
        if (FAILED(DMFindChild(_GetTarArchivePtr(), parentId, pwstrName, &wfd)))
            return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
+	   else{
+		   *pItem = GenerateChild(m_pFolder, m_pidlFolder, wfd);
+		   return S_OK;
+	   }
    }else{
        return CNseBaseItem::GetChild(pwstrName, ParseType, pItem); 
    }

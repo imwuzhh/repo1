@@ -1169,5 +1169,18 @@ BOOL HttpImpl::CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token)
 
 BOOL HttpImpl::FindChild(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
 {
+	std::list<std::wstring> lColumns; std::list<VFS_FIND_DATA> vChildren; int totalPage = 0;
+	if (GetDocInfo(pArchive, parentId, lColumns, vChildren, MaxPageSize, 1, &totalPage)){
+		for (std::list<VFS_FIND_DATA>::iterator it = vChildren.begin(); it != vChildren.end(); it++)
+		{
+			const VFS_FIND_DATA & test = *it;
+			if (!_tcscmp(test.cFileName, childName)){
+				childInfo = test;
+				return TRUE;
+			}
+		}
+	}
+	return FALSE;
+
     return FileExists(pArchive, parentId, childName, childInfo) || FolderExists(pArchive, parentId, childName, childInfo);
 }

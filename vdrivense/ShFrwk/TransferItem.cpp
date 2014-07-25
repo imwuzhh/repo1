@@ -53,6 +53,18 @@ STDMETHODIMP CTransferSource::OpenItem(IShellItem* psiSource, DWORD dwFlags, REF
     ATLTRACE(L"CTransferSource::OpenItem  riid=%s flags=0x%X\n", DbgGetIID(riid), dwFlags);
     CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
     if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
+    if (!DMHttpTransferIsEnable()){
+        VFS_FIND_DATA vfd = spItem->GetFindData();
+        CComPtr<IShellItemArray> spItems;
+        HR (::SHCreateShellItemArrayFromShellItem(psiSource, IID_PPV_ARGS(&spItems)));
+        VFS_MENUCOMMAND Cmd = { NULL, ID_FILE_EXTRACT, VFS_MNUCMD_NOVERB, DROPEFFECT_COPY, (IDataObject *)NULL, (IShellItemArray *)spItems, NULL, NULL, wcsdup(m_sDestPath.c_str()) };
+        if (IsBitSet(TSF_MOVE_AS_COPY_DELETE, dwFlags)){
+            // DMDownload with cut
+            Cmd.dwDropEffect = DROPEFFECT_MOVE;
+        }
+        HR (m_spFolder->ExecuteMenuCommand(Cmd));
+        return COPYENGINE_S_USER_IGNORED;
+    }
     CComObject<CShellItemResources>* pItemResources = NULL;
     HR( CComObject<CShellItemResources>::CreateInstance(&pItemResources) );
     CComPtr<IUnknown> spKeepAlive = pItemResources->GetUnknown();
@@ -67,10 +79,6 @@ STDMETHODIMP CTransferSource::MoveItem(IShellItem* psiSource, IShellItem* psiPar
    // Tell caller that he should convert this to a "copy and delete" operation instead...
    CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
    if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
-   VFS_FIND_DATA wfd = spItem->GetFindData();
-   if (!m_sDestPath.empty()){
-       OUTPUTLOG("%s(), src=%d:%d, dest=%s", __FUNCTION__, wfd.dwId.category, wfd.dwId.id, (const char *)CW2A(m_sDestPath.c_str()));
-   }   
    if( spItem->IsFolder() ) return E_NOINTERFACE;
    return AtlHresultFromWin32(ERROR_NOT_SAME_DEVICE);
 }
@@ -84,6 +92,7 @@ STDMETHODIMP CTransferSource::RecycleItem(IShellItem* psiSource, IShellItem* psi
 STDMETHODIMP CTransferSource::RemoveItem(IShellItem* psiSource, DWORD dwFlags)
 {
    OUTPUTLOG("CTransferSource::RemoveItem  flags=0x%X\n", dwFlags);
+   if (IsBitSet(dwFlags, TSF_MOVE_AS_COPY_DELETE)) return S_OK;
    CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
    if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
    BOOL bIsFolder = spItem->IsFolder();
@@ -466,7 +475,7 @@ STDMETHODIMP CShellItemResources::EnumResources(IEnumResources** ppenumr)
 STDMETHODIMP CShellItemResources::SupportsResource(const SHELL_ITEM_RESOURCE* pcsir)
 {
    ATLTRACE(L"CShellItemResources::SupportsResource  guid=%s [%s]\n", DbgGetIID(pcsir->guidType), pcsir->szName);
-   if( pcsir->guidType == GUID_UndocumentedStreamResource ) return S_OK;
+   //if( pcsir->guidType == GUID_UndocumentedStreamResource ) return S_OK;
    ATLTRACE(L"CShellItemResources::SupportsResource - failed\n");
    return E_NOINTERFACE;
 }

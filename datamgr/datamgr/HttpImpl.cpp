@@ -877,11 +877,13 @@ BOOL HttpImpl::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, con
 
 BOOL HttpImpl::UploadFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentFolderId, const wchar_t * localPath)
 {
-    return S_FALSE;
+    RemoteId retId; // Dummy implementation.
+    return CreateFolder(pArchive, parentFolderId, wcsrchr(localPath, _T('\\')) + 1, &retId);
 }
 
 BOOL HttpImpl::DownloadFolder(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * localPath)
 {
+    // Dummy Implementation.
     return S_FALSE;
 }
 

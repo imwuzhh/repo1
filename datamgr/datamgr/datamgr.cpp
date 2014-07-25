@@ -905,7 +905,7 @@ HRESULT DMFindChild(TAR_ARCHIVE * pArchive, RemoteId parentId, LPCWSTR childName
     OUTPUTLOG("%s() parentId=[`%d:%d'], childName=`%s'", __FUNCTION__, parentId.category, parentId.id, (const char *)CW2A(childName ? childName : _T("")));
 
     if (!GetProto(pArchive)->FindChild(pArchive, parentId, childName, *pInfo))
-        return S_FALSE;
+        return E_FAIL;
 
     return S_OK;
 }

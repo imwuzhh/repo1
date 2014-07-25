@@ -32,6 +32,10 @@ enum {
 	SearchId  = (~4),
 };
 
+enum {
+	MaxPageSize = 0x7ffff,
+};
+
 struct RemoteId {
 	DWORD category;
 	DWORD id;

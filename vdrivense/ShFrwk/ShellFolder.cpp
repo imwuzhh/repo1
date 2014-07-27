@@ -513,7 +513,7 @@ STDMETHODIMP CShellFolder::CreateViewObject(HWND hwndOwner, REFIID riid, LPVOID*
 
       PCUITEMID_CHILD pidlCurrentFolder = (PCUITEMID_CHILD)::ILClone(m_pidlFolder.GetLastItem());
       if (pidlCurrentFolder){
-          HR (_RefineMenuItems(m_hContextMenu, 1, &pidlCurrentFolder));
+          HR (_RefineUserMenuItems(m_hContextMenu, 1, &pidlCurrentFolder));
           ::ILFree((PIDLIST_RELATIVE)pidlCurrentFolder);
       }
 
@@ -650,11 +650,12 @@ STDMETHODIMP CShellFolder::GetUIObjectOf(HWND hwndOwner, UINT cidl, PCUITEMID_CH
 			  ::RemoveMenu(m_hContextMenu, ID_FILE_PREVIEW, MF_BYCOMMAND);
 			  ::RemoveMenu(m_hContextMenu, ID_FILE_EXTEDIT, MF_BYCOMMAND);
 			  ::RemoveMenu(m_hContextMenu, ID_FILE_LOCK, MF_BYCOMMAND);
+			  ::RemoveMenu(m_hContextMenu, ID_FILE_UNLOCK, MF_BYCOMMAND);
 			  ::RemoveMenu(m_hContextMenu, ID_FILE_OLDVERSION, MF_BYCOMMAND);
 		  }
 	  }
 
-      HR (_RefineMenuItems(m_hContextMenu, cidl, rgpidl));
+      HR (_RefineUserMenuItems(m_hContextMenu, cidl, rgpidl));
       
       DEFCONTEXTMENU dcm = { hwndOwner, static_cast<IContextMenuCB*>(this), m_pidlMonitor, static_cast<IShellFolder*>(this), cidl, rgpidl, NULL, 0, NULL };
       return ::SHCreateDefaultContextMenu(&dcm, riid, ppRetVal);
@@ -1127,9 +1128,7 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
          QCMINFO* pqcmi = reinterpret_cast<QCMINFO*>(lParam);
          if( !::IsMenu(m_hContextMenu) ) return S_OK;
 		 if (!DMHttpTransferIsEnable()){
-			 //DumpMenus(pqcmi->hmenu);
-			 const DWORD SYSTEM_CMDID_PROPERTIES = 30996;
-			 ::RemoveMenu(pqcmi->hmenu, SYSTEM_CMDID_PROPERTIES, MF_BYCOMMAND);
+			_RefineShellMenuItems(pqcmi->hmenu, pDataObject);
 		 }
          _SetMenuState(m_hContextMenu, pDataObject);
          UINT uCmdFirst = pqcmi->idCmdFirst;
@@ -1684,7 +1683,7 @@ HRESULT CShellFolder::_SetMenuState(HMENU hMenu, IDataObject* pDataObject)
    return S_OK;
 }
 
-HRESULT CShellFolder::_RefineMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHILD_ARRAY rgpidl)
+HRESULT CShellFolder::_RefineUserMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHILD_ARRAY rgpidl)
 {
     // HarryWu, 2014.2.20
     // Disable menu items here.
@@ -1702,32 +1701,65 @@ HRESULT CShellFolder::_RefineMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHILD_AR
         m_spFolderItem->SelectMenuItems(idstring.c_str(), &selectedMenus);
     }
 
-    if (!IsBitSet(selectedMenus, MenuDef_OpenFile)) ::RemoveMenu(m_hContextMenu, ID_FILE_SHARE, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_DownloadFile)) ::RemoveMenu(m_hContextMenu, ID_FILE_EXTRACT, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_NewFolder)) ::RemoveMenu(m_hContextMenu, ID_FILE_NEWFOLDER, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_Properties)) ::RemoveMenu(m_hContextMenu, ID_FILE_PROPERTIES, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_Share)) ::RemoveMenu(m_hContextMenu, ID_FILE_SHARE, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_Upload)) ::RemoveMenu(m_hContextMenu, ID_FILE_UPLOAD, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_Preview)) ::RemoveMenu(m_hContextMenu, ID_FILE_PREVIEW, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_Innerlink)) ::RemoveMenu(m_hContextMenu, ID_FILE_INNERLINK, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_Distribute)) ::RemoveMenu(m_hContextMenu, ID_FILE_DISTRIBUTE, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_Lock)) ::RemoveMenu(m_hContextMenu, ID_FILE_LOCK, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_Unlock)) ::RemoveMenu(m_hContextMenu, ID_FILE_UNLOCK, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_OldVersion)) ::RemoveMenu(m_hContextMenu, ID_FILE_OLDVERSION, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_Viewlog)) ::RemoveMenu(m_hContextMenu, ID_FILE_VIEWLOG, MF_BYCOMMAND);
-	if (!IsBitSet(selectedMenus, MenuDef_ExtEdit)) ::RemoveMenu(m_hContextMenu, ID_FILE_EXTEDIT, MF_BYCOMMAND); 
-	if (IsBitSet(selectedMenus, MenuDef_Properties)) {
-		::RemoveMenu(m_hContextMenu, ID_FILE_PROPERTIES, MF_BYCOMMAND); 
-	}	
+	if (!IsBitSet(selectedMenus, MenuDef_OpenFile)) ::RemoveMenu(hMenu, ID_FILE_SHARE, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_DownloadFile)) ::RemoveMenu(hMenu, ID_FILE_EXTRACT, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_NewFolder)) ::RemoveMenu(hMenu, ID_FILE_NEWFOLDER, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_Properties)) ::RemoveMenu(hMenu, ID_FILE_PROPERTIES, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_Share)) ::RemoveMenu(hMenu, ID_FILE_SHARE, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_Upload)) ::RemoveMenu(hMenu, ID_FILE_UPLOAD, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_Preview)) ::RemoveMenu(hMenu, ID_FILE_PREVIEW, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_Innerlink)) ::RemoveMenu(hMenu, ID_FILE_INNERLINK, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_Distribute)) ::RemoveMenu(hMenu, ID_FILE_DISTRIBUTE, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_Lock)) ::RemoveMenu(hMenu, ID_FILE_LOCK, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_Unlock)) ::RemoveMenu(hMenu, ID_FILE_UNLOCK, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_OldVersion)) ::RemoveMenu(hMenu, ID_FILE_OLDVERSION, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_Viewlog)) ::RemoveMenu(hMenu, ID_FILE_VIEWLOG, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_ExtEdit)) ::RemoveMenu(hMenu, ID_FILE_EXTEDIT, MF_BYCOMMAND); 
+	if (!IsBitSet(selectedMenus, MenuDef_Properties)) ::RemoveMenu(hMenu, ID_FILE_PROPERTIES, MF_BYCOMMAND); 
 
-    if (!DMHttpTransferIsEnable()){
-        ::RemoveMenu(m_hContextMenu, ID_FILE_PREV, MF_BYCOMMAND); 
-		::RemoveMenu(m_hContextMenu, ID_FILE_NEXT, MF_BYCOMMAND); 
-		::RemoveMenu(m_hContextMenu, ID_FILE_SEARCH, MF_BYCOMMAND); 
-		::RemoveMenu(m_hContextMenu, ID_FILE_UPLOAD, MF_BYCOMMAND); 
-    }
+	if (!DMHttpTransferIsEnable()){
+		::RemoveMenu(hMenu, ID_FILE_PREV, MF_BYCOMMAND); 
+		::RemoveMenu(hMenu, ID_FILE_NEXT, MF_BYCOMMAND); 
+		::RemoveMenu(hMenu, ID_FILE_SEARCH, MF_BYCOMMAND); 
+		::RemoveMenu(hMenu, ID_FILE_UPLOAD, MF_BYCOMMAND); 
+	}
 
-    return S_OK;
+	return S_OK;
+}
+
+HRESULT CShellFolder::_RefineShellMenuItems(HMENU hMenu, IDataObject * pDataObject)
+{
+	// HarryWu, 2014.2.20
+	// Disable menu items here.
+	CComPtr<IShellItemArray> spShellItems;
+	if (::SHCreateShellItemArrayFromDataObject(pDataObject, IID_PPV_ARGS(&spShellItems)))
+	{
+		return S_OK;
+	}
+
+	std::wstring idstring = _T("");
+	DWORD ic = 0; spShellItems->GetCount(&ic);
+	for (int i = 0; i < ic; i++){
+		CComPtr<IShellItem> spShellItem;
+		spShellItems->GetItemAt(i, &spShellItem);
+		CNseItemPtr spItem = GenerateChildItemFromShellItem(spShellItem);
+		if( spItem == NULL ) continue;
+		VFS_FIND_DATA wfd = spItem->GetFindData();
+		wchar_t buffer[128] = _T("");
+		swprintf_s(buffer, lengthof(buffer), _T("%d:%d.%d"), static_cast<int>(IsBitSet(wfd.dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY)), wfd.dwId.category, wfd.dwId.id);
+		idstring += buffer; idstring += _T(";");
+	}
+
+	MenuType selectedMenus = MenuDef_AllRemoved;
+	if (!idstring.empty()){
+		m_spFolderItem->SelectMenuItems(idstring.c_str(), &selectedMenus);
+	}
+
+	if (!IsBitSet(selectedMenus, MenuDef_Properties)) ::RemoveMenu(hMenu, SYSTEM_CMDID_PROPERTIES, MF_BYCOMMAND); 
+	if (!IsBitSet(selectedMenus, MenuDef_Cut)) ::RemoveMenu(hMenu, SYSTEM_CMDID_CUT, MF_BYCOMMAND); 
+	if (!IsBitSet(selectedMenus, MenuDef_Delete)) ::RemoveMenu(hMenu, SYSTEM_CMDID_DELETE, MF_BYCOMMAND); 
+	if (!IsBitSet(selectedMenus, MenuDef_Rename)) ::RemoveMenu(hMenu, SYSTEM_CMDID_RENAME, MF_BYCOMMAND); 
+	return S_OK;
 }
 
 /**

@@ -33,6 +33,8 @@
 #define ID_FILE_NEXT                    17
 #define ID_FILE_SEARCH                  18
 #define ID_FILE_GOTO                    19
+#define ID_FILE_RECOVER                 20
+#define ID_FILE_CLEAR_ALL               21
 
 #define ID_COMMAND_EXTRACT              400
 

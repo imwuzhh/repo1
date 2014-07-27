@@ -87,6 +87,8 @@ BEGIN
 		MENUITEM SEPARATOR
 		MENUITEM "Log"                           ID_FILE_VIEWLOG
 		MENUITEM SEPARATOR
+///////////////////////////////////////////////////////////////////////
+		MENUITEM "Recover"                       ID_FILE_RECOVER
     END
     POPUP "ViewMenu"
     BEGIN
@@ -104,6 +106,9 @@ BEGIN
 		MENUITEM "Log"                           ID_FILE_VIEWLOG
 		MENUITEM SEPARATOR
 		MENUITEM "Search"                        ID_FILE_SEARCH
+		MENUITEM SEPARATOR
+////////////////////////////////////////////////////////////////////////
+		MENUITEM "Clear All"                     ID_FILE_CLEAR_ALL
 		MENUITEM SEPARATOR
     END
     POPUP "CommandMenu"
@@ -135,6 +140,8 @@ BEGIN
         MENUITEM SEPARATOR
 		MENUITEM "Log"                           ID_FILE_VIEWLOG
 		MENUITEM SEPARATOR
+///////////////////////////////////////////////////////////////////////
+		MENUITEM "Recover"                       ID_FILE_RECOVER
     END
     POPUP "CommandMenu"
     BEGIN

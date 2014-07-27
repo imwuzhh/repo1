@@ -77,6 +77,7 @@
 GUID UuidFromString(LPOLESTR pwstr);
 BOOL ILIsAligned64(PCUIDLIST_RELATIVE pidl);
 HMENU GetSubMenu(HMENU hMenu, LPCTSTR pstrTitle);
+void DumpMenu(HMENU hMenu);
 FILETIME GetFileModifiedTime(LPCTSTR pstrFilename);
 BOOL IsFileTimeValid(const FILETIME& ft);
 std::string WideStringToAnsi(const wchar_t * wstr);

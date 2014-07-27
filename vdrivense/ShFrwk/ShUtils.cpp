@@ -41,6 +41,24 @@ HMENU GetSubMenu(HMENU hMenu, LPCTSTR pstrTitle)
    return NULL;
 }
 
+void DumpMenu(HMENU hMenu){
+	DWORD mc = GetMenuItemCount(hMenu);
+	for (int i = 0; i < mc; i ++){
+		MENUITEMINFOA menuiteminfo;
+		memset( &menuiteminfo, 0, sizeof(MENUITEMINFOA) );
+		menuiteminfo.cbSize         = sizeof( MENUITEMINFOA );
+		menuiteminfo.fMask          = 0x00000040;// MIIM_STRING;
+		menuiteminfo.fType          = MFT_STRING | 0x00000080;//MIIM_BITMAP;
+		menuiteminfo.fState         = MFS_ENABLED;
+		menuiteminfo.dwTypeData     = NULL;
+		menuiteminfo.cch = 100;
+		char szData[100] = ("");
+		menuiteminfo.dwTypeData = szData;
+		GetMenuItemInfoA(hMenu, i, TRUE, &menuiteminfo);
+		OUTPUTLOG("%d, %u %s\n", i, GetMenuItemID(hMenu, i), menuiteminfo.dwTypeData);
+	}
+}
+
 /**
  * Return the file last-modified timestamp of a disk file.
  */

@@ -136,7 +136,7 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    // use /MD to generate these modules.
    VFS_FIND_DATA * aList = NULL; int nListCount = 0;
 
-   DWORD dwCurrPage = 0;
+   DWORD dwCurrPage = 1;
    DWORD dwTotalPage = 0;
    ViewSettings vs; memset(&vs, 0, sizeof(vs));
 
@@ -149,7 +149,7 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
            /*HR*/( DMSetTotalPageNumber(_GetTarArchivePtr(), dwId, dwTotalPage));
        }  
    }else{
-       HR( DMGetDocInfo(_GetTarArchivePtr(), *(RemoteId *)&dwId, 0x00007fff, dwCurrPage, (int *)&dwTotalPage, &vs, &aList, &nListCount));
+       HR( DMGetDocInfo(_GetTarArchivePtr(), *(RemoteId *)&dwId, MaxPageSize, 1, (int *)&dwTotalPage, &vs, &aList, &nListCount));
    } 
 
    for( int i = 0; i < nListCount; i++ ) {

@@ -1,4 +1,3 @@
-
 #include "stdafx.h"
 #include "shfrwkres.h"
 
@@ -1127,6 +1126,11 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
       {
          QCMINFO* pqcmi = reinterpret_cast<QCMINFO*>(lParam);
          if( !::IsMenu(m_hContextMenu) ) return S_OK;
+		 if (!DMHttpTransferIsEnable()){
+			 //DumpMenus(pqcmi->hmenu);
+			 const DWORD SYSTEM_CMDID_PROPERTIES = 30996;
+			 ::RemoveMenu(pqcmi->hmenu, SYSTEM_CMDID_PROPERTIES, MF_BYCOMMAND);
+		 }
          _SetMenuState(m_hContextMenu, pDataObject);
          UINT uCmdFirst = pqcmi->idCmdFirst;
          pqcmi->idCmdFirst = ::Shell_MergeMenus(pqcmi->hmenu, m_hContextMenu, pqcmi->indexMenu, pqcmi->idCmdFirst, pqcmi->idCmdLast, 0);
@@ -1711,11 +1715,16 @@ HRESULT CShellFolder::_RefineMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHILD_AR
     if (!IsBitSet(selectedMenus, MenuDef_Unlock)) ::RemoveMenu(m_hContextMenu, ID_FILE_UNLOCK, MF_BYCOMMAND);
     if (!IsBitSet(selectedMenus, MenuDef_OldVersion)) ::RemoveMenu(m_hContextMenu, ID_FILE_OLDVERSION, MF_BYCOMMAND);
     if (!IsBitSet(selectedMenus, MenuDef_Viewlog)) ::RemoveMenu(m_hContextMenu, ID_FILE_VIEWLOG, MF_BYCOMMAND);
-    if (!IsBitSet(selectedMenus, MenuDef_ExtEdit)) ::RemoveMenu(m_hContextMenu, ID_FILE_EXTEDIT, MF_BYCOMMAND); 
+	if (!IsBitSet(selectedMenus, MenuDef_ExtEdit)) ::RemoveMenu(m_hContextMenu, ID_FILE_EXTEDIT, MF_BYCOMMAND); 
+	if (IsBitSet(selectedMenus, MenuDef_Properties)) {
+		::RemoveMenu(m_hContextMenu, ID_FILE_PROPERTIES, MF_BYCOMMAND); 
+	}	
 
-    if (!DMHttpIsEnable()){
+    if (!DMHttpTransferIsEnable()){
         ::RemoveMenu(m_hContextMenu, ID_FILE_PREV, MF_BYCOMMAND); 
-        ::RemoveMenu(m_hContextMenu, ID_FILE_NEXT, MF_BYCOMMAND); 
+		::RemoveMenu(m_hContextMenu, ID_FILE_NEXT, MF_BYCOMMAND); 
+		::RemoveMenu(m_hContextMenu, ID_FILE_SEARCH, MF_BYCOMMAND); 
+		::RemoveMenu(m_hContextMenu, ID_FILE_UPLOAD, MF_BYCOMMAND); 
     }
 
     return S_OK;

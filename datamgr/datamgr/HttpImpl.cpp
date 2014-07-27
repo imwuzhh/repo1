@@ -975,7 +975,7 @@ BOOL HttpImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, c
 
 BOOL HttpImpl::CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType * selectedMenuItems)
 {
-    *selectedMenuItems=MenuDef_AllSelected;
+    *selectedMenuItems=MenuDef_AllSelected & (~MenuDef_Properties);
     return TRUE;
 }
 

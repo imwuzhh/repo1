@@ -21,7 +21,7 @@ BOOL CTarShellModule::GetConfigBool(VFS_CONFIG Item)
    case VFS_CAN_SLOW_COPY:
 	   return TRUE;
 
-   case VFS_CAN_PROGRESSUI:
+   //case VFS_CAN_PROGRESSUI:
    case VFS_CAN_ROOT_PREVIEW:
    case VFS_CAN_ROOT_SHELLNEW:
    case VFS_CAN_ROOT_DROPTARGET:

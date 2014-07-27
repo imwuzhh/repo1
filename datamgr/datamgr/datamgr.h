@@ -36,6 +36,13 @@ enum {
 	MaxPageSize = 0x7ffff,
 };
 
+enum {
+	SYSTEM_CMDID_PROPERTIES = 30996,
+	SYSTEM_CMDID_DELETE    =  30994,
+	SYSTEM_CMDID_RENAME    =  30995,
+	SYSTEM_CMDID_CUT       =  31001,
+};
+
 struct RemoteId {
 	DWORD category;
 	DWORD id;
@@ -61,6 +68,10 @@ typedef unsigned __int64   MenuType;
 #define MenuDef_OldVersion   (0x0000000000000800)
 #define MenuDef_Viewlog      (0x0000000000001000)
 #define MenuDef_ExtEdit      (0x0000000000002000)
+#define MenuDef_Cut          (0x0000000000004000)
+#define MenuDef_Delete       (0x0000000000008000)
+#define MenuDef_Rename       (0x0000000000010000)
+
 #define MenuDef_AllRemoved   (0x0000000000000000)
 #define MenuDef_AllSelected  (0xffffFFFFffffFFFF)
 

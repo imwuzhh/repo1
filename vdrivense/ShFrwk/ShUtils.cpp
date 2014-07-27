@@ -55,7 +55,7 @@ void DumpMenu(HMENU hMenu){
 		char szData[100] = ("");
 		menuiteminfo.dwTypeData = szData;
 		GetMenuItemInfoA(hMenu, i, TRUE, &menuiteminfo);
-		OUTPUTLOG("%d, %u %s\n", i, GetMenuItemID(hMenu, i), menuiteminfo.dwTypeData);
+		OUTPUTLOG("%s: pos=%d, id=%u string=%s\n", __FUNCTION__, i, GetMenuItemID(hMenu, i), menuiteminfo.dwTypeData);
 	}
 }
 

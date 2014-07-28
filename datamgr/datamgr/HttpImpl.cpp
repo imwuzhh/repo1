@@ -690,11 +690,16 @@ BOOL HttpImpl::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL 
     // "http://localhost/EDoc2WebApi/api/Doc/FolderRead/DeleteFolderList?token=7c370032-078b-41df-bd1e-0ba5cdeb9976&intoRecycleBin=true&folderIds=562296484"
     // "http://localhost/EDoc2WebApi/api/Doc/FileRead/DeleteFileList?token=7c370032-078b-41df-bd1e-0ba5cdeb9976&intoRecycleBin=true&fileIds=562296484"
     wchar_t url [MaxUrlLength] = _T("");
-    wsprintf(url
-        , isFolder 
-        ?  _T("%s/EDoc2WebApi/api/Doc/FolderRead/DeleteFolderList?token=%s&intoRecycleBin=true&folderIds=%d")
-        :  _T("%s/EDoc2WebApi/api/Doc/FileRead/DeleteFileList?token=%s&intoRecycleBin=true&fileIds=%d")
-        , pArchive->context->service, pArchive->context->AccessToken, itemId.id);
+    if (itemId.category == PublicCat || itemId.category == PersonCat){
+        wsprintf(url
+            , isFolder 
+            ?  _T("%s/EDoc2WebApi/api/Doc/FolderRead/DeleteFolderList?token=%s&intoRecycleBin=true&folderIds=%d")
+            :  _T("%s/EDoc2WebApi/api/Doc/FileRead/DeleteFileList?token=%s&intoRecycleBin=true&fileIds=%d")
+            , pArchive->context->service, pArchive->context->AccessToken, itemId.id);
+    }else{
+        // Dummy for Recylebin/SearchBin
+        return TRUE;
+    }
 
     // {"$id":"1","FolderId":1,"AreaId":1,"ParentFolderId":1,"FolderCode":"[PublicRoot]","FolderSortOrder":0,"FolderName":"PublicRoot","FolderPath":"1","FolderNamePath":"PublicRoot","FolderSize":0,"FolderMaxFolderSize":0,"FolderAlertSize":0,"FolderMaxFileSize":0,"FolderForbiddenFileExtensions":null,"FolderChildFoldersCount":0,"FolderChildFilesCount":0,"SecurityLevelId":0,"FolderState":0,"FolderLockCount":0,"FolderCreateTime":"2009-05-20T20:45:39.937","FolderCreateOperator":0,"FolderModifyTime":"2009-05-20T20:45:39.937","FolderModifyOperator":0,"FolderArchiveTime":"0001-01-01T00:00:00","FolderArchiveOperator":0,"FolderCurVerId":0,"FolderNewestVerId":0,"FolderType":1,"FolderGuid":"97af3663-8793-45f5-a2c5-4f5ad537353f","FolderOwnerId":0,"IsDeleted":false,"FolderDeleteTime":"0001-01-01T00:00:00","FolderDeleteOperator":0,"FolderIsCascadeDelete":false,"RelativePath":"PublicRoot","IsArcFolder":false,"HasBoundStorageArea":false,"Children":null}
     std::wstring response;

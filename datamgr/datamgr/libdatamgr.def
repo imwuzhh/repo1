@@ -53,6 +53,9 @@ EXPORTS
 	DMSelectItems
 	DMFindChild
 	
+	DMRecover
+	DMClearRecycleBin
+	
 	DMMalloc
 	DMRealloc
 	DMFree

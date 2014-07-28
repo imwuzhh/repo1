@@ -345,6 +345,10 @@ HRESULT DMFindChild(TAR_ARCHIVE * pArchive, RemoteId parentId, LPCWSTR childName
 */
 HRESULT DMCheckMenu(TAR_ARCHIVE * pArchive, const wchar_t * idlist, MenuType * menudef);
 
+HRESULT DMRecover(TAR_ARCHIVE * pArchive, const wchar_t * idlist);
+
+HRESULT DMClearRecycleBin(TAR_ARCHIVE * pArchive);
+
 /**
 * Malloc memory from libdatamgr, as we use /MT to build, if you get memory from this module, free it with DMFree().
 * Parameters:

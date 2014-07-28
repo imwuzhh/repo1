@@ -926,3 +926,29 @@ HRESULT DMCheckMenu(TAR_ARCHIVE * pArchive, const wchar_t * idlist, MenuType * m
 
     return S_OK;
 }
+
+HRESULT DMRecover(TAR_ARCHIVE * pArchive, const wchar_t * idlist)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s() id=[%s]", __FUNCTION__, (const char *)CW2AEX<>(idlist, CP_UTF8));
+
+    if (!GetProto(pArchive)->Recover(pArchive, idlist)){
+        return S_FALSE;
+    }
+
+    return S_OK;
+}
+
+HRESULT DMClearRecycleBin(TAR_ARCHIVE * pArchive)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s()", __FUNCTION__);
+
+    if (!GetProto(pArchive)->ClearRecycleBin(pArchive)){
+        return S_FALSE;
+    }
+
+    return S_OK;
+}

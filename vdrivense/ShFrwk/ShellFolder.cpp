@@ -212,61 +212,7 @@ STDMETHODIMP CShellFolder::GetIDList(PIDLIST_ABSOLUTE* ppidl)
 STDMETHODIMP CShellFolder::ParseDisplayName(HWND hwnd, IBindCtx* pbc, PWSTR pszDisplayName, ULONG* pchEaten, PIDLIST_RELATIVE* ppidl, ULONG* pdwAttributes)
 {
    ATLTRACE(L"CShellFolder::ParseDisplayName  name='%ws' pbc=%p\n", pszDisplayName, pbc);
-   if( pchEaten != NULL ) *pchEaten = 0;
-   if( pszDisplayName == NULL ) pszDisplayName = L"";
-   // Parse URL Protocol?
-   if( _ShellModule.GetConfigBool(VFS_CAN_ROOT_URLPROTOCOL) ) {
-      static CComBSTR bstrUrlProtocol;
-      if( !bstrUrlProtocol ) bstrUrlProtocol.LoadString(IDS_NSE_URLPROTOCOL);
-      if( _wcsnicmp(pszDisplayName, bstrUrlProtocol, bstrUrlProtocol.Length()) == 0 && pszDisplayName[ bstrUrlProtocol.Length() ] == ':' ) {
-         pszDisplayName += bstrUrlProtocol.Length() + 1;
-         if( *pszDisplayName == '/' ) ++pszDisplayName;
-         if( *pszDisplayName == '/' ) ++pszDisplayName;
-      }
-   }
-   // Extract first component of display string (may be a path)
-   WCHAR wszComponent[MAX_PATH] = { 0 };
-   wcscpy_s(wszComponent, lengthof(wszComponent), pszDisplayName);
-   if( wcschr(wszComponent, '\\') != NULL ) *wcschr(wszComponent, '\\') = '\0';
-   LPWSTR pwstrNext = wcschr(pszDisplayName, '\\');
-   // Find the file from the parsing/editing name; we may not have refreshed the cache
-   // lately so a deleted file may or may not be found.
-   CNseItemPtr spItem;
-   m_spFolderItem->GetChild(wszComponent, SHGDN_FOREDITING, &spItem);
-   if( pbc != NULL && pwstrNext == NULL ) {
-      // During SaveAs dialog the Shell will eventually call us with
-      // binding option STGM_CREATE. Later the Shell might query IIdentityName
-      // for this item to get the real filename. Other STGM_XXX options are also
-      // possible when the Shell really requests a disk file.
-      BIND_OPTS Opts = { sizeof(Opts) };
-      if( SUCCEEDED( pbc->GetBindOptions(&Opts) ) ) {
-         HRESULT Hr = _ParseDisplayNameWithBind(spItem, pszDisplayName, pbc, Opts);
-         if( FAILED(Hr) ) return Hr;
-      }
-   }
-   if( spItem == NULL ) {
-      ATLTRACE(L"CShellFolder::ParseDisplayName - failed\n");
-      // An undocumented feature is that our IBindCtx::GetBindOptions() trick above
-      // only works if we return ERROR_FILE_NOT_FOUND for the regular query first.
-      return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
-   }
-   CPidl pidl = spItem->GetITEMID();
-   if( pwstrNext != NULL ) {
-      // There are more segments in the path...
-      CPidl pidlNext;
-      CComPtr<IShellFolder> spShellFolder;
-      HR( BindToObject(pidl, pbc, IID_PPV_ARGS(&spShellFolder)) );
-      HR( spShellFolder->ParseDisplayName(hwnd, pbc, ++pwstrNext, pchEaten, &pidlNext, pdwAttributes) );
-      if( pchEaten != NULL ) *pchEaten += 1;
-      pidl += pidlNext;
-   }
-   else {
-      // This is the last PIDL
-      if( pdwAttributes != NULL ) GetAttributesOf(1, (PCUITEMID_CHILD_ARRAY) &pidl.m_p, pdwAttributes);
-   }
-   if( pchEaten != NULL ) *pchEaten += (ULONG) wcslen(wszComponent);
-   *ppidl = pidl.Detach();
-   return S_OK;
+   ATLTRACENOTIMPL(_T("CShellFolder::ParseDisplayName"));
 }
 
 STDMETHODIMP CShellFolder::EnumObjects(HWND hwnd, SHCONTF grfFlags, IEnumIDList** ppEnumIDList)

@@ -798,6 +798,7 @@ BOOL HttpImpl::CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, c
 */
 BOOL HttpImpl::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * tempFile, const wchar_t * faceName)
 {
+    if (!DMHttpTransferIsEnable()) return FALSE;
     // Prepare upload id, used for query progress.
     wchar_t uploadidstring [100] = _T("");
     _stprintf_s(uploadidstring, lengthof(uploadidstring), _T("EDoc2_SWFUpload_%0u_0"), (int)time(NULL));
@@ -847,6 +848,7 @@ BOOL HttpImpl::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, con
 */
 BOOL HttpImpl::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * tempFile)
 {
+    if (!DMHttpTransferIsEnable()) return FALSE;
     // Prepare url.
     wchar_t url [MaxUrlLength] = _T("");
     _stprintf_s(url, lengthof(url)
@@ -877,14 +879,16 @@ BOOL HttpImpl::DownloadFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId, con
 
 BOOL HttpImpl::UploadFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentFolderId, const wchar_t * localPath)
 {
+    if (!DMHttpTransferIsEnable()) return FALSE;
     RemoteId retId; // Dummy implementation.
     return CreateFolder(pArchive, parentFolderId, wcsrchr(localPath, _T('\\')) + 1, &retId);
 }
 
 BOOL HttpImpl::DownloadFolder(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * localPath)
 {
+    if (!DMHttpTransferIsEnable()) return FALSE;
     // Dummy Implementation.
-    return S_FALSE;
+    return FALSE;
 }
 
 BOOL HttpImpl::Select(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL selected, BOOL isFolder)

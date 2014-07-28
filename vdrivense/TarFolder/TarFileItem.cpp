@@ -300,6 +300,8 @@ HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
    case ID_FILE_VIEWLOG:     return _ViewLog(Cmd);
    case ID_FILE_EXTEDIT:     return _ExtEdit(Cmd);
    case ID_FILE_SEARCH:      return _Search(Cmd);
+   case ID_FILE_RECOVER:     return _Recover(Cmd);
+   case ID_FILE_CLEAR_ALL:   return _ClearRecycleBin(Cmd);
    }
    return E_NOTIMPL;
 }
@@ -633,4 +635,17 @@ std::wstring CTarFileItem::GetSelectedIdList(VFS_MENUCOMMAND & Cmd)
         }
     }
     return idlist;
+}
+
+HRESULT CTarFileItem::_Recover(VFS_MENUCOMMAND & Cmd)
+{
+    std::wstring idlist = GetSelectedIdList(Cmd);
+    HR ( DMRecover(_GetTarArchivePtr(), idlist.c_str()));
+    return S_OK;
+}
+
+HRESULT CTarFileItem::_ClearRecycleBin(VFS_MENUCOMMAND & Cmd)
+{
+    HR ( DMClearRecycleBin(_GetTarArchivePtr()));
+    return S_OK;
 }

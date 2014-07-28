@@ -76,4 +76,8 @@ public:
     BOOL SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds);
 
     BOOL CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token);
+
+    BOOL Recover(TAR_ARCHIVE * pArchive, LPCWSTR itemIds);
+
+    BOOL ClearRecycleBin(TAR_ARCHIVE * pArchive);
 };

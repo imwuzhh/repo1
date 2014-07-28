@@ -13,7 +13,6 @@ public:
      
      virtual BOOL GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<VFS_FIND_DATA> & childFiles) = 0;
      
-     
      virtual BOOL GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<std::wstring> & columns, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount) = 0;
 
      virtual BOOL GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount) = 0;
@@ -134,4 +133,8 @@ public:
      * if available return TRUE, otherwise return FALSE.
      */
      virtual BOOL CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token) = 0;
+
+     virtual BOOL Recover(TAR_ARCHIVE * pArchive, LPCWSTR itemIds) = 0;
+
+     virtual BOOL ClearRecycleBin(TAR_ARCHIVE * pArchive) = 0;
 };

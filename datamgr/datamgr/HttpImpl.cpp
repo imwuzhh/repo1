@@ -1188,3 +1188,31 @@ BOOL HttpImpl::FindChild(TAR_ARCHIVE * pArchive, const RemoteId & parentId, cons
 
     return FileExists(pArchive, parentId, childName, childInfo) || FolderExists(pArchive, parentId, childName, childInfo);
 }
+
+BOOL HttpImpl::Recover(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
+{
+    return FALSE;
+}
+
+BOOL HttpImpl::ClearRecycleBin(TAR_ARCHIVE * pArchive)
+{
+    wchar_t url [MaxUrlLength] = _T("");
+    wsprintf(url
+        , _T("%s/edoc2v4/?token=%s")
+        , pArchive->context->service, pArchive->context->AccessToken);
+
+    // Prepare cookie.
+    std::wstring cookie = _T("");
+    cookie += _T("account=");  cookie += pArchive->context->username;    cookie += _T(";");
+    cookie += _T("tkn=");      cookie += pArchive->context->AccessToken; cookie += _T(";");
+    cookie += _T("token=");    cookie += pArchive->context->AccessToken; cookie += _T(";");
+
+    std::wstring sFormData = _T("<form>");
+        sFormData += _T("<input type='text' name='jueAction' value='postBack'></input>");
+        sFormData += _T("<input type='text' name='jueUid' value='webClient'></input>");
+        sFormData += _T("<input type='text' name='jueEvt' value='ClearRecycleBin'></input>");
+        sFormData += _T("</form>");
+    
+    std::stringstream strmResponse; 
+    return Utility::HttpPostForm(url, sFormData.c_str(), cookie, strmResponse, pArchive->context->HttpTimeoutMs);
+}

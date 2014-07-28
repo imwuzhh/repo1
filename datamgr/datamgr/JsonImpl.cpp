@@ -902,3 +902,13 @@ BOOL JsonImpl::FindChild(TAR_ARCHIVE * pArchive, const RemoteId & parentId, cons
     // TODO: Parse result and fill in contents of <childInfo>
     return TRUE;
 }
+
+BOOL JsonImpl::Recover(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
+{
+    return FALSE;
+}
+
+BOOL JsonImpl::ClearRecycleBin(TAR_ARCHIVE * pArchive)
+{
+    return FALSE;
+}

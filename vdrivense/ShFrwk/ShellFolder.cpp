@@ -1533,6 +1533,13 @@ HRESULT CShellFolder::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
          HRESULT Hr = spItem->ExecuteMenuCommand(Cmd);
          if( Hr != E_NOTIMPL ) HrRes = Hr;
          if( HrRes != S_OK ) break;
+         // HarryWu, 20140729
+         // Some operations(GUI present) should be batched.
+         if (Cmd.wMenuID == ID_FILE_SHARE) break;
+         if (Cmd.wMenuID == ID_FILE_VIEWLOG) break;
+         if (Cmd.wMenuID == ID_FILE_DISTRIBUTE) break;
+         if (Cmd.wMenuID == ID_FILE_INNERLINK) break;
+         if (Cmd.wMenuID == ID_FILE_OLDVERSION) break;
       }
    }
    // Any item can abort if they performed the entire operation alone

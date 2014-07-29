@@ -36,7 +36,7 @@
 
 
 #ifdef _DEBUG
-   #define HR(expr)  { HRESULT _hr; if(FAILED(_hr=(expr))) { _CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, NULL, #expr); _CrtDbgBreak(); return _hr; } }  
+   #define HR(expr)  { HRESULT _hr; if(FAILED(_hr=(expr))) { /*_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, NULL, #expr); _CrtDbgBreak();*/ return _hr; } }  
 #else
    #define HR(expr)  { HRESULT _hr; if(FAILED(_hr=(expr))) return _hr; }
 #endif // _DEBUG

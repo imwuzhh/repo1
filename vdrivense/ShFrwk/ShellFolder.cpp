@@ -1341,6 +1341,12 @@ HRESULT CShellFolder::BindToFolder(PCUITEMID_CHILD pidl, CRefPtr<CShellFolder>& 
       ATLTRACE(L"CShellFolder::BindToFolder - failed (SFGAO_FOLDER)\n");
       return E_INVALIDARG;
    }
+   VFS_FIND_DATA wfd = spItem->GetFindData();
+   if ( wfd.dwId.category == RecycleCat && wfd.dwId.id != RecycleId)
+   {
+       ATLTRACE(L"CShellFolder::BindToFolder - failed (Invalid Category)\n");
+       return E_INVALIDARG;
+   }
    // Initialize new folder object
    CComObject<CShellFolder>* pFolder = NULL;
    HR( CComObject<CShellFolder>::CreateInstance(&pFolder) );

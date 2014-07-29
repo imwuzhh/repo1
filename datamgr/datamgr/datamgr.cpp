@@ -904,6 +904,19 @@ HRESULT DMFindChild(TAR_ARCHIVE * pArchive, RemoteId parentId, LPCWSTR childName
 
     OUTPUTLOG("%s() parentId=[`%d:%d'], childName=`%s'", __FUNCTION__, parentId.category, parentId.id, (const char *)CW2A(childName ? childName : _T("")));
 
+    if (parentId.category != PublicCat && parentId.category != PersonCat){
+        lock.Unlock();
+        int totalPage = 0; VFS_FIND_DATA * pChild = NULL; int nChildCount = 0; ViewSettings vs;
+        HR (DMGetDocInfo(pArchive, parentId, MaxPageSize, 1, &totalPage, &vs, &pChild, &nChildCount));
+        for (int i = 0; i < nChildCount; i ++){
+            if (!wcscmp(pChild[i].cFileName, childName)){
+                *pInfo = pChild[i];break;
+            }
+        }
+        DMFree((LPBYTE)pChild);
+        return S_OK;
+    }
+
     if (!GetProto(pArchive)->FindChild(pArchive, parentId, childName, *pInfo))
         return E_FAIL;
 

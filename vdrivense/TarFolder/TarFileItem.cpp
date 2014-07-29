@@ -94,27 +94,22 @@ HRESULT CTarFileItem::GetChild(LPCWSTR pwstrName, SHGNO ParseType, CNseItem** pI
    HR( _GetIdQuick(m_pidlItem, &parentId));
 
    // HarryWu, 2014.6.5
-   // there are two different policy, directy call FileExists() to query, 
+   // there are two different policy, directly call FileExists() to query, 
    // or use Enum() api to get full list and then check it's presence.
-   if (DMFastCheckIsEnable() && parentId.id > 0){
-       VFS_FIND_DATA wfd = { 0 };
-       if (FAILED(DMFindChild(_GetTarArchivePtr(), parentId, pwstrName, &wfd)))
-           return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
-	   else{
-		   *pItem = GenerateChild(m_pFolder, m_pidlFolder, wfd);
-		   return S_OK;
-	   }
-   }else{
-       return CNseBaseItem::GetChild(pwstrName, ParseType, pItem); 
+   VFS_FIND_DATA wfd = { 0 };
+   if (FAILED(DMFindChild(_GetTarArchivePtr(), parentId, pwstrName, &wfd)))
+       return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
+   else{
+	   *pItem = GenerateChild(m_pFolder, m_pidlFolder, wfd);
+	   return S_OK;
    }
-
    return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
 }
 
 /**
  * Retrieve the list of children of the current folder item.
  */
-HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aItems, BOOL paged)
+HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aItems)
 {
    // Only directories have sub-items
    if( !IsFolder() ) return E_HANDLE;
@@ -140,7 +135,7 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    DWORD dwTotalPage = 0;
    ViewSettings vs; memset(&vs, 0, sizeof(vs));
 
-   if (paged && dwPageSize){
+   if (dwPageSize){
        if (dwId.category != VdriveCat){
            /*HR*/ (DMGetCurrentPageNumber(_GetTarArchivePtr(), dwId, &dwCurrPage));
        }

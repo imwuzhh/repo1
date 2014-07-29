@@ -99,7 +99,7 @@ public:
    CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const VFS_FIND_DATA & wfd);
 
    HRESULT GetChild(LPCWSTR pstrName, SHGNO ParseType, CNseItem** pItem);
-   HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aList, BOOL paged);
+   HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aList);
    
    HRESULT GetStream(const VFS_STREAM_REASON& Reason, CNseFileStream** ppFile);
 

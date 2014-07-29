@@ -134,12 +134,13 @@ STDMETHODIMP CEnumIDList::Clone(IEnumIDList** ppEnum)
 HRESULT CEnumIDList::_PopulateList()
 {
    ATLASSERT(m_pidl.IsNull());
+   if (!IsBitSet(m_grfFlags, SHCONTF_FLATLIST)) return S_OK;
    // HarryWu, 2014.6.5
    // Can not known the caller's context, two cases:
    // 1) list paged items to populate view;
    // 2) get all children for storage operations etc.
    // support page feature by default, storage operations will be posted to external exe.
-   HRESULT Hr = m_spFolder->m_spFolderItem->EnumChildren(m_hWnd, m_grfFlags, m_aChildren, TRUE);
+   HRESULT Hr = m_spFolder->m_spFolderItem->EnumChildren(m_hWnd, m_grfFlags, m_aChildren);
    ATLASSERT(Hr==S_OK || Hr==E_PENDING);
    if( Hr != S_OK && Hr != E_PENDING ) return Hr;
    for( int i = 0; i < m_aChildren.GetSize(); i++ ) m_pidl.Append( m_aChildren[i]->GetITEMID() );

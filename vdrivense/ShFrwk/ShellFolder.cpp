@@ -949,7 +949,7 @@ STDMETHODIMP CShellFolder::EnumElements(DWORD reserved1, LPVOID reserved2, DWORD
    *ppenum = NULL;
    if( !_ShellModule.GetConfigBool(VFS_HAVE_VIRTUAL_FILES) ) return E_NOTIMPL;
    CNseItemArray aChildren;
-   HR( m_spFolderItem->EnumChildren(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS | SHCONTF_STORAGE, aChildren, FALSE) );
+   HR( m_spFolderItem->EnumChildren(NULL, SHCONTF_FOLDERS | SHCONTF_NONFOLDERS | SHCONTF_STORAGE, aChildren) );
    CSimpleArray<STATSTG> aList;
    for( int i = 0; i < aChildren.GetSize(); i++ ) {
       const VFS_FIND_DATA wfd = aChildren[i]->GetFindData();

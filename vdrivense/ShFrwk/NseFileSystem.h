@@ -246,7 +246,7 @@ public:
    virtual CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const VFS_FIND_DATA & wfd) = 0;
 
    virtual HRESULT GetChild(LPCWSTR pstrName, SHGNO ParseType, CNseItem** pItem) = 0;
-   virtual HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleArray<CNseItem*>& aList, BOOL paged) = 0;
+   virtual HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleArray<CNseItem*>& aList) = 0;
    virtual HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, HANDLE hAsync, ADDENUMOBJECTCB fnCallback) = 0;
 
    // Item data support
@@ -345,7 +345,7 @@ public:
    CNseItem* GenerateChild(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, const VFS_FIND_DATA & wfd);
 
    HRESULT GetChild(LPCWSTR pstrName, SHGNO ParseType, CNseItem** pItem);
-   HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aList, BOOL paged);
+   HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValArray<CNseItem*>& aList);
    HRESULT EnumChildren(HWND hwndOwner, SHCONTF grfFlags, HANDLE hAsync, ADDENUMOBJECTCB fnCallback);
 
    PCITEMID_CHILD GetITEMID();

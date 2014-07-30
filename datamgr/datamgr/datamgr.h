@@ -73,7 +73,6 @@ typedef unsigned __int64   MenuType;
 #define MenuDef_Rename       (0x0000000000010000)
 #define MenuDef_TrashClear	 (0x0000000000020000)
 #define MenuDef_TrashRestore (0x0000000000040000)
-
 #define MenuDef_AllRemoved   (0x0000000000000000)
 #define MenuDef_AllSelected  (0xffffFFFFffffFFFF)
 

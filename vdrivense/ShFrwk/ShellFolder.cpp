@@ -1677,7 +1677,9 @@ HRESULT CShellFolder::_RefineUserMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHIL
 	if (!IsBitSet(selectedMenus, MenuDef_OldVersion)) ::RemoveMenu(hMenu, ID_FILE_OLDVERSION, MF_BYCOMMAND);
 	if (!IsBitSet(selectedMenus, MenuDef_Viewlog)) ::RemoveMenu(hMenu, ID_FILE_VIEWLOG, MF_BYCOMMAND);
 	if (!IsBitSet(selectedMenus, MenuDef_ExtEdit)) ::RemoveMenu(hMenu, ID_FILE_EXTEDIT, MF_BYCOMMAND); 
-	if (!IsBitSet(selectedMenus, MenuDef_Properties)) ::RemoveMenu(hMenu, ID_FILE_PROPERTIES, MF_BYCOMMAND); 
+    if (!IsBitSet(selectedMenus, MenuDef_Properties)) ::RemoveMenu(hMenu, ID_FILE_PROPERTIES, MF_BYCOMMAND); 
+    if (!IsBitSet(selectedMenus, MenuDef_TrashRestore)) ::RemoveMenu(hMenu, ID_FILE_RECOVER, MF_BYCOMMAND); 
+    if (!IsBitSet(selectedMenus, MenuDef_TrashClear)) ::RemoveMenu(hMenu, ID_FILE_CLEAR_ALL, MF_BYCOMMAND); 
 
 	if (!DMHttpTransferIsEnable()){
 		::RemoveMenu(hMenu, ID_FILE_PREV, MF_BYCOMMAND); 

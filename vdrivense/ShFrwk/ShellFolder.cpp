@@ -1720,7 +1720,8 @@ HRESULT CShellFolder::_RefineShellMenuItems(HMENU hMenu, IDataObject * pDataObje
 	}
 
 	if (!IsBitSet(selectedMenus, MenuDef_Properties)) ::RemoveMenu(hMenu, SYSTEM_CMDID_PROPERTIES, MF_BYCOMMAND); 
-	if (!IsBitSet(selectedMenus, MenuDef_Cut)) ::RemoveMenu(hMenu, SYSTEM_CMDID_CUT, MF_BYCOMMAND); 
+    if (!IsBitSet(selectedMenus, MenuDef_Copy)) ::RemoveMenu(hMenu, SYSTEM_CMDID_COPY, MF_BYCOMMAND); 
+    if (!IsBitSet(selectedMenus, MenuDef_Cut)) ::RemoveMenu(hMenu, SYSTEM_CMDID_CUT, MF_BYCOMMAND); 
 	if (!IsBitSet(selectedMenus, MenuDef_Delete)) ::RemoveMenu(hMenu, SYSTEM_CMDID_DELETE, MF_BYCOMMAND); 
 	if (!IsBitSet(selectedMenus, MenuDef_Rename)) ::RemoveMenu(hMenu, SYSTEM_CMDID_RENAME, MF_BYCOMMAND); 
 	return S_OK;

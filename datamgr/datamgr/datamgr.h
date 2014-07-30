@@ -40,7 +40,8 @@ enum {
 	SYSTEM_CMDID_PROPERTIES = 30996,
 	SYSTEM_CMDID_DELETE    =  30994,
 	SYSTEM_CMDID_RENAME    =  30995,
-	SYSTEM_CMDID_CUT       =  31001,
+    SYSTEM_CMDID_CUT       =  31001,
+    SYSTEM_CMDID_COPY      =  31002,
 };
 
 struct RemoteId {
@@ -73,6 +74,7 @@ typedef unsigned __int64   MenuType;
 #define MenuDef_Rename       (0x0000000000010000)
 #define MenuDef_TrashClear	 (0x0000000000020000)
 #define MenuDef_TrashRestore (0x0000000000040000)
+#define MenuDef_Copy         (0x0000000000080000)
 #define MenuDef_AllRemoved   (0x0000000000000000)
 #define MenuDef_AllSelected  (0xffffFFFFffffFFFF)
 

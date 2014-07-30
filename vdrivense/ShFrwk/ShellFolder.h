@@ -83,6 +83,7 @@ public:
 	  MESSAGE_HANDLER(SFVM_GETNOTIFY, OnGetNotify)
 	  MESSAGE_HANDLER(SFVM_SIZE, OnSize)
       MESSAGE_HANDLER(SFVM_WINDOWCLOSING, OnWindowClosing)
+      MESSAGE_HANDLER(SFVM_COLUMNCLICK, OnColumnClick)
    END_MSG_MAP()
 
    DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -222,6 +223,7 @@ public:
    LRESULT OnUpdateObject(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);   
    LRESULT OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
    LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+   LRESULT OnColumnClick(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
    // Operations
 

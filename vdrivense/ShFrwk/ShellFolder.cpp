@@ -1239,6 +1239,12 @@ LRESULT CShellFolder::OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, B
     return S_OK;
 }
 
+LRESULT CShellFolder::OnColumnClick(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+    return S_OK;
+}
+
+
 LRESULT CShellFolder::OnGetNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
    // Tell the Shell we want to receive Change Notifications for our folder.
@@ -1657,7 +1663,7 @@ HRESULT CShellFolder::_RefineUserMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHIL
         m_spFolderItem->SelectMenuItems(idstring.c_str(), &selectedMenus);
     }
 
-	if (!IsBitSet(selectedMenus, MenuDef_OpenFile)) ::RemoveMenu(hMenu, ID_FILE_SHARE, MF_BYCOMMAND);
+	if (!IsBitSet(selectedMenus, MenuDef_OpenFile)) ::RemoveMenu(hMenu, ID_FILE_OPEN, MF_BYCOMMAND);
 	if (!IsBitSet(selectedMenus, MenuDef_DownloadFile)) ::RemoveMenu(hMenu, ID_FILE_EXTRACT, MF_BYCOMMAND);
 	if (!IsBitSet(selectedMenus, MenuDef_NewFolder)) ::RemoveMenu(hMenu, ID_FILE_NEWFOLDER, MF_BYCOMMAND);
 	if (!IsBitSet(selectedMenus, MenuDef_Properties)) ::RemoveMenu(hMenu, ID_FILE_PROPERTIES, MF_BYCOMMAND);

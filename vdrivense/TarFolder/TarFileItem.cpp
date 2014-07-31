@@ -276,7 +276,7 @@ HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
    switch( Cmd.wMenuID ) {
    case ID_FILE_PREVIEW:     return _PreviewFile(GetITEMID());
    case ID_FILE_OPEN:        return LoadAndLaunchFile(Cmd.hWnd, m_pFolder, GetITEMID());
-   case ID_FILE_EXTRACT:     return _ExtractToFolder(Cmd);
+   case ID_FILE_EXTRACT:     //return _ExtractToFolder(Cmd);
    case ID_COMMAND_EXTRACT:  return _ExtractToFolder(Cmd);
    case DFM_CMD_PASTE:       return _DoPasteFiles(Cmd);
    case DFM_CMD_NEWFOLDER:   //return _DoNewFolder(Cmd, IDS_NEWFOLDER);
@@ -385,7 +385,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
     // http://msdn.microsoft.com/en-us/library/windows/desktop/dd318066(v=vs.85).aspx
     if (!DMHttpTransferIsEnable())
     {
-        RemoteId ItemId; _GetIdQuick(m_pidlItem, &ItemId);
+        RemoteId DestId; _GetIdQuick(m_pidlItem, &DestId);
 
 		FORMATETC fmtec; 
 		fmtec.cfFormat = CF_HDROP;
@@ -421,7 +421,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 				}
 				// HarryWu, 2014.3.14
 				// Post task to external tool
-				DMUpload(_GetTarArchivePtr(), szFullPath, *(RemoteId *)&ItemId, Cmd.dwDropEffect == DROPEFFECT_MOVE );			
+				DMUpload(_GetTarArchivePtr(), szFullPath, DestId, IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE) );
 				strFileList += szFullPath; strFileList += _T(";");
 				free(szFullPath);
 			}
@@ -430,7 +430,27 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 			FILEGROUPDESCRIPTOR * pFgd = (FILEGROUPDESCRIPTOR *)GlobalLock(medium.hGlobal);
 			for (int i = 0; i < pFgd->cItems; i ++){
 				std::wstring filepath = pFgd->fgd[i].cFileName;
-				OUTPUTLOG("%s(), file=%s", __FUNCTION__, (const char *)(CW2A(filepath.c_str())));
+                OUTPUTLOG("%s(), Action=[%s], Source=[{%d.%d}:{%d.%d}:{%s}], Dest=[%d.%d:{%s}]", __FUNCTION__
+                    , IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE) ? "Move" : "Copy"
+                    , pFgd->fgd[i].pointl.x
+                    , pFgd->fgd[i].pointl.y
+                    , pFgd->fgd[i].sizel.cx
+                    , pFgd->fgd[i].sizel.cy
+                    , (const char *)(CW2A(filepath.c_str()))
+                    , m_pWfd->dwId.category
+                    , m_pWfd->dwId.id
+                    , (const char *)CW2A(m_pWfd->cFileName));
+                
+                // HarryWu, 2014.7.31
+                // Cut with Same origin
+                if (pFgd->fgd[i].pointl.x == m_pWfd->dwId.category 
+                    && pFgd->fgd[i].pointl.y == m_pWfd->dwId.id
+                    && IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE)){
+                    OUTPUTLOG("%s(), Cut with Same Origin, ignore it.");
+                }else{
+                    RemoteId srcId = {pFgd->fgd[i].sizel.cx, pFgd->fgd[i].sizel.cy};
+                    DMMove(_GetTarArchivePtr(), srcId, DestId, IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE) );
+                }
 			}
 			GlobalUnlock(medium.hGlobal);
 		}
@@ -636,11 +656,13 @@ HRESULT CTarFileItem::_Recover(VFS_MENUCOMMAND & Cmd)
 {
     std::wstring idlist = GetSelectedIdList(Cmd);
     HR ( DMRecover(_GetTarArchivePtr(), idlist.c_str()));
+    _RefreshFolderView();
     return S_OK;
 }
 
 HRESULT CTarFileItem::_ClearRecycleBin(VFS_MENUCOMMAND & Cmd)
 {
     HR ( DMClearRecycleBin(_GetTarArchivePtr()));
+    _RefreshFolderView();
     return S_OK;
 }

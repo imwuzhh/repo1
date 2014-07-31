@@ -200,6 +200,19 @@ HRESULT CDataObject::_CollectFiles(IShellFolder* pShellFolder, PCIDLIST_RELATIVE
       if( IsFileTimeValid(wfd.ftLastWriteTime) ) fd.ftLastWriteTime = wfd.ftLastWriteTime, fd.dwFlags |= FD_WRITESTIME;
       if( IsFileTimeValid(wfd.ftLastAccessTime) ) fd.ftLastAccessTime = wfd.ftLastAccessTime, fd.dwFlags |= FD_ACCESSTIME;
       fd.dwFileAttributes = wfd.dwFileAttributes;
+
+      // Setup item info into <sizel>
+      NSEFILEPIDLDATA * pNseInfo = (NSEFILEPIDLDATA *)pidlItem.GetItem(0);
+      if (pNseInfo && pNseInfo->magic == TARFILE_MAGIC_ID && pNseInfo->cb == sizeof(NSEFILEPIDLDATA)){
+            fd.sizel.cx = pNseInfo->wfd.dwId.category; fd.sizel.cy = pNseInfo->wfd.dwId.id;
+      }      
+
+	  // Setup parent info into <pointl>
+      if (m_spFolder && m_spFolder->m_spFolderItem){
+            VFS_FIND_DATA vfd = m_spFolder->m_spFolderItem->GetFindData();
+            fd.pointl.x = vfd.dwId.category; fd.pointl.y = vfd.dwId.id;
+      }      
+
       if( !m_aFiles.Add(fd) ) return E_OUTOFMEMORY;
 
       // Recurse into sub-folders...

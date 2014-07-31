@@ -1348,7 +1348,7 @@ HRESULT CShellFolder::BindToFolder(PCUITEMID_CHILD pidl, CRefPtr<CShellFolder>& 
       return E_INVALIDARG;
    }
    VFS_FIND_DATA wfd = spItem->GetFindData();
-   if ( wfd.dwId.category == RecycleCat && wfd.dwId.id != RecycleId)
+   if ( wfd.dwId.category == RecycleCat && wfd.dwId.id != RecycleId || wfd.dwId.category == SearchCat && wfd.dwId.id != SearchId)
    {
        ATLTRACE(L"CShellFolder::BindToFolder - failed (Invalid Category)\n");
        return E_INVALIDARG;

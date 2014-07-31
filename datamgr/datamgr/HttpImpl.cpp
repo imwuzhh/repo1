@@ -645,9 +645,9 @@ BOOL HttpImpl::GetPagedSearchResults(TAR_ARCHIVE * pArchive, const std::wstring 
     // http://192.168.253.242/api/api/files/Search?token=9c5323a6-dab1-4704-8703-4dbae644bfa7&pageNum=1&pageSize=50&searchKey=test
     for (int i = 0; i < PageSize; i ++){
         VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
-        rfd.dwId.category = VdriveCat;
+        rfd.dwId.category = SearchCat;
         rfd.dwId.id = 0;
-        swprintf_s(rfd.cFileName, lengthof(rfd.cFileName), _T("%s-%04d-%04d")
+        swprintf_s(rfd.cFileName, lengthof(rfd.cFileName), _T("Key[%s]-Page[%04d]-Item[%04d]")
             , query.c_str(), PageNo, i);
         rfd.dwFileAttributes = (i % 2) ? FILE_ATTRIBUTE_NORMAL : FILE_ATTRIBUTE_DIRECTORY;
         children.push_back(rfd);

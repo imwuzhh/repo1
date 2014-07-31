@@ -337,8 +337,8 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
     Json::Reader reader; 
     if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
         // Parse Folder array
-        Json::Value _fodersInfo = root.get("_foldersInfo", "");
-        if (!_fodersInfo.asString().empty()){
+        if (root.isMember("_foldersInfo")){
+            Json::Value _fodersInfo = root.get("_foldersInfo", "");
             for (size_t index = 0; index < _fodersInfo.size(); index ++){
                 VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
@@ -383,8 +383,8 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
             }
         }
         // Parse Files array
-        Json::Value _filesInfo = root.get("_filesInfo", "");
-        if (!_filesInfo.asString().empty()){
+        if (root.isMember("_filesInfo")){
+            Json::Value _filesInfo = root.get("_filesInfo", "");
             for (size_t index = 0; index < _filesInfo.size(); index ++){
                 VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
@@ -432,8 +432,8 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
             }
         }
         // Parse _settings.
-        Json::Value _settings = root.get("_settings", "");
-        if (!_settings.asString().empty()){
+        if (root.isMember("_settings")){
+            Json::Value _settings = root.get("_settings", "");
             Json::Value JsonTotalCount = _settings.get("totalCount", 0);
             int itemCount = 0;
             if (!JsonTotalCount.empty()){
@@ -446,9 +446,10 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
         }
 
         // Parse _infoItems
-        Json::Value _infoItems = root.get("_infoItems", "");
-        if (!_infoItems.asString().empty() && _infoItems.isArray()){
-            for (size_t i = 0; i < _infoItems.size(); i++)
+
+        if (root.isMember("_infoItems")){
+            Json::Value _infoItems = root.get("_infoItems", "");
+            for (size_t i = 0; _infoItems.isArray() && i < _infoItems.size(); i++)
             {
                 Json::Value item = _infoItems[i].get("_title", "");
                 if (!item.empty()){
@@ -530,8 +531,8 @@ BOOL HttpImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_D
     Json::Reader reader; 
     if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
         // Parse Folder array
-        Json::Value _fodersInfo = root.get("folders", "");
-        if (!_fodersInfo.asString().empty()){
+        if (root.isMember("folders")){
+            Json::Value _fodersInfo = root.get("folders", "");
             for (size_t index = 0; index < _fodersInfo.size(); index ++){
                 VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
@@ -576,8 +577,8 @@ BOOL HttpImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_D
             }
         }
         // Parse Files array
-        Json::Value _filesInfo = root.get("files", "");
-        if (!_filesInfo.asString().empty()){
+        if (root.isMember("files")){
+            Json::Value _filesInfo = root.get("files", "");
             for (size_t index = 0; index < _filesInfo.size(); index ++){
                 VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
@@ -837,10 +838,12 @@ BOOL HttpImpl::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, con
     Json::Value root;
     Json::Reader reader; 
     if (reader.parse((const char *)CW2A(strresponse.c_str()), root, false)){
-        Json::Value tag = root.get("tag", "");
-        if (tag.asString().empty()) return FALSE;
-        std::string tagstr = tag.asString();
-        int fileId = atoi(strchr(tagstr.c_str(), '|') + 1);
+        if (root.isMember("tag")){
+            Json::Value tag = root.get("tag", "");
+        	if (tag.asString().empty()) return FALSE;
+            std::string tagstr = tag.asString();
+            int fileId = atoi(strchr(tagstr.c_str(), '|') + 1);
+        }
     }
 
     return TRUE;

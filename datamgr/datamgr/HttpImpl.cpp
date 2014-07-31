@@ -338,7 +338,7 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
     if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
         // Parse Folder array
         Json::Value _fodersInfo = root.get("_foldersInfo", "");
-        if (!_fodersInfo.empty()){
+        if (!_fodersInfo.asString().empty()){
             for (size_t index = 0; index < _fodersInfo.size(); index ++){
                 VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
@@ -384,7 +384,7 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
         }
         // Parse Files array
         Json::Value _filesInfo = root.get("_filesInfo", "");
-        if (!_filesInfo.empty()){
+        if (!_filesInfo.asString().empty()){
             for (size_t index = 0; index < _filesInfo.size(); index ++){
                 VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
@@ -433,7 +433,7 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
         }
         // Parse _settings.
         Json::Value _settings = root.get("_settings", "");
-        if (!_settings.empty()){
+        if (!_settings.asString().empty()){
             Json::Value JsonTotalCount = _settings.get("totalCount", 0);
             int itemCount = 0;
             if (!JsonTotalCount.empty()){
@@ -447,7 +447,7 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, std
 
         // Parse _infoItems
         Json::Value _infoItems = root.get("_infoItems", "");
-        if (!_infoItems.empty() && _infoItems.isArray()){
+        if (!_infoItems.asString().empty() && _infoItems.isArray()){
             for (size_t i = 0; i < _infoItems.size(); i++)
             {
                 Json::Value item = _infoItems[i].get("_title", "");
@@ -531,7 +531,7 @@ BOOL HttpImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_D
     if (reader.parse((const char *)CW2A(response.c_str()), root, false)){
         // Parse Folder array
         Json::Value _fodersInfo = root.get("folders", "");
-        if (!_fodersInfo.empty()){
+        if (!_fodersInfo.asString().empty()){
             for (size_t index = 0; index < _fodersInfo.size(); index ++){
                 VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
@@ -577,7 +577,7 @@ BOOL HttpImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_D
         }
         // Parse Files array
         Json::Value _filesInfo = root.get("files", "");
-        if (!_filesInfo.empty()){
+        if (!_filesInfo.asString().empty()){
             for (size_t index = 0; index < _filesInfo.size(); index ++){
                 VFS_FIND_DATA rfd; memset(&rfd, 0, sizeof(rfd));
 
@@ -838,7 +838,7 @@ BOOL HttpImpl::UploadFile(TAR_ARCHIVE * pArchive, const RemoteId & parentId, con
     Json::Reader reader; 
     if (reader.parse((const char *)CW2A(strresponse.c_str()), root, false)){
         Json::Value tag = root.get("tag", "");
-        if (tag.empty()) return FALSE;
+        if (tag.asString().empty()) return FALSE;
         std::string tagstr = tag.asString();
         int fileId = atoi(strchr(tagstr.c_str(), '|') + 1);
     }

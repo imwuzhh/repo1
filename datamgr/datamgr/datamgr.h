@@ -350,6 +350,8 @@ HRESULT DMRecover(TAR_ARCHIVE * pArchive, const wchar_t * idlist);
 
 HRESULT DMClearRecycleBin(TAR_ARCHIVE * pArchive);
 
+HRESULT DMMove(TAR_ARCHIVE * pArchive, RemoteId srcId, RemoteId destFolderId, BOOL fRemoveSource);
+
 /**
 * Malloc memory from libdatamgr, as we use /MT to build, if you get memory from this module, free it with DMFree().
 * Parameters:

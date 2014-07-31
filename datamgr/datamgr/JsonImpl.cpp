@@ -912,3 +912,8 @@ BOOL JsonImpl::ClearRecycleBin(TAR_ARCHIVE * pArchive)
 {
     return FALSE;
 }
+
+BOOL JsonImpl::Move(TAR_ARCHIVE * pArchive, const RemoteId & srcId, const RemoteId & destId, BOOL fRemoveSource)
+{
+    return FALSE;
+}

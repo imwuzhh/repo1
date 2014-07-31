@@ -137,4 +137,6 @@ public:
      virtual BOOL Recover(TAR_ARCHIVE * pArchive, LPCWSTR itemIds) = 0;
 
      virtual BOOL ClearRecycleBin(TAR_ARCHIVE * pArchive) = 0;
+
+     virtual BOOL Move(TAR_ARCHIVE * pArchive, const RemoteId & srcId, const RemoteId & destId, BOOL fRemoveSource) = 0;
 };

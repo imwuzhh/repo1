@@ -965,3 +965,16 @@ HRESULT DMClearRecycleBin(TAR_ARCHIVE * pArchive)
 
     return S_OK;
 }
+
+HRESULT DMMove(TAR_ARCHIVE * pArchive, RemoteId srcId, RemoteId destFolderId, BOOL fRemoveSource)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s([%d.%d]->[%d.%d], %s)", __FUNCTION__, srcId.category, srcId.id, destFolderId.category, destFolderId.id, fRemoveSource ? "Move" : "Copy" );
+
+    if (!GetProto(pArchive)->Move(pArchive, srcId, destFolderId, fRemoveSource)){
+        return S_FALSE;
+    }
+
+    return S_OK;
+}

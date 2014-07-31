@@ -56,6 +56,8 @@ EXPORTS
 	DMRecover
 	DMClearRecycleBin
 	
+	DMMove
+	
 	DMMalloc
 	DMRealloc
 	DMFree

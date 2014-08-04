@@ -320,7 +320,7 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int Pag
 {
     OUTPUTLOG("%s(), RemoteId={%d, %d}", __FUNCTION__, dwId.category, dwId.id);
     *retList = NULL; *nListCount = 0;
-    // TODO, not implemented for root/search/recycle, use default NON-PAGED version.
+    // not implemented for root, use default NON-PAGED version.
     if (dwId.category == VdriveCat){
         HR(DMGetRootChildren(pArchive, dwId, retList, nListCount));
         *totalPage = 1;
@@ -623,13 +623,13 @@ HRESULT DMPreviewFile(TAR_ARCHIVE * pArchive, RemoteId itemId)
     return S_OK;
 }
 
-HRESULT DMOnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+HRESULT DMOnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd, DWORD dwCat, DWORD dwId)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-    OUTPUTLOG("%s() shellViewWnd=[%p]", __FUNCTION__, shellViewWnd);
+    OUTPUTLOG("%s() shellViewWnd=[%p], Cat=%d, id=%d", __FUNCTION__, shellViewWnd, dwCat, dwId);
 
-    if (!GetProto(pArchive)->OnShellViewCreated(pArchive, shellViewWnd))
+    if (!GetProto(pArchive)->OnShellViewCreated(pArchive, shellViewWnd, dwCat, dwId))
         return S_FALSE;
 
     return S_OK;

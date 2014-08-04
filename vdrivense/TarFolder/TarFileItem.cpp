@@ -488,9 +488,9 @@ HRESULT CTarFileItem::_PreviewFile( PCITEMID_CHILD pidl)
 	return S_OK;
 }
 
-HRESULT CTarFileItem::OnShellViewCreated(HWND shellViewWnd)
+HRESULT CTarFileItem::OnShellViewCreated(HWND shellViewWnd, DWORD dwCat, DWORD dwId)
 {
-    if (!DMOnShellViewCreated(_GetTarArchivePtr(), shellViewWnd))
+    if (!DMOnShellViewCreated(_GetTarArchivePtr(), shellViewWnd, dwCat, dwId))
         return S_FALSE;
 
     return S_OK;

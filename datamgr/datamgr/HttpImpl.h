@@ -43,7 +43,7 @@ public:
 
      BOOL PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId);
 
-     BOOL OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
+     BOOL OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd, DWORD dwCat, DWORD dwId);
 
      BOOL OnShellViewSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
 

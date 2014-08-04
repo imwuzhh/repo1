@@ -272,7 +272,7 @@ HRESULT DMPreviewFile(TAR_ARCHIVE * pArchive, RemoteId itemId);
 * [pArchive] context handle
 * [shellViewWnd] window handle of shell view window
 */
-HRESULT DMOnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd);
+HRESULT DMOnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd, DWORD dwCat, DWORD dwId);
 
 /**
 * Notify about refresh of shell view window

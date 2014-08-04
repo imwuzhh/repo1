@@ -76,7 +76,7 @@ public:
 
      virtual BOOL PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId) = 0;
 
-     virtual BOOL OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd) = 0;
+     virtual BOOL OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd, DWORD dwCat, DWORD dwId) = 0;
 
      virtual BOOL OnShellViewSized(TAR_ARCHIVE * pArchive, HWND shellViewWnd) = 0;
 

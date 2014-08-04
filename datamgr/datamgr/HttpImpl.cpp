@@ -917,7 +917,7 @@ BOOL HttpImpl::PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
     return TRUE;
 }
 
-BOOL HttpImpl::OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+BOOL HttpImpl::OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd, DWORD dwCat, DWORD dwId)
 {
     return FALSE;
 }

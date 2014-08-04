@@ -478,7 +478,7 @@ BOOL JsonImpl::PreviewFile(TAR_ARCHIVE * pArchive, const RemoteId & itemId)
     return TRUE;
 }
 
-BOOL JsonImpl::OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
+BOOL JsonImpl::OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd, DWORD dwCat, DWORD dwId)
 {
     Json::StyledWriter writer;
     Json::Value  root;
@@ -491,6 +491,8 @@ BOOL JsonImpl::OnShellViewCreated(TAR_ARCHIVE * pArchive, HWND shellViewWnd)
     Json::Value parameters; 
     // In windows, window handle is global handle of x-processes.
     parameters["WindowHandle"] = (int)shellViewWnd;
+    parameters["FolderCat"] = (int)dwCat;
+    parameters["FolderId"] = (int)dwId;
 
     root ["Params"] = parameters;
     std::string jsonString = writer.write(root);

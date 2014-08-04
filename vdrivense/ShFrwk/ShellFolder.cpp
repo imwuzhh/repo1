@@ -1214,7 +1214,7 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 
     m_spFolderItem->InitCustomColumns();
 
-    m_spFolderItem->OnShellViewCreated(hWnd);
+    m_spFolderItem->OnShellViewCreated(hWnd, m_spFolderItem->GetFindData().dwId.category, m_spFolderItem->GetFindData().dwId.id);
 
     if (s_lock == NULL) {
         s_lock = new CRITICAL_SECTION; InitializeCriticalSection(s_lock);

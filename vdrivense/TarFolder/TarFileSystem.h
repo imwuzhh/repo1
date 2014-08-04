@@ -107,7 +107,7 @@ public:
    HRESULT Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName);
    HRESULT Delete();
    HRESULT OnSelected(BOOL isSelected);
-   HRESULT OnShellViewCreated(HWND shellViewWnd);
+   HRESULT OnShellViewCreated(HWND shellViewWnd, DWORD dwCat, DWORD dwId);
    HRESULT OnShellViewRefreshed(HWND shellViewWnd);
    HRESULT OnShellViewSized(HWND shellViewWnd);
    HRESULT OnShellViewClosing(HWND shellViewWnd);

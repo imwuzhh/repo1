@@ -480,7 +480,7 @@ HRESULT CNseBaseItem::OnSelected(BOOL isSelected)
     return E_NOTIMPL;
 }
 
-HRESULT CNseBaseItem::OnShellViewCreated(HWND shellViewWnd)
+HRESULT CNseBaseItem::OnShellViewCreated(HWND shellViewWnd, DWORD dwCat, DWORD dwId)
 {
     return E_NOTIMPL;
 }

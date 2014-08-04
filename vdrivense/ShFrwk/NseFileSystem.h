@@ -268,7 +268,7 @@ public:
    virtual HRESULT Delete() = 0;
    virtual HRESULT Refresh(VFS_REFRESH Reason) = 0;
    virtual HRESULT OnSelected(BOOL isSelected) = 0;
-   virtual HRESULT OnShellViewCreated(HWND shellViewWnd) = 0;
+   virtual HRESULT OnShellViewCreated(HWND shellViewWnd, DWORD dwCat, DWORD dwId) = 0;
    virtual HRESULT OnShellViewRefreshed(HWND shellViewWnd) = 0;
    virtual HRESULT OnShellViewSized(HWND shellViewWnd) = 0;
    virtual HRESULT OnShellViewClosing(HWND shellViewWnd) = 0;
@@ -362,7 +362,7 @@ public:
    HRESULT Delete();
    HRESULT Refresh(VFS_REFRESH Reason);
    HRESULT OnSelected(BOOL isSelected);
-   HRESULT OnShellViewCreated(HWND shellViewWnd);
+   HRESULT OnShellViewCreated(HWND shellViewWnd, DWORD dwCat, DWORD dwId);
    HRESULT OnShellViewRefreshed(HWND shellViewWnd);
    HRESULT OnShellViewSized(HWND shellViewWnd);
    HRESULT OnShellViewClosing(HWND shellViewWnd);

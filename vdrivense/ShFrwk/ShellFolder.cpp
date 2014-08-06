@@ -132,6 +132,7 @@ HRESULT CShellFolder::FinalConstruct()
 {
    ATLTRACE(L"CShellFolder::FinalConstruct\n");
    m_hwndOwner = NULL;
+   m_hShellDefView = NULL;
    m_hMenu = m_hContextMenu = NULL;
    m_pShellView = NULL;
    return S_OK;
@@ -1191,6 +1192,8 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 {
     HWND hWnd = (HWND)wParam;
 
+    m_hShellDefView = hWnd;
+
 	// Tag this window.
 	SetWindowLongPtr(hWnd, GWLP_USERDATA, 0xED0CED0C);
 
@@ -1232,10 +1235,8 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 LRESULT CShellFolder::OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     HWND hWnd = (HWND)wParam;
-    m_spFolderItem->OnShellViewClosing(hWnd);
-
-    RemoveShellFolder(hWnd);
-
+    m_spFolderItem->OnShellViewClosing(m_hShellDefView);
+    RemoveShellFolder(m_hShellDefView);
     return S_OK;
 }
 
@@ -1259,7 +1260,7 @@ LRESULT CShellFolder::OnListRefreshed(UINT uMsg, WPARAM wParam, LPARAM lParam, B
    // This is an undocumented feature, but it appears that when the user
    // forces a refresh (ie. through F5) then the wParam is non-zero.
    if( wParam != 0 ) m_spFolderItem->Refresh(VFS_REFRESH_USERFORCED);
-   m_spFolderItem->OnShellViewRefreshed(NULL);
+   m_spFolderItem->OnShellViewRefreshed(m_hShellDefView);
    return 0;
 }
 
@@ -1324,7 +1325,7 @@ LRESULT CShellFolder::OnUpdateObject(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 
 LRESULT CShellFolder::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    m_spFolderItem->OnShellViewSized(NULL);
+    m_spFolderItem->OnShellViewSized(m_hShellDefView);
 	return S_FALSE;
 }
 

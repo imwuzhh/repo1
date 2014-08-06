@@ -49,6 +49,7 @@ public:
    CPidl m_pidlParent;                           // PIDL of the parent item
    CPidl m_pidlRoot;                             // PIDL of the root (relative to Desktop)
    HWND m_hwndOwner;                             // Owner window handle
+   HWND m_hShellDefView;                         // Shell_DefView window handle
    HMENU m_hMenu;                                // Handle to current context-menu
    HMENU m_hContextMenu;                         // Handle to current popup context-menu
    IShellView * m_pShellView;

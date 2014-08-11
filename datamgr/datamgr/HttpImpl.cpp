@@ -985,7 +985,7 @@ BOOL HttpImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, c
     return FALSE;
 }
 
-BOOL HttpImpl::CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType * selectedMenuItems)
+BOOL HttpImpl::CheckMenu(TAR_ARCHIVE * pArchive, HWND hDefShellView, std::wstring & idlist, MenuType * selectedMenuItems)
 {
     *selectedMenuItems=MenuDef_AllSelected & (~MenuDef_Properties);
     return TRUE;
@@ -1132,7 +1132,7 @@ BOOL HttpImpl::HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
     return TRUE;
 }
 
-BOOL HttpImpl::SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
+BOOL HttpImpl::SelectItems(TAR_ARCHIVE * pArchive, HWND hShellViewWindow, LPCWSTR itemIds)
 {
     OUTPUTLOG("%s() idList=`%s'", __FUNCTION__, (const char *)CW2A(itemIds));
     

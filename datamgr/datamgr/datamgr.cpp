@@ -886,13 +886,13 @@ HRESULT DMHistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
     return S_OK;
 }
 
-HRESULT DMSelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
+HRESULT DMSelectItems(TAR_ARCHIVE * pArchive, HWND hShellViewWindow, LPCWSTR itemIds)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
     OUTPUTLOG("%s() ids=[`%s']", __FUNCTION__, (const char *)CW2A(itemIds ? itemIds : _T("")));
 
-    if (!GetProto(pArchive)->SelectItems(pArchive, itemIds ? itemIds : _T("")))
+    if (!GetProto(pArchive)->SelectItems(pArchive, hShellViewWindow, itemIds ? itemIds : _T("")))
         return S_FALSE;
 
     return S_OK;
@@ -923,14 +923,14 @@ HRESULT DMFindChild(TAR_ARCHIVE * pArchive, RemoteId parentId, LPCWSTR childName
     return S_OK;
 }
 
-HRESULT DMCheckMenu(TAR_ARCHIVE * pArchive, const wchar_t * idlist, MenuType * menudef)
+HRESULT DMCheckMenu(TAR_ARCHIVE * pArchive, HWND hDefShellView, const wchar_t * idlist, MenuType * menudef)
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
     OUTPUTLOG("%s() id=[%s], inputbits=[%llx]", __FUNCTION__, (const char *)CW2AEX<>(idlist, CP_UTF8), (*menudef));
 
     std::wstring sIdList = idlist;
-    if (!GetProto(pArchive)->CheckMenu(pArchive, sIdList, menudef))
+    if (!GetProto(pArchive)->CheckMenu(pArchive, hDefShellView, sIdList, menudef))
     {
         return S_FALSE;
     }

@@ -628,7 +628,7 @@ BOOL JsonImpl::FolderExists(TAR_ARCHIVE * pArchive, const RemoteId & parentId, c
     return TRUE;
 }
 
-BOOL JsonImpl::CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType * selectedMenuItems)
+BOOL JsonImpl::CheckMenu(TAR_ARCHIVE * pArchive, HWND hDefShellView, std::wstring & idlist, MenuType * selectedMenuItems)
 {
     Json::StyledWriter writer;
     Json::Value  root;
@@ -640,6 +640,7 @@ BOOL JsonImpl::CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType
 
     Json::Value parameters; 
     // In windows, window handle is global handle of x-processes.
+    parameters["hwnd"] = (Json::UInt)hDefShellView;
     parameters["idList"] = (const char *)CW2AEX<>(idlist.c_str(), CP_UTF8);
 
     root ["Params"] = parameters;
@@ -829,7 +830,7 @@ BOOL JsonImpl::HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id)
     return TRUE;
 }
 
-BOOL JsonImpl::SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
+BOOL JsonImpl::SelectItems(TAR_ARCHIVE * pArchive, HWND hShellViewWindow, LPCWSTR itemIds)
 {
     Json::StyledWriter writer;
     Json::Value  root;
@@ -841,6 +842,7 @@ BOOL JsonImpl::SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds)
 
     Json::Value parameters; 
     // In windows, window handle is global handle of x-processes.
+    parameters["hwnd"] = (Json::UInt)hShellViewWindow;
     parameters["idList"] = (const char *)CW2AEX<>(itemIds, CP_UTF8);
 
     root ["Params"] = parameters;

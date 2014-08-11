@@ -57,7 +57,7 @@ public:
 
      BOOL FindChild(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo);
 
-     BOOL CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType * selectedMenuItems);
+     BOOL CheckMenu(TAR_ARCHIVE * pArchive, HWND hDefShellView, std::wstring & idlist, MenuType * selectedMenuItems);
 
      BOOL LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock);
 
@@ -73,7 +73,7 @@ public:
 
      BOOL HistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id);
 
-     BOOL SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds);
+     BOOL SelectItems(TAR_ARCHIVE * pArchive, HWND hShellViewWindow, LPCWSTR itemIds);
 
      BOOL CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token);
 

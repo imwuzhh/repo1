@@ -333,7 +333,7 @@ HRESULT DMViewLog(TAR_ARCHIVE * pArchive, LPCWSTR idlist);
 
 HRESULT DMHistoryVersion(TAR_ARCHIVE * pArchive, RemoteId id);
 
-HRESULT DMSelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds);
+HRESULT DMSelectItems(TAR_ARCHIVE * pArchive, HWND hShellViewWindow, LPCWSTR itemIds);
 
 HRESULT DMFindChild(TAR_ARCHIVE * pArchive, RemoteId parentId, LPCWSTR childName, VFS_FIND_DATA * pInfo);
 
@@ -344,7 +344,7 @@ HRESULT DMFindChild(TAR_ARCHIVE * pArchive, RemoteId parentId, LPCWSTR childName
 * [idlist]   items' id list, in format "type:id", such as "0:1998;1:123;", 0 for file type, 1 for folder type.
 * [menudef]  selected value of menu items.
 */
-HRESULT DMCheckMenu(TAR_ARCHIVE * pArchive, const wchar_t * idlist, MenuType * menudef);
+HRESULT DMCheckMenu(TAR_ARCHIVE * pArchive, HWND hDefShellView, const wchar_t * idlist, MenuType * menudef);
 
 HRESULT DMRecover(TAR_ARCHIVE * pArchive, const wchar_t * idlist);
 

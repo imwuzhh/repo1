@@ -100,7 +100,7 @@ public:
      */
      virtual BOOL FindChild(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo) = 0;
 
-     virtual BOOL CheckMenu(TAR_ARCHIVE * pArchive, std::wstring & idlist, MenuType * selectedMenuItems) = 0;
+     virtual BOOL CheckMenu(TAR_ARCHIVE * pArchive, HWND hDefShellView, std::wstring & idlist, MenuType * selectedMenuItems) = 0;
 
      virtual BOOL LockFile(TAR_ARCHIVE * pArchive, RemoteId id, BOOL toLock) = 0;
 
@@ -122,7 +122,7 @@ public:
 	 * 1) pArchive: context
 	 * 2) itemIds: selected items' id, with format `id1:flag1,id2:flag2,...', if directory selected, flag is 1, otherwise flag is 0.
 	 */
-     virtual BOOL SelectItems(TAR_ARCHIVE * pArchive, LPCWSTR itemIds) = 0;
+     virtual BOOL SelectItems(TAR_ARCHIVE * pArchive, HWND hShellViewWindow, LPCWSTR itemIds) = 0;
 
      /**
      * Function: check available of old token. 

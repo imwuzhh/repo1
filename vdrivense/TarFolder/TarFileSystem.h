@@ -112,10 +112,10 @@ public:
    HRESULT OnShellViewSized(HWND shellViewWnd);
    HRESULT OnShellViewClosing(HWND shellViewWnd);
    HRESULT InitCustomColumns();
-   HRESULT SelectItems(LPCWSTR itemIds);
+   HRESULT SelectItems(HWND hShellViewWindow, LPCWSTR itemIds);
 
    HMENU GetMenu();
-   HRESULT SelectMenuItems(const wchar_t* idstring, MenuType * selectedMenuItems);
+   HRESULT SelectMenuItems(HWND hDefShellView, const wchar_t* idstring, MenuType * selectedMenuItems);
    HRESULT ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd);
 
    // Implementation

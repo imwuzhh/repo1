@@ -1307,12 +1307,12 @@ LRESULT CShellFolder::OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam
                         pShellItem->Release();
                     }
                 }
-                m_spFolderItem->SelectItems(sSelectedItemIds.c_str());
+                m_spFolderItem->SelectItems(m_hShellDefView, sSelectedItemIds.c_str());
                 pItemArray->Release();
             }
             pDataObject->Release();
         }else{
-            m_spFolderItem->SelectItems(NULL);
+            m_spFolderItem->SelectItems(m_hShellDefView, NULL);
         }
     }
 	return 0;
@@ -1661,7 +1661,7 @@ HRESULT CShellFolder::_RefineUserMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHIL
 
     MenuType selectedMenus = MenuDef_AllRemoved;
     if (!idstring.empty()){
-        m_spFolderItem->SelectMenuItems(idstring.c_str(), &selectedMenus);
+        m_spFolderItem->SelectMenuItems(m_hShellDefView, idstring.c_str(), &selectedMenus);
     }
 
 	if (!IsBitSet(selectedMenus, MenuDef_OpenFile)) ::RemoveMenu(hMenu, ID_FILE_OPEN, MF_BYCOMMAND);
@@ -1717,7 +1717,7 @@ HRESULT CShellFolder::_RefineShellMenuItems(HMENU hMenu, IDataObject * pDataObje
 
 	MenuType selectedMenus = MenuDef_AllRemoved;
 	if (!idstring.empty()){
-		m_spFolderItem->SelectMenuItems(idstring.c_str(), &selectedMenus);
+		m_spFolderItem->SelectMenuItems(m_hShellDefView, idstring.c_str(), &selectedMenus);
 	}
 
 	if (!IsBitSet(selectedMenus, MenuDef_Properties)) ::RemoveMenu(hMenu, SYSTEM_CMDID_PROPERTIES, MF_BYCOMMAND); 

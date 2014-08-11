@@ -241,13 +241,13 @@ HRESULT CTarFileItem::InitCustomColumns()
     return S_OK;
 }
 
-HRESULT CTarFileItem::SelectItems(LPCWSTR itemIds)
+HRESULT CTarFileItem::SelectItems(HWND hShellViewWindow, LPCWSTR itemIds)
 {
     if (itemIds){
         OUTPUTLOG("%s(`%s')", __FUNCTION__, (const char *)CW2A(itemIds));
     }
     
-    HR (DMSelectItems(_GetTarArchivePtr(), itemIds));
+    HR (DMSelectItems(_GetTarArchivePtr(), hShellViewWindow, itemIds));
 
     return S_OK;
 }
@@ -262,9 +262,9 @@ HMENU CTarFileItem::GetMenu()
    return ::LoadMenu(_pModule->GetResourceInstance(), MAKEINTRESOURCE(uMenuRes));
 }
 
-HRESULT CTarFileItem::SelectMenuItems(const wchar_t* idstring, MenuType * selectedMenuItems)
+HRESULT CTarFileItem::SelectMenuItems(HWND hDefShellView, const wchar_t* idstring, MenuType * selectedMenuItems)
 {
-    HR ( DMCheckMenu(_GetTarArchivePtr(), idstring, selectedMenuItems));
+    HR ( DMCheckMenu(_GetTarArchivePtr(), hDefShellView, idstring, selectedMenuItems));
     return S_OK;
 }
 

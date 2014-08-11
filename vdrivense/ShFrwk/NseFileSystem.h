@@ -256,7 +256,7 @@ public:
    virtual PCUITEMID_CHILD GetITEMID() = 0;
 
    virtual HMENU GetMenu() = 0;
-   virtual HRESULT SelectMenuItems(const wchar_t * idstring, MenuType * selectedMenuItems) = 0;
+   virtual HRESULT SelectMenuItems(HWND hDefShellView, const wchar_t * idstring, MenuType * selectedMenuItems) = 0;
    virtual HRESULT SetMenuState(const VFS_MENUSTATE& State) = 0;
    virtual HRESULT ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd) = 0;
  
@@ -273,7 +273,7 @@ public:
    virtual HRESULT OnShellViewSized(HWND shellViewWnd) = 0;
    virtual HRESULT OnShellViewClosing(HWND shellViewWnd) = 0;
    virtual HRESULT InitCustomColumns() = 0;
-   virtual HRESULT SelectItems(LPCWSTR itemIds) = 0;
+   virtual HRESULT SelectItems(HWND hShellViewWindow, LPCWSTR itemIds) = 0;
 };
 
 

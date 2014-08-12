@@ -1769,6 +1769,30 @@ HRESULT CShellFolder::_ParseDisplayNameWithBind(CNseItemPtr& spItem, PWSTR pszDi
    return S_OK;
 }
 
+HRESULT CShellFolder::_GetShellBrowser(IShellBrowser ** ppShellBrowser)
+{
+    if (!m_spUnkSite) return E_NOINTERFACE;
+    CComQIPtr<IServiceProvider> spService = m_spUnkSite;
+    HRESULT hr = spService->QueryService(SID_STopLevelBrowser, IID_IShellBrowser, (void**)ppShellBrowser);
+    if (hr == S_OK){
+        ppShellBrowser[0]->AddRef();
+        return S_OK;
+    }
+    return hr;
+}
+
+HRESULT CShellFolder::_GetCurrentSortColumn(UINT * iColumn)
+{
+    if (!m_spUnkSite) return E_NOINTERFACE;
+    CComQIPtr<IServiceProvider> spService = m_spUnkSite;
+    CComPtr<IFolderView2> spFV2;
+    HR( spService->QueryService(SID_SFolderView, IID_PPV_ARGS(&spFV2)) );
+    SORTCOLUMN sc;
+    spFV2->GetSortColumns(&sc, 1);
+    iColumn = 0;
+    return S_OK;
+}
+
 HRESULT CShellFolder::StartOperations( void) 
 {
     return E_NOTIMPL;

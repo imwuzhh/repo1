@@ -245,6 +245,8 @@ public:
    HRESULT _SetMenuState(HMENU hMenu, IDataObject* pDataObject);
    HRESULT _RefineUserMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHILD_ARRAY rgpidl);
    HRESULT _RefineShellMenuItems(HMENU hMenu, IDataObject * pDataObject);
+   HRESULT _GetShellBrowser(IShellBrowser ** pShellBrowser);
+   HRESULT _GetCurrentSortColumn(UINT * iColumn);
 };
 
 

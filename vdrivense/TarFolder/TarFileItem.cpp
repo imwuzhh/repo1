@@ -621,8 +621,16 @@ HRESULT CTarFileItem::_Search(VFS_MENUCOMMAND & Cmd)
     searchPidl.Append(pidlChild); CoTaskMemFree((LPVOID)pidlChild);
     sei.lpIDList = searchPidl.GetData(); // <-- your pidl
 
-    sei.nShow = SW_SHOW;
-    ShellExecuteEx(&sei);
+    IShellBrowser * pShellBrowser = NULL;
+    m_pFolder->_GetShellBrowser(&pShellBrowser);
+    if (pShellBrowser != NULL){
+        pShellBrowser->BrowseObject((PCITEMID_CHILD)sei.lpIDList, SBSP_SAMEBROWSER);
+        pShellBrowser->Release();
+        return S_OK;
+    }else{
+        sei.nShow = SW_SHOW;
+        ShellExecuteEx(&sei);
+    }
 
     return S_OK;
 }

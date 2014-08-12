@@ -51,6 +51,7 @@ STDMETHODIMP CTransferSource::SetProperties(IPropertyChangeArray* pPropArray)
 STDMETHODIMP CTransferSource::OpenItem(IShellItem* psiSource, DWORD dwFlags, REFIID riid, LPVOID* ppv)
 {
     ATLTRACE(L"CTransferSource::OpenItem  riid=%s flags=0x%X\n", DbgGetIID(riid), dwFlags);
+	OUTPUTLOG("%s() called with dwFlags=0x%08x", __FUNCTION__, dwFlags);
     CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
     if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
     if (!DMHttpTransferIsEnable()){

@@ -135,6 +135,7 @@ HRESULT CShellFolder::FinalConstruct()
    m_hShellDefView = NULL;
    m_hMenu = m_hContextMenu = NULL;
    m_pShellView = NULL;
+   m_pSortKey = PKEY_ParsingName;
    return S_OK;
 }
 
@@ -1245,6 +1246,34 @@ LRESULT CShellFolder::OnColumnClick(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
     return S_OK;
 }
 
+LRESULT CShellFolder::OnBackGroudEnumDone(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	PROPERTYKEY pKey = PKEY_ApplicationName;
+	UINT iDirection = -1;
+	HR( _GetCurrentSortColumn(&pKey, &iDirection));
+	if (pKey != m_pSortKey && pKey != PKEY_ApplicationName || iDirection != -1 && iDirection != m_iSortDirection){
+		WCHAR wszName[80] = { 0 };
+		CCoTaskString str;
+		if( SUCCEEDED( ::PSGetNameFromPropertyKey(m_pSortKey, &str) ) ) wcscpy_s(wszName, lengthof(wszName), str);
+		OUTPUTLOG("%s SortColumn=%s", __FUNCTION__, (const char *)CW2A(wszName));
+		m_pSortKey = pKey;
+		
+		if (0){
+			IShellBrowser * pShellBrowser = NULL;
+			_GetShellBrowser(&pShellBrowser);
+			if (pShellBrowser){
+				IShellView * pShellView;
+				pShellBrowser->QueryActiveShellView(&pShellView);
+				if (pShellView){
+					pShellView->Refresh();
+					pShellView->Release();
+				}
+				pShellBrowser->Release();
+			}
+		}
+	}
+	return S_OK;
+}
 
 LRESULT CShellFolder::OnGetNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
@@ -1773,23 +1802,20 @@ HRESULT CShellFolder::_GetShellBrowser(IShellBrowser ** ppShellBrowser)
 {
     if (!m_spUnkSite) return E_NOINTERFACE;
     CComQIPtr<IServiceProvider> spService = m_spUnkSite;
-    HRESULT hr = spService->QueryService(SID_STopLevelBrowser, IID_IShellBrowser, (void**)ppShellBrowser);
-    if (hr == S_OK){
-        ppShellBrowser[0]->AddRef();
-        return S_OK;
-    }
+    HR( spService->QueryService(SID_STopLevelBrowser, IID_IShellBrowser, (void**)ppShellBrowser));
     return hr;
 }
 
-HRESULT CShellFolder::_GetCurrentSortColumn(UINT * iColumn)
+HRESULT CShellFolder::_GetCurrentSortColumn(PROPERTYKEY * ppkey, UINT * iDirection)
 {
     if (!m_spUnkSite) return E_NOINTERFACE;
     CComQIPtr<IServiceProvider> spService = m_spUnkSite;
     CComPtr<IFolderView2> spFV2;
     HR( spService->QueryService(SID_SFolderView, IID_PPV_ARGS(&spFV2)) );
     SORTCOLUMN sc;
-    spFV2->GetSortColumns(&sc, 1);
-    iColumn = 0;
+    HR( spFV2->GetSortColumns(&sc, 1));
+    *ppkey = sc.propkey;
+	*iDirection = sc.direction;
     return S_OK;
 }
 

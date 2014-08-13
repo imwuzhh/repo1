@@ -53,6 +53,8 @@ public:
    HMENU m_hMenu;                                // Handle to current context-menu
    HMENU m_hContextMenu;                         // Handle to current popup context-menu
    IShellView * m_pShellView;
+   PROPERTYKEY m_pSortKey;
+   UINT m_iSortDirection;
 
    BEGIN_COM_MAP(CShellFolder)
       COM_INTERFACE_ENTRY(IShellFolder)
@@ -84,7 +86,8 @@ public:
 	  MESSAGE_HANDLER(SFVM_GETNOTIFY, OnGetNotify)
 	  MESSAGE_HANDLER(SFVM_SIZE, OnSize)
       MESSAGE_HANDLER(SFVM_WINDOWCLOSING, OnWindowClosing)
-      MESSAGE_HANDLER(SFVM_COLUMNCLICK, OnColumnClick)
+	  MESSAGE_HANDLER(SFVM_COLUMNCLICK, OnColumnClick)
+	  MESSAGE_HANDLER(SFVM_BACKGROUNDENUMDONE, OnBackGroudEnumDone)
    END_MSG_MAP()
 
    DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -225,6 +228,7 @@ public:
    LRESULT OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
    LRESULT OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
    LRESULT OnColumnClick(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+   LRESULT OnBackGroudEnumDone(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 
    // Operations
 
@@ -246,7 +250,7 @@ public:
    HRESULT _RefineUserMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHILD_ARRAY rgpidl);
    HRESULT _RefineShellMenuItems(HMENU hMenu, IDataObject * pDataObject);
    HRESULT _GetShellBrowser(IShellBrowser ** pShellBrowser);
-   HRESULT _GetCurrentSortColumn(UINT * iColumn);
+   HRESULT _GetCurrentSortColumn(PROPERTYKEY * pkey, UINT * iDirection);
 };
 
 

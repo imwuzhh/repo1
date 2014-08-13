@@ -136,6 +136,7 @@ HRESULT CShellFolder::FinalConstruct()
    m_hMenu = m_hContextMenu = NULL;
    m_pShellView = NULL;
    m_pSortKey = PKEY_ParsingName;
+   m_iSortDirection = SORT_ASCENDING;
    return S_OK;
 }
 
@@ -1248,31 +1249,19 @@ LRESULT CShellFolder::OnColumnClick(UINT uMsg, WPARAM wParam, LPARAM lParam, BOO
 
 LRESULT CShellFolder::OnBackGroudEnumDone(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-	PROPERTYKEY pKey = PKEY_ApplicationName;
-	UINT iDirection = -1;
+	PROPERTYKEY pKey = m_pSortKey;
+	SORTDIRECTION iDirection = m_iSortDirection;
 	HR( _GetCurrentSortColumn(&pKey, &iDirection));
-	if (pKey != m_pSortKey && pKey != PKEY_ApplicationName || iDirection != -1 && iDirection != m_iSortDirection){
-		WCHAR wszName[80] = { 0 };
-		CCoTaskString str;
-		if( SUCCEEDED( ::PSGetNameFromPropertyKey(m_pSortKey, &str) ) ) wcscpy_s(wszName, lengthof(wszName), str);
-		OUTPUTLOG("%s SortColumn=%s", __FUNCTION__, (const char *)CW2A(wszName));
-		m_pSortKey = pKey;
-		
-		if (0){
-			IShellBrowser * pShellBrowser = NULL;
-			_GetShellBrowser(&pShellBrowser);
-			if (pShellBrowser){
-				IShellView * pShellView;
-				pShellBrowser->QueryActiveShellView(&pShellView);
-				if (pShellView){
-					pShellView->Refresh();
-					pShellView->Release();
-				}
-				pShellBrowser->Release();
-			}
-		}
-	}
-	return S_OK;
+	if (pKey == m_pSortKey && iDirection == m_iSortDirection){
+        OUTPUTLOG("%s(), key=%s, direction=%d, no sort", __FUNCTION__, GetPropertyKeyName(pKey).c_str(), iDirection);
+        return S_OK;
+    }
+
+	OUTPUTLOG("%s(), SortColumn=%s, direction=%d", __FUNCTION__, GetPropertyKeyName(pKey).c_str(), iDirection);
+	m_pSortKey = pKey;
+    m_iSortDirection = iDirection;
+
+    return S_OK;
 }
 
 LRESULT CShellFolder::OnGetNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -1288,6 +1277,7 @@ LRESULT CShellFolder::OnListRefreshed(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 {
    // This is an undocumented feature, but it appears that when the user
    // forces a refresh (ie. through F5) then the wParam is non-zero.
+   OUTPUTLOG("%s() wParam=0x%08x", __FUNCTION__, wParam);
    if( wParam != 0 ) m_spFolderItem->Refresh(VFS_REFRESH_USERFORCED);
    m_spFolderItem->OnShellViewRefreshed(m_hShellDefView);
    return 0;
@@ -1798,15 +1788,17 @@ HRESULT CShellFolder::_ParseDisplayNameWithBind(CNseItemPtr& spItem, PWSTR pszDi
    return S_OK;
 }
 
-HRESULT CShellFolder::_GetShellBrowser(IShellBrowser ** ppShellBrowser)
+HRESULT CShellFolder::_NaviageTo(PCUITEMID_CHILD pidl)
 {
     if (!m_spUnkSite) return E_NOINTERFACE;
     CComQIPtr<IServiceProvider> spService = m_spUnkSite;
-    HR( spService->QueryService(SID_STopLevelBrowser, IID_IShellBrowser, (void**)ppShellBrowser));
-    return hr;
+    CComPtr<IShellBrowser> spBrowser;
+    HR( spService->QueryService(SID_STopLevelBrowser, IID_PPV_ARGS(&spBrowser)));
+    spBrowser->BrowseObject(pidl, SBSP_SAMEBROWSER);
+    return S_OK;
 }
 
-HRESULT CShellFolder::_GetCurrentSortColumn(PROPERTYKEY * ppkey, UINT * iDirection)
+HRESULT CShellFolder::_GetCurrentSortColumn(PROPERTYKEY * ppkey, SORTDIRECTION * iDirection)
 {
     if (!m_spUnkSite) return E_NOINTERFACE;
     CComQIPtr<IServiceProvider> spService = m_spUnkSite;

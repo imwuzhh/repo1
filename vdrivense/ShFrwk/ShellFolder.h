@@ -54,7 +54,7 @@ public:
    HMENU m_hContextMenu;                         // Handle to current popup context-menu
    IShellView * m_pShellView;
    PROPERTYKEY m_pSortKey;
-   UINT m_iSortDirection;
+   SORTDIRECTION m_iSortDirection;
 
    BEGIN_COM_MAP(CShellFolder)
       COM_INTERFACE_ENTRY(IShellFolder)
@@ -249,8 +249,8 @@ public:
    HRESULT _SetMenuState(HMENU hMenu, IDataObject* pDataObject);
    HRESULT _RefineUserMenuItems(HMENU hMenu, int cidl, PCUITEMID_CHILD_ARRAY rgpidl);
    HRESULT _RefineShellMenuItems(HMENU hMenu, IDataObject * pDataObject);
-   HRESULT _GetShellBrowser(IShellBrowser ** pShellBrowser);
-   HRESULT _GetCurrentSortColumn(PROPERTYKEY * pkey, UINT * iDirection);
+   HRESULT _NaviageTo(PCUITEMID_CHILD pidl);
+   HRESULT _GetCurrentSortColumn(PROPERTYKEY * pkey, SORTDIRECTION * iDirection);
 };
 
 

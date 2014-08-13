@@ -59,6 +59,17 @@ void DumpMenu(HMENU hMenu){
 	}
 }
 
+std::string GetPropertyKeyName(const PROPERTYKEY & pKey)
+{
+    WCHAR wszName[80] = L"";
+    CCoTaskString str;
+    if( SUCCEEDED( ::PSGetNameFromPropertyKey(pKey, &str) ) ) {
+        wcscpy_s(wszName, lengthof(wszName), str);
+    }
+    return (const char *)CW2A(wszName);
+}
+
+
 /**
  * Return the file last-modified timestamp of a disk file.
  */

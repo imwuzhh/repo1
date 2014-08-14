@@ -52,7 +52,8 @@ HRESULT CTarFileStream::SetFileSize(DWORD dwSize)
 
 HRESULT CTarFileStream::Read(LPVOID pData, ULONG dwSize, ULONG& dwBytesRead)
 {
-   dwBytesRead = 0;
+   dwBytesRead = 0; 
+   if (!DMHttpTransferIsEnable()) return S_OK;
    // We cannot mix reads and writes on same stream
    if( m_uAccess != GENERIC_READ ) return E_ACCESSDENIED;
    // Read the entire file now and keep the contents in a memory buffer
@@ -69,7 +70,8 @@ HRESULT CTarFileStream::Read(LPVOID pData, ULONG dwSize, ULONG& dwBytesRead)
 
 HRESULT CTarFileStream::Write(LPCVOID pData, ULONG dwSize, ULONG& dwBytesWritten)
 {
-   dwBytesWritten = 0;
+   dwBytesWritten = 0; 
+   if (!DMHttpTransferIsEnable()) return S_OK;
    // Cannot mix reads and writes on same stream
    if( m_uAccess != GENERIC_WRITE ) return E_ACCESSDENIED;
    // Grow the buffer?

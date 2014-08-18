@@ -151,7 +151,7 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
       // Filter item according to the 'grfFlags' argument
       if( SHFilterEnumItem(grfFlags, *(WIN32_FIND_DATA *)(&aList[i])) != S_OK ) continue;
       // Create an NSE Item from the file-info data
-      aItems.Add( GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, *(VFS_FIND_DATA *)(&aList[i])) );
+      aItems.Add( GenerateChild(m_pFolder, m_pFolder->m_pidlFolder, aList[i]) );
       // Cache it to db
       DMAddItemToDB(_GetTarArchivePtr(), aList[i].dwId, aList[i].cFileName, IsBitSet(aList[i].dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
    }

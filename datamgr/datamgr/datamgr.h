@@ -91,6 +91,7 @@ typedef struct _VFS_FIND_DATAW {
 	WCHAR  cAlternateFileName[ 14 ];
 //////////////////////////////////////////////////
     RemoteId dwId;
+    MenuType dwMenuPerm;
     WCHAR versionStr [16];
     WCHAR creatorName[32];
 } VFS_FIND_DATA, *PVFS_FIND_DATA, *LPVFS_FIND_DATA;
@@ -239,7 +240,7 @@ HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemI
 HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId, BOOL removeSource);
 
 /**
-* Notify the tool when an item in shell is being seleced.
+* Notify the tool when an item in shell is being selected.
 * Parameters:
 * [pArchive] the context.
 * [itemId] the selected item's id.
@@ -252,14 +253,14 @@ HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL is
 * Retrieve the custom column info from remote.
 * Parameters:
 * [pArchive] the context.
-* [viewId] the folder's id, which has custome columns.
+* [viewId] the folder's id, which has customized columns.
 * [pwstrColumnList] string, used to hold the custom columns, colon separated, e.g.: "Col1;Col2;Col3;"
 * [maxcch] buffer's length of pwstrColumnList
 */
 HRESULT DMGetCustomColumns(TAR_ARCHIVE * pArchive, RemoteId viewId, LPWSTR pwstrColumnList, int maxcch);
 
 /**
-* Notify external assistance tool to preivew a file.
+* Notify external assistance tool to preview a file.
 * Parameters:
 * [pArchive] context handle.
 * [itemId] file's id.
@@ -355,7 +356,7 @@ HRESULT DMMove(TAR_ARCHIVE * pArchive, RemoteId srcId, RemoteId destFolderId, BO
 /**
 * Malloc memory from libdatamgr, as we use /MT to build, if you get memory from this module, free it with DMFree().
 * Parameters:
-* [ppBuffer] out pointer to hold the buffer position allated.
+* [ppBuffer] out pointer to hold the buffer position allocated.
 * [dwBufSize] request buffer size.
 */
 HRESULT DMMalloc(LPBYTE * ppBuffer, DWORD dwBufSize);

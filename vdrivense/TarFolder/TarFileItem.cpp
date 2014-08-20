@@ -139,12 +139,12 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
        if (dwId.category != VdriveCat){
            /*HR*/ (DMGetCurrentPageNumber(_GetTarArchivePtr(), dwId, &dwCurrPage));
        }
-       HR( DMGetDocInfo(_GetTarArchivePtr(), *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &vs, &aList, &nListCount));
+       HR( DMGetDocInfo(_GetTarArchivePtr(), hwndOwner, *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &vs, &aList, &nListCount));
        if (dwId.id != VdriveId){
            /*HR*/( DMSetTotalPageNumber(_GetTarArchivePtr(), dwId, dwTotalPage));
        }  
    }else{
-       HR( DMGetDocInfo(_GetTarArchivePtr(), *(RemoteId *)&dwId, MaxPageSize, 1, (int *)&dwTotalPage, &vs, &aList, &nListCount));
+       HR( DMGetDocInfo(_GetTarArchivePtr(), hwndOwner, *(RemoteId *)&dwId, MaxPageSize, 1, (int *)&dwTotalPage, &vs, &aList, &nListCount));
    } 
 
    for( int i = 0; i < nListCount; i++ ) {
@@ -222,15 +222,6 @@ HRESULT CTarFileItem::Delete()
 }
 
 /**
-* Select this item.
-*/
-HRESULT CTarFileItem::OnSelected(BOOL isSelected)
-{
-    HR (DMSelect(_GetTarArchivePtr(), *(RemoteId *)(&m_pWfd->dwId), isSelected, IsFolder()) );
-    return S_OK;
-}
-
-/**
 * Get Custom Columns
 */
 HRESULT CTarFileItem::InitCustomColumns()
@@ -241,7 +232,7 @@ HRESULT CTarFileItem::InitCustomColumns()
     return S_OK;
 }
 
-HRESULT CTarFileItem::SelectItems(HWND hShellViewWindow, LPCWSTR itemIds)
+HRESULT CTarFileItem::SelectItems(HWND hWndOwner, HWND hShellViewWindow, LPCWSTR itemIds)
 {
     if (itemIds){
         OUTPUTLOG("%s(`%s')", __FUNCTION__, (const char *)CW2A(itemIds));
@@ -488,7 +479,7 @@ HRESULT CTarFileItem::_PreviewFile( PCITEMID_CHILD pidl)
 	return S_OK;
 }
 
-HRESULT CTarFileItem::OnShellViewCreated(HWND shellViewWnd, DWORD dwCat, DWORD dwId)
+HRESULT CTarFileItem::OnShellViewCreated(HWND hWndOwner, HWND shellViewWnd, DWORD dwCat, DWORD dwId)
 {
     if (!DMOnShellViewCreated(_GetTarArchivePtr(), shellViewWnd, dwCat, dwId))
         return S_FALSE;
@@ -496,7 +487,7 @@ HRESULT CTarFileItem::OnShellViewCreated(HWND shellViewWnd, DWORD dwCat, DWORD d
     return S_OK;
 }
 
-HRESULT CTarFileItem::OnShellViewSized(HWND shellViewWnd)
+HRESULT CTarFileItem::OnShellViewSized(HWND hWndOwner, HWND shellViewWnd)
 {
     if (!DMOnShellViewSized(_GetTarArchivePtr(), shellViewWnd))
         return S_FALSE;
@@ -504,7 +495,7 @@ HRESULT CTarFileItem::OnShellViewSized(HWND shellViewWnd)
     return S_OK;
 }
 
-HRESULT CTarFileItem::OnShellViewRefreshed(HWND shellViewWnd)
+HRESULT CTarFileItem::OnShellViewRefreshed(HWND hWndOwner, HWND shellViewWnd)
 {
     if (!DMOnShellViewRefreshed(_GetTarArchivePtr(), shellViewWnd))
         return S_FALSE;
@@ -512,7 +503,7 @@ HRESULT CTarFileItem::OnShellViewRefreshed(HWND shellViewWnd)
     return S_OK;
 }
 
-HRESULT CTarFileItem::OnShellViewClosing(HWND shellViewWnd)
+HRESULT CTarFileItem::OnShellViewClosing(HWND hWndOwner, HWND shellViewWnd)
 {
     if (!DMOnShellViewClosing(_GetTarArchivePtr(), shellViewWnd))
         return S_FALSE;

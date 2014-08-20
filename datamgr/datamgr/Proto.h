@@ -13,11 +13,11 @@ public:
      
      virtual BOOL GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<VFS_FIND_DATA> & childFiles) = 0;
      
-     virtual BOOL GetDocInfo(TAR_ARCHIVE * pArchive, const RemoteId & folderId, std::list<std::wstring> & columns, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount) = 0;
+     virtual BOOL GetDocInfo(TAR_ARCHIVE * pArchive, HWND hWndOwner, const RemoteId & folderId, std::list<std::wstring> & columns, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount) = 0;
 
-     virtual BOOL GetPagedRecycleItems(TAR_ARCHIVE * pArchive, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount) = 0;
+     virtual BOOL GetPagedRecycleItems(TAR_ARCHIVE * pArchive, HWND hWndOwner, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount) = 0;
 
-     virtual BOOL GetPagedSearchResults(TAR_ARCHIVE * pArchive, const std::wstring & query, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount) = 0;
+     virtual BOOL GetPagedSearchResults(TAR_ARCHIVE * pArchive, HWND hWndOwner, const std::wstring & query, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount) = 0;
      
      virtual BOOL DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder) = 0;
      

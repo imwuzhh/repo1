@@ -149,13 +149,13 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive);
 * Enumerate the children of specified id.
 * Parameters:
 * [pArchive] the context.
-* [dwId] the folder's id used to enumerate its childeren.
+* [dwId] the folder's id used to enumerate its children.
 * [aList] pointer to hold the array of children, it's DMAllocat-ed internally, so free it with DMFree().
 * [nListCount] pointer to get number of the total children.
 */
 HRESULT DMGetRootChildren(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA ** aList, int * nListCount);
 
-HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** aList, int * nListCount);
+HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, HWND hWndOwner, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** aList, int * nListCount);
 
 HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DATA * wfd);
 
@@ -238,16 +238,6 @@ HRESULT DMDownload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalDir, RemoteId itemI
 * [removeSource] flag, True when cut, False when copy.
 */
 HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId, BOOL removeSource);
-
-/**
-* Notify the tool when an item in shell is being selected.
-* Parameters:
-* [pArchive] the context.
-* [itemId] the selected item's id.
-* [selected] flag, True, selected; False, Cancel selection.
-* [isFolder] flag, True, the item is a folder; False, the item is a file.
-*/
-HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL isFolder);
 
 /**
 * Retrieve the custom column info from remote.

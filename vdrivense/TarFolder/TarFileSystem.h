@@ -106,13 +106,12 @@ public:
    HRESULT CreateFolder();
    HRESULT Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName);
    HRESULT Delete();
-   HRESULT OnSelected(BOOL isSelected);
-   HRESULT OnShellViewCreated(HWND shellViewWnd, DWORD dwCat, DWORD dwId);
-   HRESULT OnShellViewRefreshed(HWND shellViewWnd);
-   HRESULT OnShellViewSized(HWND shellViewWnd);
-   HRESULT OnShellViewClosing(HWND shellViewWnd);
+   HRESULT OnShellViewCreated(HWND hWndOwner, HWND shellViewWnd, DWORD dwCat, DWORD dwId);
+   HRESULT OnShellViewRefreshed(HWND hWndOwner, HWND shellViewWnd);
+   HRESULT OnShellViewSized(HWND hWndOwner, HWND shellViewWnd);
+   HRESULT OnShellViewClosing(HWND hWndOwner, HWND shellViewWnd);
    HRESULT InitCustomColumns();
-   HRESULT SelectItems(HWND hShellViewWindow, LPCWSTR itemIds);
+   HRESULT SelectItems(HWND hWndOwner, HWND hShellViewWindow, LPCWSTR itemIds);
 
    HMENU GetMenu();
    HRESULT SelectMenuItems(HWND hDefShellView, const wchar_t* idstring, MenuType * selectedMenuItems);

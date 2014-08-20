@@ -443,66 +443,11 @@ HRESULT CNseBaseItem::GetIdentity(LPWSTR pstrFilename)
 }
 
 /**
- * Physically create the NSE Item as a folder.
- */
-HRESULT CNseBaseItem::CreateFolder()
-{
-   return E_NOTIMPL;
-}
-
-/**
- * Physically rename this NSE Item.
- */
-HRESULT CNseBaseItem::Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName)
-{
-   return E_NOTIMPL;
-}
-
-/**
- * Physically delete this NSE Item.
- */
-HRESULT CNseBaseItem::Delete()
-{
-   return E_NOTIMPL;
-}
-
-/**
  * Force a refresh of children list.
  */
 HRESULT CNseBaseItem::Refresh(VFS_REFRESH Reason)
 {
    return E_NOTIMPL;
-}
-
-
-HRESULT CNseBaseItem::OnSelected(BOOL isSelected)
-{
-    return E_NOTIMPL;
-}
-
-HRESULT CNseBaseItem::OnShellViewCreated(HWND shellViewWnd, DWORD dwCat, DWORD dwId)
-{
-    return E_NOTIMPL;
-}
-
-HRESULT CNseBaseItem::OnShellViewRefreshed(HWND shellViewWnd)
-{
-    return E_NOTIMPL;
-}
-
-HRESULT CNseBaseItem::OnShellViewSized(HWND shellViewWnd)
-{
-    return E_NOTIMPL;
-}
-
-HRESULT CNseBaseItem::OnShellViewClosing(HWND shellViewWnd)
-{
-    return E_NOTIMPL;
-}
-
-HRESULT CNseBaseItem::InitCustomColumns()
-{
-    return E_NOTIMPL;
 }
 
 // Static members

@@ -22,7 +22,6 @@ EXPORTS
 	DMDownload	
 	DMUpload
 	
-	DMSelect
 	DMGetCustomColumns
 	
 	DMSetPageNumber

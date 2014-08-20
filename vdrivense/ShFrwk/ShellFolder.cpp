@@ -1219,7 +1219,7 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 
     m_spFolderItem->InitCustomColumns();
 
-    m_spFolderItem->OnShellViewCreated(hWnd, m_spFolderItem->GetFindData().dwId.category, m_spFolderItem->GetFindData().dwId.id);
+    m_spFolderItem->OnShellViewCreated(m_hwndOwner, hWnd, m_spFolderItem->GetFindData().dwId.category, m_spFolderItem->GetFindData().dwId.id);
 
     if (s_lock == NULL) {
         s_lock = new CRITICAL_SECTION; InitializeCriticalSection(s_lock);
@@ -1237,7 +1237,7 @@ LRESULT CShellFolder::OnWindowCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 LRESULT CShellFolder::OnWindowClosing(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     HWND hWnd = (HWND)wParam;
-    m_spFolderItem->OnShellViewClosing(m_hShellDefView);
+    m_spFolderItem->OnShellViewClosing(m_hwndOwner, m_hShellDefView);
     RemoveShellFolder(m_hShellDefView);
     return S_OK;
 }
@@ -1279,7 +1279,7 @@ LRESULT CShellFolder::OnListRefreshed(UINT uMsg, WPARAM wParam, LPARAM lParam, B
    // forces a refresh (ie. through F5) then the wParam is non-zero.
    OUTPUTLOG("%s() wParam=0x%08x", __FUNCTION__, wParam);
    if( wParam != 0 ) m_spFolderItem->Refresh(VFS_REFRESH_USERFORCED);
-   m_spFolderItem->OnShellViewRefreshed(m_hShellDefView);
+   m_spFolderItem->OnShellViewRefreshed(m_hwndOwner, m_hShellDefView);
    return 0;
 }
 
@@ -1326,12 +1326,12 @@ LRESULT CShellFolder::OnSelectionChanged(UINT uMsg, WPARAM wParam, LPARAM lParam
                         pShellItem->Release();
                     }
                 }
-                m_spFolderItem->SelectItems(m_hShellDefView, sSelectedItemIds.c_str());
+                m_spFolderItem->SelectItems(m_hwndOwner, m_hShellDefView, sSelectedItemIds.c_str());
                 pItemArray->Release();
             }
             pDataObject->Release();
         }else{
-            m_spFolderItem->SelectItems(m_hShellDefView, NULL);
+            m_spFolderItem->SelectItems(m_hwndOwner, m_hShellDefView, NULL);
         }
     }
 	return 0;
@@ -1344,7 +1344,7 @@ LRESULT CShellFolder::OnUpdateObject(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 
 LRESULT CShellFolder::OnSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    m_spFolderItem->OnShellViewSized(m_hShellDefView);
+    m_spFolderItem->OnShellViewSized(m_hwndOwner, m_hShellDefView);
 	return S_FALSE;
 }
 

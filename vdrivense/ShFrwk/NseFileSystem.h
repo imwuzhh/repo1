@@ -267,13 +267,12 @@ public:
    virtual HRESULT Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName) = 0;
    virtual HRESULT Delete() = 0;
    virtual HRESULT Refresh(VFS_REFRESH Reason) = 0;
-   virtual HRESULT OnSelected(BOOL isSelected) = 0;
-   virtual HRESULT OnShellViewCreated(HWND shellViewWnd, DWORD dwCat, DWORD dwId) = 0;
-   virtual HRESULT OnShellViewRefreshed(HWND shellViewWnd) = 0;
-   virtual HRESULT OnShellViewSized(HWND shellViewWnd) = 0;
-   virtual HRESULT OnShellViewClosing(HWND shellViewWnd) = 0;
+   virtual HRESULT OnShellViewCreated(HWND hWndOwner, HWND shellViewWnd, DWORD dwCat, DWORD dwId) = 0;
+   virtual HRESULT OnShellViewRefreshed(HWND hWndOwner, HWND shellViewWnd) = 0;
+   virtual HRESULT OnShellViewSized(HWND hWndOwner, HWND shellViewWnd) = 0;
+   virtual HRESULT OnShellViewClosing(HWND hWndOwner, HWND shellViewWnd) = 0;
    virtual HRESULT InitCustomColumns() = 0;
-   virtual HRESULT SelectItems(HWND hShellViewWindow, LPCWSTR itemIds) = 0;
+   virtual HRESULT SelectItems(HWND hWndOwner, HWND hShellViewWindow, LPCWSTR itemIds) = 0;
 };
 
 
@@ -356,22 +355,10 @@ public:
 
    HRESULT GetStream(const VFS_STREAM_REASON& Reason, CNseFileStream** ppFile);
    HRESULT GetIdentity(LPWSTR pstrFilename);
-
-   HRESULT CreateFolder();
-   HRESULT Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName);
-   HRESULT Delete();
    HRESULT Refresh(VFS_REFRESH Reason);
-   HRESULT OnSelected(BOOL isSelected);
-   HRESULT OnShellViewCreated(HWND shellViewWnd, DWORD dwCat, DWORD dwId);
-   HRESULT OnShellViewRefreshed(HWND shellViewWnd);
-   HRESULT OnShellViewSized(HWND shellViewWnd);
-   HRESULT OnShellViewClosing(HWND shellViewWnd);
-   HRESULT InitCustomColumns();
 
    // Implementation
-
    CPidl _GetFullPidl() const;
-
    HRESULT _RefreshRootView();
    HRESULT _RefreshFolderView();
    HRESULT _RefreshItemInView();

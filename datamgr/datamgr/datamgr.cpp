@@ -316,7 +316,7 @@ HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DAT
     return S_OK;
 }
 
-HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** retList, int * nListCount)
+HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, HWND hWndOwner, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** retList, int * nListCount)
 {
     OUTPUTLOG("%s(), RemoteId={%d, %d}", __FUNCTION__, dwId.category, dwId.id);
     *retList = NULL; *nListCount = 0;
@@ -332,12 +332,12 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int Pag
     std::list<VFS_FIND_DATA> tmpList;
     if (dwId.category == PublicCat || dwId.category == PersonCat)
     {
-        if(!GetProto(pArchive)->GetDocInfo(pArchive, dwId, columns, tmpList, PageSize, PageNo, totalPage))
+        if(!GetProto(pArchive)->GetDocInfo(pArchive, hWndOwner, dwId, columns, tmpList, PageSize, PageNo, totalPage))
             return S_FALSE;
     }
     if (dwId.category == RecycleCat)
     {
-        if(!GetProto(pArchive)->GetPagedRecycleItems(pArchive, tmpList, PageSize, PageNo, totalPage))
+        if(!GetProto(pArchive)->GetPagedRecycleItems(pArchive, hWndOwner, tmpList, PageSize, PageNo, totalPage))
             return S_FALSE;        
     }
     if (dwId.category == SearchCat){
@@ -348,7 +348,7 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, RemoteId dwId, int PageSize, int Pag
         const ServerItemInfo & refItem = GetDB(pArchive)->find(SearchId)->second;
         query = refItem.szQuery;
 
-        if(!GetProto(pArchive)->GetPagedSearchResults(pArchive, query, tmpList, PageSize, PageNo, totalPage))
+        if(!GetProto(pArchive)->GetPagedSearchResults(pArchive, hWndOwner, query, tmpList, PageSize, PageNo, totalPage))
             return S_FALSE;
     }
     if (!tmpList.size()) return S_FALSE;
@@ -585,18 +585,6 @@ HRESULT DMUpload(TAR_ARCHIVE * pArchive, LPCWSTR pwstrLocalPath, RemoteId viewId
     }
 
 	return S_OK;
-}
-
-HRESULT DMSelect(TAR_ARCHIVE * pArchive, RemoteId itemId, BOOL selected, BOOL isFolder)
-{
-    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
-
-    OUTPUTLOG("%s() [%s] [%d:%d]", __FUNCTION__, selected ? "Select" : "CancelSelect", itemId.category, itemId.id);
-
-    if (!GetProto(pArchive)->Select(pArchive, itemId, selected, isFolder))
-        return S_FALSE;
-
-    return S_OK;
 }
 
 HRESULT DMGetCustomColumns(TAR_ARCHIVE * pArchive, RemoteId viewId, LPWSTR pwstrColumnList, int maxcch)
@@ -907,7 +895,7 @@ HRESULT DMFindChild(TAR_ARCHIVE * pArchive, RemoteId parentId, LPCWSTR childName
     if (parentId.category != PublicCat && parentId.category != PersonCat){
         lock.Unlock();
         int totalPage = 0; VFS_FIND_DATA * pChild = NULL; int nChildCount = 0; ViewSettings vs;
-        HR (DMGetDocInfo(pArchive, parentId, MaxPageSize, 1, &totalPage, &vs, &pChild, &nChildCount));
+        HR (DMGetDocInfo(pArchive, NULL/*--query data only--*/, parentId, MaxPageSize, 1, &totalPage, &vs, &pChild, &nChildCount));
         for (int i = 0; i < nChildCount; i ++){
             if (!wcscmp(pChild[i].cFileName, childName)){
                 *pInfo = pChild[i];break;

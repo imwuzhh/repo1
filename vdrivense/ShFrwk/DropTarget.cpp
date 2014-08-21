@@ -29,7 +29,7 @@ HRESULT CDropTarget::Init(CShellFolder* pFolder, PCUITEMID_CHILD pidlItem, HWND 
 
 STDMETHODIMP CDropTarget::DragEnter(LPDATAOBJECT pDataObj, DWORD dwKeyState, POINTL ptl, LPDWORD pdwEffect)
 {
-   ATLTRACE(L"CDropTarget::DragEnter\n");
+   ATLTRACE(L"CDropTarget::DragEnter, dwKeyState=0x%08x\n", dwKeyState);
    // Does the drag source provide acceptable clipboard format types?
    // We should ask the folder item about this.
    m_bAcceptFmt = _AcceptDropFormat(pDataObj);
@@ -173,9 +173,9 @@ DWORD CDropTarget::_QueryDrop(DWORD dwKeyState, DWORD dwEffect) const
 
 DWORD CDropTarget::_GetDropEffectFromKeyState(DWORD dwKeyState) const
 {
-   // The DROPEFFECT_COPY operation is the default.
+   // The DROPEFFECT_MOVE operation is the default.
    // We don't support DROPEFFECT_LINK operations.
-   DWORD dwDropEffect = DROPEFFECT_COPY;
+   DWORD dwDropEffect = DROPEFFECT_MOVE;
    if( IsBitSet(dwKeyState, MK_CONTROL) ) dwDropEffect = DROPEFFECT_COPY;
    if( IsBitSet(dwKeyState, MK_SHIFT) ) dwDropEffect = DROPEFFECT_MOVE;
    return dwDropEffect;

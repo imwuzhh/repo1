@@ -94,6 +94,9 @@ STDMETHODIMP CTransferSource::RemoveItem(IShellItem* psiSource, DWORD dwFlags)
 {
    OUTPUTLOG("CTransferSource::RemoveItem  flags=0x%X\n", dwFlags);
    if (IsBitSet(dwFlags, TSF_MOVE_AS_COPY_DELETE)) return S_OK;
+   // HarryWu, 2014.8.21
+   // this should be in the context of drag&drop, so return directly.
+   if (IsBitSet(dwFlags, TSF_OVERWRITE_EXIST)) return S_OK;
    CNseItemPtr spItem = m_spFolder->GenerateChildItemFromShellItem(psiSource);
    if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
    BOOL bIsFolder = spItem->IsFolder();

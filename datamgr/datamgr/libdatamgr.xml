@@ -8,6 +8,7 @@
     <HttpConnectioTimeoutMilliSeconds>5000</HttpConnectioTimeoutMilliSeconds>
     <ViewPort>60688</ViewPort>
     <JsonPort>60684</JsonPort>
+	<TransEncoding>UTF-8</TransEncoding>
   </Net>
   <API>
       <FastCheck>Yes</FastCheck>
@@ -18,6 +19,7 @@
     <PersonBin>1</PersonBin>
     <SearchBin>1</SearchBin>
     <RecycleBin>1</RecycleBin>
+	<SearchBar>0</SearchBar>
   </View>
   <Locale>
     <RecycleBin>

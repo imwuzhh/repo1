@@ -361,7 +361,7 @@ HRESULT CTarFileItem::_ExtractToFolder(VFS_MENUCOMMAND& Cmd)
 }
 
 /**
-* Paste a data-object as a buch of files.
+* Paste a data-object as a bunch of files.
 * Assumes that the passed IDataObject contains files to paste into
 * our virtual file-system.
 */

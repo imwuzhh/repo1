@@ -1817,6 +1817,18 @@ HRESULT CShellFolder::_RemoveSystemSearchBar(HWND hWndOwner)
 {
     // HarryWu, 2014.8.21
     // Here we assume that spy++ display the correct structure of windows.
+    // the find algorithm could be modified.
+    if (m_hwndOwner == NULL) return S_OK;
+    HWND hWnd = GetWindow(m_hwndOwner, GW_HWNDPREV);
+    if (hWnd == NULL) return S_OK;
+    hWnd = GetWindow(hWnd, GW_CHILD);
+    if (hWnd == NULL) return S_OK;
+    hWnd = GetWindow(hWnd, GW_CHILD);
+    if (hWnd == NULL) return S_OK;
+    hWnd = GetWindow(hWnd, GW_HWNDLAST);
+    if (hWnd == NULL) return S_OK;
+    //HWND hWndSearchBar = FindWindowExA(hWnd, NULL, "UniversalSearchBand", NULL);
+    ShowWindow(hWnd, SW_HIDE);
     return S_OK;
 }
 

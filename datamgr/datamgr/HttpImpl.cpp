@@ -1225,7 +1225,7 @@ BOOL HttpImpl::ClearRecycleBin(TAR_ARCHIVE * pArchive)
     return Utility::HttpPostForm(url, sFormData.c_str(), cookie, strmResponse, pArchive->context->HttpTimeoutMs);
 }
 
-BOOL HttpImpl::Move(TAR_ARCHIVE * pArchive, const RemoteId & srcId, const RemoteId & destId, BOOL fRemoveSource)
+BOOL HttpImpl::Move(TAR_ARCHIVE * pArchive, const wchar_t * sIdList, const RemoteId & destId, BOOL fRemoveSource)
 {
     return TRUE;
 }

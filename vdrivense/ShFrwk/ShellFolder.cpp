@@ -443,6 +443,8 @@ STDMETHODIMP CShellFolder::CreateViewObject(HWND hwndOwner, REFIID riid, LPVOID*
           m_pShellView = (IShellView *)*ppRetVal;
           m_pShellView->AddRef();
       }
+      // And remove default system search bar
+      _RemoveSystemSearchBar(hwndOwner);
       return Hr;
    }
    if( riid == IID_IDropTarget ) 
@@ -1808,6 +1810,13 @@ HRESULT CShellFolder::_GetCurrentSortColumn(PROPERTYKEY * ppkey, SORTDIRECTION *
     HR( spFV2->GetSortColumns(&sc, 1));
     *ppkey = sc.propkey;
 	*iDirection = sc.direction;
+    return S_OK;
+}
+
+HRESULT CShellFolder::_RemoveSystemSearchBar(HWND hWndOwner)
+{
+    // HarryWu, 2014.8.21
+    // Here we assume that spy++ display the correct structure of windows.
     return S_OK;
 }
 

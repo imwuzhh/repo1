@@ -251,6 +251,7 @@ public:
    HRESULT _RefineShellMenuItems(HMENU hMenu, IDataObject * pDataObject);
    HRESULT _NaviageTo(PCUITEMID_CHILD pidl);
    HRESULT _GetCurrentSortColumn(PROPERTYKEY * pkey, SORTDIRECTION * iDirection);
+   HRESULT _RemoveSystemSearchBar(HWND hWndOwner);
 };
 
 

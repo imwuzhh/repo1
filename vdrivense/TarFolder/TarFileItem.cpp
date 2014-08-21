@@ -374,6 +374,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
     // HarryWu, 2014.3.14
     // Task: Hook upload, EVENT_OBJECT_DRAGDROPPED
     // http://msdn.microsoft.com/en-us/library/windows/desktop/dd318066(v=vs.85).aspx
+    // DragCurrent Process Not Encrypt Or not Control ClipboardCDataObject::GetData  cf=UntrustedDragDrop
     if (!DMHttpTransferIsEnable())
     {
         RemoteId DestId; _GetIdQuick(m_pidlItem, &DestId);

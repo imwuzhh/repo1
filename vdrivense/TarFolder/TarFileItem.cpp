@@ -420,6 +420,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 		}
 		if (fmtec.cfFormat == CDataObject::s_cfFILEDESCRIPTOR){
 			FILEGROUPDESCRIPTOR * pFgd = (FILEGROUPDESCRIPTOR *)GlobalLock(medium.hGlobal);
+            std::wstring sIdList;
 			for (int i = 0; i < pFgd->cItems; i ++){
 				std::wstring filepath = pFgd->fgd[i].cFileName;
                 OUTPUTLOG("%s(), Action=[%s], Source=[{%d.%d}:{%d.%d}:{%s}], Dest=[%d.%d:{%s}]", __FUNCTION__
@@ -441,9 +442,14 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
                     OUTPUTLOG("%s(), Cut with Same Origin, ignore it.");
                 }else{
                     RemoteId srcId = {pFgd->fgd[i].sizel.cx, pFgd->fgd[i].sizel.cy};
-                    DMMove(_GetTarArchivePtr(), srcId, DestId, IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE) );
+                    wchar_t szBuf[100] = _T(""); swprintf_s(szBuf, lengthof(szBuf), _T("%d.%d"), srcId.category, srcId.id);
+                    sIdList += szBuf;
+                    sIdList += _T(";");
                 }
 			}
+            if (!sIdList.empty())
+                DMMove(_GetTarArchivePtr(), sIdList.c_str(), DestId, IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE) );
+
 			GlobalUnlock(medium.hGlobal);
 		}
         return S_OK;

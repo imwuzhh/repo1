@@ -13,6 +13,7 @@
 
 CLIPFORMAT CDataObject::s_cfPRIVATE = (CLIPFORMAT)::RegisterClipboardFormatW(CComBSTR(CLSID_ShellFolder));
 CLIPFORMAT CDataObject::s_cfFILECONTENTS = (CLIPFORMAT)::RegisterClipboardFormat(CFSTR_FILECONTENTS);
+CLIPFORMAT CDataObject::s_cfUNTRUSTEDDRAGDROP = (CLIPFORMAT)::RegisterClipboardFormat(CFSTR_UNTRUSTEDDRAGDROP);
 CLIPFORMAT CDataObject::s_cfFILEDESCRIPTOR = (CLIPFORMAT)::RegisterClipboardFormat(CFSTR_FILEDESCRIPTOR);
 CLIPFORMAT CDataObject::s_cfPREFERREDDROPEFFECT = (CLIPFORMAT)::RegisterClipboardFormat(CFSTR_PREFERREDDROPEFFECT);
 
@@ -99,6 +100,11 @@ STDMETHODIMP CDataObject::GetData(FORMATETC* pFormatetc, STGMEDIUM* pMedium)
       return _SetHGLOBAL(pMedium, &dwValue, sizeof(dwValue));
    }
 
+   if ( pFormatetc->cfFormat == s_cfUNTRUSTEDDRAGDROP )
+   {
+       return E_NOTIMPL;
+   }
+
    return E_NOTIMPL;
 }
 
@@ -125,6 +131,7 @@ STDMETHODIMP CDataObject::QueryGetData(FORMATETC* pFormatetc)
       { s_cfPREFERREDDROPEFFECT,  TYMED_HGLOBAL,   VFS_CAN_SLOW_COPY },
       { s_cfFILEDESCRIPTOR,       TYMED_HGLOBAL,   VFS_HAVE_VIRTUAL_FILES },
       { s_cfFILECONTENTS,         TYMED_ISTREAM,   VFS_HAVE_VIRTUAL_FILES },
+      //{ s_cfUNTRUSTEDDRAGDROP,    TYMED_HGLOBAL,   VFS_HAVE_VIRTUAL_FILES },
    };
    for( int i = 0; i < lengthof(aSupportedFormats); i++ ) {
       if( pFormatetc->cfFormat != aSupportedFormats[i].cf ) continue;

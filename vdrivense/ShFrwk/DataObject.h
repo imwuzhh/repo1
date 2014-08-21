@@ -61,6 +61,7 @@ public:
 
    static CLIPFORMAT s_cfFILEDESCRIPTOR;             // Clipboard format for FILEDESCRIPTOR
    static CLIPFORMAT s_cfFILECONTENTS;               // Clipboard format for FILECONTENTS
+   static CLIPFORMAT s_cfUNTRUSTEDDRAGDROP;          // Clipboard format for UNTRUSTEDDRAGDROP
    static CLIPFORMAT s_cfPREFERREDDROPEFFECT;        // Clipboard format for PREFERREDDROPEFFECT
    static CLIPFORMAT s_cfPRIVATE;                    // Clipboard format for our private marker
 };

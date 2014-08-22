@@ -80,6 +80,10 @@ BEGIN
     BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&Download",                    ID_FILE_EXTRACT
+        MENUITEM SEPARATOR
+		MENUITEM "Share"                         ID_FILE_SHARE
+        MENUITEM "Link"                          ID_FILE_INNERLINK
+        MENUITEM "Distribute"                    ID_FILE_DISTRIBUTE
 		MENUITEM SEPARATOR
 		MENUITEM "Log"                           ID_FILE_VIEWLOG
 		MENUITEM SEPARATOR
@@ -91,10 +95,6 @@ BEGIN
         MENUITEM SEPARATOR
 		MENUITEM "PrevPage"                      ID_FILE_PREV
 		MENUITEM "NextPage"                      ID_FILE_NEXT
-		MENUITEM SEPARATOR
-        MENUITEM "Share"                         ID_FILE_SHARE
-        MENUITEM "Link"                          ID_FILE_INNERLINK
-        MENUITEM "Distribute"                    ID_FILE_DISTRIBUTE
         MENUITEM SEPARATOR
 		MENUITEM "&Upload",                      ID_FILE_UPLOAD
         MENUITEM "New &Folder",                  ID_FILE_NEWFOLDER

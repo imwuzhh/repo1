@@ -13,6 +13,8 @@ struct Edoc2Context {
     DWORD   pageSize;
     BOOL    fastCheck;
     DWORD   dwRootMask;
+    BOOL    fEnableSearchBar;
+    DWORD   dwTransEncoding;
     HINSTANCE hInst;
     Proto*  proto;
     wchar_t modulepath    [1024];

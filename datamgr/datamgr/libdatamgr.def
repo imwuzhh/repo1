@@ -3,6 +3,8 @@ EXPORTS
 	DMHttpTransferIsEnable
 	DMFastCheckIsEnable
 	DMHasRootChild
+	DMGetTransEncoding
+	DMSearchBarIsEnable
 	
 	DMOpen 
 	DMClose 

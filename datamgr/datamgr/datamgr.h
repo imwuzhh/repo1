@@ -130,6 +130,10 @@ BOOL DMFastCheckIsEnable();
 
 BOOL DMHasRootChild(DWORD dwCat);
 
+DWORD DMGetTransEncoding();
+
+BOOL DMSearchBarIsEnable();
+
 /**
 * Create an context for consequent api invoke.
 * Parameters:

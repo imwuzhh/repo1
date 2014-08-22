@@ -147,6 +147,13 @@ static HRESULT DMInit(HINSTANCE hInst){
 
     Utility::GetRootChildMask(context.configfile, &context.dwRootMask);
 
+    // Check if hide search bar
+    context.fEnableSearchBar = Utility::SearchBarIsEnable(context.configfile);
+
+    // Setup transfer encoding
+    context.dwTransEncoding = Utility::GetTransEncoding(context.configfile);
+    OUTPUTLOG("Current Transfer Encoding is %u", context.dwTransEncoding);
+
 	// Cleanup AccessToken
 	context.AccessToken [0] = _T('\0');
 
@@ -197,6 +204,16 @@ BOOL DMFastCheckIsEnable()
 BOOL DMHasRootChild(DWORD dwCat){
     if (!gspEdoc2Context) return FALSE;
     return dwCat & gspEdoc2Context->dwRootMask;
+}
+
+DWORD DMGetTransEncoding()
+{
+    return gspEdoc2Context && gspEdoc2Context->dwTransEncoding;
+}
+
+BOOL DMSearchBarIsEnable()
+{
+    return gspEdoc2Context && gspEdoc2Context->fEnableSearchBar;
 }
 
 /**

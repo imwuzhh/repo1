@@ -21,6 +21,8 @@ public:
     static BOOL CheckHttpEnable(const wchar_t * xmlconfigfile);
     static BOOL CheckHttpTransferEnable(const wchar_t * xmlconfigfile);
     static BOOL FastCheckIsEnable(const wchar_t * xmlconfigfile);
+    static BOOL SearchBarIsEnable(const wchar_t * xmlconfigfile);
+    static DWORD GetTransEncoding(const wchar_t * xmlconfigfile);
     static DWORD GetHttpTimeoutMs(const WCHAR * xmlconfigfile);
     static BOOL GetServiceBase(const wchar_t* xmlconfigfile, wchar_t * pszSvcBase, int maxcch);
     static BOOL GetServiceUser(const wchar_t* xmlconfigfile, wchar_t * pszSvcUser, int maxcch);

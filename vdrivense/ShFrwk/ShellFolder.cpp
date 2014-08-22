@@ -443,8 +443,12 @@ STDMETHODIMP CShellFolder::CreateViewObject(HWND hwndOwner, REFIID riid, LPVOID*
           m_pShellView = (IShellView *)*ppRetVal;
           m_pShellView->AddRef();
       }
-      // And remove default system search bar
-      _RemoveSystemSearchBar(hwndOwner);
+
+      if (!DMSearchBarIsEnable()){
+          // And remove default system search bar
+          _RemoveSystemSearchBar(hwndOwner);
+      }
+
       return Hr;
    }
    if( riid == IID_IDropTarget ) 

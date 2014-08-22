@@ -434,6 +434,86 @@ BOOL Utility::FastCheckIsEnable(const wchar_t * xmlconfigfile)
     return fastCheck;
 }
 
+BOOL Utility::SearchBarIsEnable(const wchar_t * xmlconfigfile)
+{
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return FALSE;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("View");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    TiXmlNode * target= local->FirstChild("SearchBar");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return FALSE;
+    }
+
+    BOOL enableSearchBar = !strnicmp(target->ToElement()->GetText(), "1", 1);
+
+    delete xdoc; xdoc = NULL;
+
+    return enableSearchBar;
+}
+
+DWORD Utility::GetTransEncoding(const wchar_t * xmlconfigfile)
+{
+    DWORD dwTransEncoding = CP_UTF8;
+
+    TiXmlDocument * xdoc = new TiXmlDocument();
+    if (!xdoc) return dwTransEncoding;
+
+    if (!xdoc->LoadFile((const char *)CW2A(xmlconfigfile))){
+        delete xdoc; xdoc = NULL;
+        return dwTransEncoding;
+    }
+
+    TiXmlElement * xroot = xdoc->RootElement();
+    if (!xroot){
+        delete xdoc; xdoc = NULL;
+        return dwTransEncoding;
+    }
+
+    TiXmlNode * local = xroot->FirstChild("Net");
+    if (!local) {
+        delete xdoc; xdoc = NULL;
+        return dwTransEncoding;
+    }
+
+    TiXmlNode * target= local->FirstChild("TransEncoding");
+    if (!target){
+        delete xdoc; xdoc = NULL;
+        return dwTransEncoding;
+    }
+
+    if ( !strnicmp(target->ToElement()->GetText(), "UTF8", 4) || !strnicmp(target->ToElement()->GetText(), "UTF-8", 5))
+    {
+        dwTransEncoding = CP_UTF8;
+    }
+
+    if ( !strnicmp(target->ToElement()->GetText(), "GBK", 3) || !strnicmp(target->ToElement()->GetText(), "GB2312", 6) || !strnicmp(target->ToElement()->GetText(), "GB18030", 7) )
+    {
+        dwTransEncoding = 936;
+    }
+
+    delete xdoc; xdoc = NULL;
+
+    return dwTransEncoding;
+}
+
 BOOL Utility::CheckHttpEnable(const wchar_t * xmlconfigfile)
 {
     TiXmlDocument * xdoc = new TiXmlDocument();

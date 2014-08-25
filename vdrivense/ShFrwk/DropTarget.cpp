@@ -29,6 +29,10 @@ HRESULT CDropTarget::Init(CShellFolder* pFolder, PCUITEMID_CHILD pidlItem, HWND 
 
 STDMETHODIMP CDropTarget::DragEnter(LPDATAOBJECT pDataObj, DWORD dwKeyState, POINTL ptl, LPDWORD pdwEffect)
 {
+   // HarryWu, 2014.8.25
+   // TODO: what is the defalut copy/move setting.
+   // Default copy/move? maybe you can check it in [pDataObject].
+   // Bjarke setup copy as default.
    ATLTRACE(L"CDropTarget::DragEnter, dwKeyState=0x%08x\n", dwKeyState);
    // Does the drag source provide acceptable clipboard format types?
    // We should ask the folder item about this.
@@ -175,7 +179,7 @@ DWORD CDropTarget::_GetDropEffectFromKeyState(DWORD dwKeyState) const
 {
    // The DROPEFFECT_MOVE operation is the default.
    // We don't support DROPEFFECT_LINK operations.
-   DWORD dwDropEffect = DROPEFFECT_MOVE;
+   DWORD dwDropEffect = DROPEFFECT_COPY;
    if( IsBitSet(dwKeyState, MK_CONTROL) ) dwDropEffect = DROPEFFECT_COPY;
    if( IsBitSet(dwKeyState, MK_SHIFT) ) dwDropEffect = DROPEFFECT_MOVE;
    return dwDropEffect;

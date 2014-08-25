@@ -413,10 +413,10 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 				}
 				// HarryWu, 2014.3.14
 				// Post task to external tool
-				DMUpload(_GetTarArchivePtr(), szFullPath, DestId, IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE) );
 				strFileList += szFullPath; strFileList += _T(";");
 				free(szFullPath);
 			}
+            if (!strFileList.empty()) DMUpload(_GetTarArchivePtr(), strFileList.c_str(), DestId, IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE) );
 		}
 		if (fmtec.cfFormat == CDataObject::s_cfFILEDESCRIPTOR){
 			FILEGROUPDESCRIPTOR * pFgd = (FILEGROUPDESCRIPTOR *)GlobalLock(medium.hGlobal);

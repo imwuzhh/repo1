@@ -413,7 +413,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 				}
 				// HarryWu, 2014.3.14
 				// Post task to external tool
-				strFileList += szFullPath; strFileList += _T(";");
+                strFileList += szFullPath; strFileList += _T("|");
 				free(szFullPath);
 			}
             if (!strFileList.empty()) DMUpload(_GetTarArchivePtr(), strFileList.c_str(), DestId, IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE) );

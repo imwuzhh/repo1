@@ -30,7 +30,7 @@ HRESULT CDropTarget::Init(CShellFolder* pFolder, PCUITEMID_CHILD pidlItem, HWND 
 STDMETHODIMP CDropTarget::DragEnter(LPDATAOBJECT pDataObj, DWORD dwKeyState, POINTL ptl, LPDWORD pdwEffect)
 {
    // HarryWu, 2014.8.25
-   // TODO: what is the defalut copy/move setting.
+   // TODO: what is the default copy/move setting.
    // Default copy/move? maybe you can check it in [pDataObject].
    // Bjarke setup copy as default.
    ATLTRACE(L"CDropTarget::DragEnter, dwKeyState=0x%08x\n", dwKeyState);

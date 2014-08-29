@@ -252,6 +252,7 @@ public:
    HRESULT _NaviageTo(PCUITEMID_CHILD pidl);
    HRESULT _GetCurrentSortColumn(PROPERTYKEY * pkey, SORTDIRECTION * iDirection);
    HRESULT _RemoveSystemSearchBar(HWND hWndOwner);
+   HRESULT _Refresh();
 };
 
 

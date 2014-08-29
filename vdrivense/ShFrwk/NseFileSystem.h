@@ -266,7 +266,6 @@ public:
    virtual HRESULT CreateFolder() = 0;
    virtual HRESULT Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName) = 0;
    virtual HRESULT Delete() = 0;
-   virtual HRESULT Refresh(VFS_REFRESH Reason) = 0;
    virtual HRESULT OnShellViewCreated(HWND hWndOwner, HWND shellViewWnd, DWORD dwCat, DWORD dwId) = 0;
    virtual HRESULT OnShellViewRefreshed(HWND hWndOwner, HWND shellViewWnd) = 0;
    virtual HRESULT OnShellViewSized(HWND hWndOwner, HWND shellViewWnd) = 0;
@@ -355,7 +354,6 @@ public:
 
    HRESULT GetStream(const VFS_STREAM_REASON& Reason, CNseFileStream** ppFile);
    HRESULT GetIdentity(LPWSTR pstrFilename);
-   HRESULT Refresh(VFS_REFRESH Reason);
 
    // Implementation
    CPidl _GetFullPidl() const;

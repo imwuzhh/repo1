@@ -525,14 +525,12 @@ STDMETHODIMP CShellFolder::GetAttributesOf(UINT cidl, PCUITEMID_CHILD_ARRAY rgpi
    ATLTRACE(L"CShellFolder::GetAttributesOf  count=%u mask=0x%X [SFGAO_%s]\n", cidl, *rgfInOut, DbgGetSFGAOF(*rgfInOut));
    DWORD dwOrigAttributes = *rgfInOut;
    if( *rgfInOut == 0 ) *rgfInOut = (SFGAOF)(~SFGAO_VALIDATE);
-   // Wants to validate folder items?
-   if( IsBitSet(dwOrigAttributes, SFGAO_VALIDATE) ) m_spFolderItem->Refresh(VFS_REFRESH_VALIDATE);
    // Gather attribute information for child items...
    for( UINT i = 0; i < cidl; i++ ) {
       CNseItemPtr spItem = GenerateChildItem(rgpidl[i]);
       if( spItem == NULL ) return AtlHresultFromWin32(ERROR_FILE_NOT_FOUND);
       *rgfInOut &= spItem->GetSFGAOF(dwOrigAttributes);
-      // Must honour SFGAO_VALIDATE flag: we need to trigger an actual lookup rather
+      // Must honor SFGAO_VALIDATE flag: we need to trigger an actual lookup rather
       // than possibly just fetching information out of the PIDL structure.
       if( IsBitSet(dwOrigAttributes, SFGAO_VALIDATE) ) {
          CNseItemPtr spTemp;
@@ -1284,7 +1282,6 @@ LRESULT CShellFolder::OnListRefreshed(UINT uMsg, WPARAM wParam, LPARAM lParam, B
    // This is an undocumented feature, but it appears that when the user
    // forces a refresh (ie. through F5) then the wParam is non-zero.
    OUTPUTLOG("%s() wParam=0x%08x", __FUNCTION__, wParam);
-   if( wParam != 0 ) m_spFolderItem->Refresh(VFS_REFRESH_USERFORCED);
    m_spFolderItem->OnShellViewRefreshed(m_hwndOwner, m_hShellDefView);
    return 0;
 }
@@ -1834,6 +1831,11 @@ HRESULT CShellFolder::_RemoveSystemSearchBar(HWND hWndOwner)
     //HWND hWndSearchBar = FindWindowExA(hWnd, NULL, "UniversalSearchBand", NULL);
     ShowWindow(hWnd, SW_HIDE);
     return S_OK;
+}
+
+HRESULT CShellFolder::_Refresh()
+{
+    return m_pShellView ? m_pShellView->Refresh() : S_OK;
 }
 
 HRESULT CShellFolder::StartOperations( void) 

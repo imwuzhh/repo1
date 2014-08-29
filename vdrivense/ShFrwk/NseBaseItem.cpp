@@ -442,14 +442,6 @@ HRESULT CNseBaseItem::GetIdentity(LPWSTR pstrFilename)
    return E_NOTIMPL;
 }
 
-/**
- * Force a refresh of children list.
- */
-HRESULT CNseBaseItem::Refresh(VFS_REFRESH Reason)
-{
-   return E_NOTIMPL;
-}
-
 // Static members
 
 /**
@@ -497,7 +489,8 @@ HRESULT CNseBaseItem::_RefreshRootView()
  */
 HRESULT CNseBaseItem::_RefreshFolderView()
 {
-   ::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST, m_pFolder->m_pidlMonitor);
+   m_pFolder->_Refresh();
+   //::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST | SHCNF_FLUSH  , m_pFolder->m_pidlMonitor);
    return S_OK;
 }
 

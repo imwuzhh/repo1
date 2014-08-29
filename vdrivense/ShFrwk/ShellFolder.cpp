@@ -1257,13 +1257,15 @@ LRESULT CShellFolder::OnBackGroudEnumDone(UINT uMsg, WPARAM wParam, LPARAM lPara
 	SORTDIRECTION iDirection = m_iSortDirection;
 	HR( _GetCurrentSortColumn(&pKey, &iDirection));
 	if (pKey == m_pSortKey && iDirection == m_iSortDirection){
-        OUTPUTLOG("%s(), key=%s, direction=%d, no sort", __FUNCTION__, GetPropertyKeyName(pKey).c_str(), iDirection);
+        OUTPUTLOG("%s(), key=%s, direction=%d, no sort", __FUNCTION__, GetPropertyKeyNameA(pKey).c_str(), iDirection);
         return S_OK;
     }
 
-	OUTPUTLOG("%s(), SortColumn=%s, direction=%d", __FUNCTION__, GetPropertyKeyName(pKey).c_str(), iDirection);
+	OUTPUTLOG("%s(), SortColumn=%s, direction=%d", __FUNCTION__, GetPropertyKeyNameA(pKey).c_str(), iDirection);
 	m_pSortKey = pKey;
     m_iSortDirection = iDirection;
+
+    m_spFolderItem->Resort(m_hwndOwner, m_hShellDefView,  GetPropertyKeyNameW(pKey).c_str(), iDirection);
 
     return S_OK;
 }

@@ -666,3 +666,13 @@ HRESULT CTarFileItem::_ClearRecycleBin(VFS_MENUCOMMAND & Cmd)
     _RefreshFolderView();
     return S_OK;
 }
+
+HRESULT CTarFileItem::Resort(HWND hWndOwner, HWND hShellView, const wchar_t *sortKey, int iDirection)
+{
+    // Only directories have sub-items
+    if( !IsFolder() ) return E_HANDLE;
+   
+    _RefreshFolderView();
+
+    return S_OK;
+}

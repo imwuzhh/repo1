@@ -272,6 +272,7 @@ public:
    virtual HRESULT OnShellViewClosing(HWND hWndOwner, HWND shellViewWnd) = 0;
    virtual HRESULT InitCustomColumns() = 0;
    virtual HRESULT SelectItems(HWND hWndOwner, HWND hShellViewWindow, LPCWSTR itemIds) = 0;
+   virtual HRESULT Resort(HWND, HWND, const wchar_t * , int) = 0;
 };
 
 

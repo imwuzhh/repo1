@@ -112,6 +112,7 @@ public:
    HRESULT OnShellViewClosing(HWND hWndOwner, HWND shellViewWnd);
    HRESULT InitCustomColumns();
    HRESULT SelectItems(HWND hWndOwner, HWND hShellViewWindow, LPCWSTR itemIds);
+   HRESULT Resort(HWND hWndOwner, HWND hShellView, const wchar_t * sortKey, int iDirection);
 
    HMENU GetMenu();
    HRESULT SelectMenuItems(HWND hDefShellView, const wchar_t* idstring, MenuType * selectedMenuItems);

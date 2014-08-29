@@ -218,6 +218,10 @@ HRESULT CTarFileItem::Rename(LPCWSTR pstrNewName, LPWSTR pstrOutputName)
 HRESULT CTarFileItem::Delete()
 {
    HR( DMDelete(_GetTarArchivePtr(), *(RemoteId *)(&m_pWfd->dwId), IsFolder()) );
+
+   CPidl pidl(m_pFolder->m_pidlRoot, m_pidlFolder, m_pidlItem);
+   ::SHChangeNotify(SHCNE_DELETE, SHCNF_IDLIST | SHCNF_FLUSH, pidl);
+
    return S_OK;
 }
 

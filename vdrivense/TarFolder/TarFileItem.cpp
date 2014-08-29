@@ -288,6 +288,7 @@ HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
    case ID_FILE_SEARCH:      return _Search(Cmd);
    case ID_FILE_RECOVER:     return _Recover(Cmd);
    case ID_FILE_CLEAR_ALL:   return _ClearRecycleBin(Cmd);
+   case DFM_CMD_DELETE:      return Delete();
    }
    return E_NOTIMPL;
 }

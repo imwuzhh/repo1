@@ -59,14 +59,19 @@ void DumpMenu(HMENU hMenu){
 	}
 }
 
-std::string GetPropertyKeyName(const PROPERTYKEY & pKey)
+std::string GetPropertyKeyNameA(const PROPERTYKEY & pKey)
+{
+    return (const char *)CW2A(GetPropertyKeyNameW(pKey).c_str());
+}
+
+std::wstring GetPropertyKeyNameW(const PROPERTYKEY & pKey)
 {
     WCHAR wszName[80] = L"";
     CCoTaskString str;
     if( SUCCEEDED( ::PSGetNameFromPropertyKey(pKey, &str) ) ) {
         wcscpy_s(wszName, lengthof(wszName), str);
     }
-    return (const char *)CW2A(wszName);
+    return wszName;
 }
 
 

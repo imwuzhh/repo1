@@ -82,7 +82,8 @@ FILETIME GetFileModifiedTime(LPCTSTR pstrFilename);
 BOOL IsFileTimeValid(const FILETIME& ft);
 std::string WideStringToAnsi(const wchar_t * wstr);
 void OutputLog(const char * format, ...);
-std::string GetPropertyKeyName(const PROPERTYKEY & pKey);
+std::string  GetPropertyKeyNameA(const PROPERTYKEY & pKey);
+std::wstring GetPropertyKeyNameW(const PROPERTYKEY & pKey);
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -28,7 +28,7 @@ SFGAOF CTarFileItem::GetSFGAOF(SFGAOF dwMask)
           | SFGAO_CANMOVE
           | SFGAO_CANDELETE
           | SFGAO_CANRENAME
-          | SFGAO_HASPROPSHEET;
+          /*| SFGAO_HASPROPSHEET*/;
 }
 
 /**

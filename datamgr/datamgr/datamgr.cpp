@@ -67,6 +67,13 @@ static DBType * gspGlobalDB = NULL;
 static __inline DBType * GetDB(TAR_ARCHIVE * pArchive) {return (gspGlobalDB);}
 //////////////////////////////////////////////////////////////////////////
 
+//////////////////////////////////////////////////////////////////////////
+// Global database index-ed by HWND
+typedef std::map<HWND, WndInfo> WndDbType;
+static WndDbType * gspGlobalWndDB = NULL;
+static __inline WndDbType * GetWndDB(TAR_ARCHIVE * pArchive){return (gspGlobalWndDB);}
+//////////////////////////////////////////////////////////////////////////
+
 // TAR archive manipulation
 
 /**
@@ -79,6 +86,8 @@ static HRESULT DMInit(HINSTANCE hInst){
 
     // Create a global db
     gspGlobalDB = new DBType();
+    // Create a global db
+    gspGlobalWndDB = new WndDbType();
 
     // Create a global context
 	gspEdoc2Context = new Edoc2Context();
@@ -983,3 +992,24 @@ HRESULT DMMove(TAR_ARCHIVE * pArchive, const wchar_t * srcIdList, RemoteId destF
 
     return S_OK;
 }
+
+HRESULT DMSetWndInfo(TAR_ARCHIVE * pArchive, HWND hWndOwner, const struct WndInfo * winfo)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    if (winfo->dwMagic != WndInfoMagic) return E_INVALIDARG;
+
+    GetWndDB(pArchive)->find(hWndOwner)->second = *winfo;
+
+    return S_OK;
+}
+
+HRESULT DMGetWndInfo(TAR_ARCHIVE * pArchive, HWND hWndOwner, struct WndInfo * winfo)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    *winfo = GetWndDB(pArchive)->find(hWndOwner)->second;
+
+    return S_OK;
+}
+

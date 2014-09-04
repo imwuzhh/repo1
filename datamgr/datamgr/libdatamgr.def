@@ -59,6 +59,9 @@ EXPORTS
 	
 	DMMove
 	
+	DMSetWndInfo
+	DMGetWndInfo
+	
 	DMMalloc
 	DMRealloc
 	DMFree

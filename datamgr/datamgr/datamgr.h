@@ -34,6 +34,7 @@ enum {
 
 enum {
 	MaxPageSize = 0x7ffff,
+    WndInfoMagic= 0x1d0c1d0c,
 };
 
 enum {
@@ -105,6 +106,15 @@ struct ViewSettings{
     struct ColumnDef aColumns [100];
 };
 
+struct WndInfo{
+    DWORD dwMagic;
+    HWND  hWnd;
+    RemoteId id;
+    DWORD pageNo;
+    DWORD totalPage;
+    wchar_t szQuery[100];
+};
+
 struct Edoc2Context;
 
 struct TAR_ARCHIVE
@@ -169,6 +179,10 @@ HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DAT
 * 
 */
 HRESULT DMGetPageSize(TAR_ARCHIVE * pArchive, DWORD * pdwPageSize);
+
+HRESULT DMSetWndInfo(TAR_ARCHIVE * pArchive, HWND hWndOwner, const struct WndInfo * winfo);
+
+HRESULT DMGetWndInfo(TAR_ARCHIVE * pArchive, HWND hWndOwner, struct WndInfo * winfo);
 
 
 /**

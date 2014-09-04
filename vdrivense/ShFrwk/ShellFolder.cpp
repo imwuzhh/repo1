@@ -1826,6 +1826,7 @@ HRESULT CShellFolder::_RemoveSystemSearchBar(HWND hWndOwner)
     // Get the Windows version.
     DWORD dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
     DWORD dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
+
     if (dwMajorVersion == 6 && dwMinorVersion == 1)// Win7
     {
         if (m_hwndOwner == NULL) return S_OK;
@@ -1837,13 +1838,29 @@ HRESULT CShellFolder::_RemoveSystemSearchBar(HWND hWndOwner)
         if (hWnd == NULL) return S_OK;
         hWnd = GetWindow(hWnd, GW_HWNDLAST);
         if (hWnd == NULL) return S_OK;
-        //HWND hWndSearchBar = FindWindowExA(hWnd, NULL, "UniversalSearchBand", NULL);
         ShowWindow(hWnd, SW_HIDE);
     }
+
     if (dwMajorVersion == 6 && dwMinorVersion >= 2) // Win8
     {
-        //TODO: put code for win8 here.
-
+        if (m_hwndOwner == NULL) return S_OK;
+        HWND hWnd = GetWindow(m_hwndOwner, GW_HWNDPREV);
+        if (hWnd == NULL) return S_OK;
+        hWnd = GetWindow(hWnd, GW_CHILD);
+        if (hWnd == NULL) return S_OK;
+        hWnd = GetWindow(hWnd, GW_CHILD);
+        if (hWnd == NULL) return S_OK;
+        hWnd = GetWindow(hWnd, GW_HWNDFIRST);
+        if (hWnd == NULL) return S_OK;
+        while(hWnd)
+        {
+            TCHAR tcClassName[MAX_PATH]=_T("");
+            GetClassName(hWnd, tcClassName, MAX_PATH);
+            if(!_tcscmp(tcClassName,_T("UniversalSearchBand")))
+                break;
+            hWnd = GetWindow(hWnd,GW_HWNDNEXT);
+        }
+        if (hWnd) ShowWindow(hWnd, SW_HIDE);
     }
     return S_OK;
 }

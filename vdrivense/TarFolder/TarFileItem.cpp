@@ -614,7 +614,7 @@ HRESULT CTarFileItem::_Search(VFS_MENUCOMMAND & Cmd)
 {
     std::wstring query = _T("Undefined");
     if (Cmd.pUserData){
-        query = (const wchar_t *)CA2WEX<>((const char *)Cmd.pUserData, CP_UTF8);
+        query = (const wchar_t *)CA2WEX<>((const char *)Cmd.pUserData, CP_ACP);
     }
 
     VFS_FIND_DATA searchItem;

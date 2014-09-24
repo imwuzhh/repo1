@@ -9,7 +9,7 @@ HKCR
 			{
 				val ThreadingModel = s 'Apartment'
 			}
-			DefaultIcon = s '%MODULE%'
+			DefaultIcon = s '%MODULE%,-100'
 			ProgID = s '%PROJECTNAME%'
 			ForceRemove 'Implemented Categories'
 			{

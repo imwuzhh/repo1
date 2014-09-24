@@ -26,6 +26,7 @@ BOOL CTarShellModule::GetConfigBool(VFS_CONFIG Item)
    case VFS_CAN_ROOT_SHELLNEW:
    case VFS_CAN_ROOT_DROPTARGET:
    case VFS_CAN_ROOT_CONTEXTMENU:
+   case VFS_CAN_ROOT_STARTMENU_LINK:
       return TRUE;
 
    case VFS_HAVE_ICONOVERLAYS:
@@ -61,10 +62,10 @@ LONG CTarShellModule::GetConfigInt(VFS_CONFIG Item)
 
    case VFS_INT_SHELLROOT_SFGAO:
        return   SFGAO_FOLDER 
-			  | SFGAO_CANCOPY 
-              | SFGAO_CANMOVE 
-              | SFGAO_CANRENAME 
-              | SFGAO_DROPTARGET
+			  //| SFGAO_CANCOPY 
+              //| SFGAO_CANMOVE 
+              //| SFGAO_CANRENAME 
+              //| SFGAO_DROPTARGET
               //| SFGAO_STREAM
               | SFGAO_BROWSABLE 
               | SFGAO_HASSUBFOLDER 

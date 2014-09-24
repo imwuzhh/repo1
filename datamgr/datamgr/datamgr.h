@@ -107,12 +107,14 @@ struct ViewSettings{
 };
 
 struct WndInfo{
-    DWORD dwMagic;
-    HWND  hWnd;
-    RemoteId id;
-    DWORD pageNo;
-    DWORD totalPage;
-    wchar_t szQuery[100];
+    DWORD        dwMagic;
+    HWND         hWnd;
+    RemoteId     id;
+    DWORD        pageNo;
+    DWORD        totalPage;
+    int          iSortDirection;
+    wchar_t      szSortKey[100];
+    wchar_t      szQuery[100];
 };
 
 struct Edoc2Context;
@@ -169,7 +171,7 @@ HRESULT DMClose(TAR_ARCHIVE* pArchive);
 */
 HRESULT DMGetRootChildren(TAR_ARCHIVE* pArchive, RemoteId dwId, VFS_FIND_DATA ** aList, int * nListCount);
 
-HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, HWND hWndOwner, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** aList, int * nListCount);
+HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, HWND hWndOwner, RemoteId dwId, int PageSize, int PageNo, const wchar_t * sortKey, int iSortDirection, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** aList, int * nListCount);
 
 HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DATA * wfd);
 

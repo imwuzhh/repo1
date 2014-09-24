@@ -1,5 +1,6 @@
 
 #define IDI_APP                         100
+#define IDI_APP_GRAY                    101
 #define IDR_MAINFRAME                   128
 
 #define IDS_NSE_PROJNAME                200

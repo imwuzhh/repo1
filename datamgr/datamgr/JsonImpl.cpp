@@ -155,7 +155,7 @@ BOOL JsonImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, 
     return TRUE;
 }
 
-BOOL JsonImpl::GetDocInfo(TAR_ARCHIVE *pArchive, HWND hWndOwner, const RemoteId &folderId, std::list<std::wstring> & columns, std::list<VFS_FIND_DATA> &children, int PageSize, int PageNo, int *PageCount)
+BOOL JsonImpl::GetDocInfo(TAR_ARCHIVE *pArchive, HWND hWndOwner, const RemoteId &folderId, std::list<std::wstring> & columns, std::list<VFS_FIND_DATA> &children, int PageSize, int PageNo, const std::wstring & sortKey, int iSortDirection, int *PageCount)
 {
     // HarryWu, 2014.2.28
     // Json Format request, not in use now, 
@@ -184,7 +184,7 @@ BOOL JsonImpl::GetDocInfo(TAR_ARCHIVE *pArchive, HWND hWndOwner, const RemoteId 
     return TRUE;
 }
 
-BOOL JsonImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, HWND hWndOwner, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
+BOOL JsonImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, HWND hWndOwner, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, const std::wstring & sortKey, int iSortDirection, int* PageCount)
 {
     // HarryWu, 2014.2.28
     // Json Format request, not in use now, 
@@ -212,7 +212,7 @@ BOOL JsonImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, HWND hWndOwner, std:
     return TRUE;
 }
 
-BOOL JsonImpl::GetPagedSearchResults(TAR_ARCHIVE * pArchive, HWND hWndOwner, const std::wstring & query, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
+BOOL JsonImpl::GetPagedSearchResults(TAR_ARCHIVE * pArchive, HWND hWndOwner, const std::wstring & query, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, const std::wstring & sortKey, int iSortDirection, int* PageCount)
 {
     Json::StyledWriter writer;
     Json::Value  root;

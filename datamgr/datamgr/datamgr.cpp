@@ -342,9 +342,9 @@ HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DAT
     return S_OK;
 }
 
-HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, HWND hWndOwner, RemoteId dwId, int PageSize, int PageNo, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** retList, int * nListCount)
+HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, HWND hWndOwner, RemoteId dwId, int PageSize, int PageNo, const wchar_t * sortKey, int iSortDirection, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** retList, int * nListCount)
 {
-    OUTPUTLOG("%s(), RemoteId={%d, %d}", __FUNCTION__, dwId.category, dwId.id);
+    OUTPUTLOG("%s(), RemoteId={%d, %d}, PageSize=%u, PageNo=%u, sortKey=%s, sortDirection=%d", __FUNCTION__, dwId.category, dwId.id, PageSize, PageNo, (const char *)CW2A(sortKey), iSortDirection);
     *retList = NULL; *nListCount = 0;
     // not implemented for root, use default NON-PAGED version.
     if (dwId.category == VdriveCat){
@@ -358,12 +358,12 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, HWND hWndOwner, RemoteId dwId, int P
     std::list<VFS_FIND_DATA> tmpList;
     if (dwId.category == PublicCat || dwId.category == PersonCat)
     {
-        if(!GetProto(pArchive)->GetDocInfo(pArchive, hWndOwner, dwId, columns, tmpList, PageSize, PageNo, totalPage))
+        if(!GetProto(pArchive)->GetDocInfo(pArchive, hWndOwner, dwId, columns, tmpList, PageSize, PageNo, sortKey, iSortDirection, totalPage))
             return S_FALSE;
     }
     if (dwId.category == RecycleCat)
     {
-        if(!GetProto(pArchive)->GetPagedRecycleItems(pArchive, hWndOwner, tmpList, PageSize, PageNo, totalPage))
+        if(!GetProto(pArchive)->GetPagedRecycleItems(pArchive, hWndOwner, tmpList, PageSize, PageNo, sortKey, iSortDirection, totalPage))
             return S_FALSE;        
     }
     if (dwId.category == SearchCat){
@@ -374,7 +374,7 @@ HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, HWND hWndOwner, RemoteId dwId, int P
         const ServerItemInfo & refItem = GetDB(pArchive)->find(SearchId)->second;
         query = refItem.szQuery;
 
-        if(!GetProto(pArchive)->GetPagedSearchResults(pArchive, hWndOwner, query, tmpList, PageSize, PageNo, totalPage))
+        if(!GetProto(pArchive)->GetPagedSearchResults(pArchive, hWndOwner, query, tmpList, PageSize, PageNo, sortKey, iSortDirection, totalPage))
             return S_FALSE;
     }
     if (!tmpList.size()) return S_FALSE;
@@ -921,7 +921,7 @@ HRESULT DMFindChild(TAR_ARCHIVE * pArchive, RemoteId parentId, LPCWSTR childName
     if (parentId.category != PublicCat && parentId.category != PersonCat){
         lock.Unlock();
         int totalPage = 0; VFS_FIND_DATA * pChild = NULL; int nChildCount = 0; ViewSettings vs;
-        HR (DMGetDocInfo(pArchive, NULL/*--query data only--*/, parentId, MaxPageSize, 1, &totalPage, &vs, &pChild, &nChildCount));
+        HR (DMGetDocInfo(pArchive, NULL/*--query data only--*/, parentId, MaxPageSize, 1, NULL, 0, &totalPage, &vs, &pChild, &nChildCount));
         for (int i = 0; i < nChildCount; i ++){
             if (!wcscmp(pChild[i].cFileName, childName)){
                 *pInfo = pChild[i];break;
@@ -999,7 +999,14 @@ HRESULT DMSetWndInfo(TAR_ARCHIVE * pArchive, HWND hWndOwner, const struct WndInf
 
     if (winfo->dwMagic != WndInfoMagic) return E_INVALIDARG;
 
-    GetWndDB(pArchive)->find(hWndOwner)->second = *winfo;
+    if (GetWndDB(pArchive)->find(hWndOwner) == GetWndDB(pArchive)->end()){
+        GetWndDB(pArchive)->insert(std::make_pair(hWndOwner, *winfo));
+        return S_OK;
+    }
+
+    WndInfo & wi = GetWndDB(pArchive)->find(hWndOwner)->second;
+
+    if (wi.dwMagic == WndInfoMagic) wi = *winfo;
 
     return S_OK;
 }
@@ -1008,7 +1015,10 @@ HRESULT DMGetWndInfo(TAR_ARCHIVE * pArchive, HWND hWndOwner, struct WndInfo * wi
 {
     CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
 
-    *winfo = GetWndDB(pArchive)->find(hWndOwner)->second;
+    memset(winfo, 0, sizeof(*winfo));
+
+    if (GetWndDB(pArchive)->find(hWndOwner) != GetWndDB(pArchive)->end())
+        *winfo = GetWndDB(pArchive)->find(hWndOwner)->second;
 
     return S_OK;
 }

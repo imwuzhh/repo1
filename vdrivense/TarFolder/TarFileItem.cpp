@@ -126,6 +126,15 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
    DWORD dwPageSize = 0;
    HR (DMGetPageSize(_GetTarArchivePtr(), &dwPageSize));
 
+   std::wstring sSortKey = _T("");
+   int iSortDirection = 0;
+   struct WndInfo winfo; memset(&winfo, 0, sizeof(winfo));
+   HR (DMGetWndInfo(_GetTarArchivePtr(), hwndOwner, &winfo));
+   if (winfo.dwMagic == WndInfoMagic) {
+        sSortKey = winfo.szSortKey;
+        iSortDirection = winfo.iSortDirection;
+   }
+
    // HarryWu, 2014.1.29
    // Note!, it is NOT safe to pass c++ objects array between modules.
    // use /MD to generate these modules.
@@ -139,12 +148,12 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
        if (dwId.category != VdriveCat){
            /*HR*/ (DMGetCurrentPageNumber(_GetTarArchivePtr(), dwId, &dwCurrPage));
        }
-       HR( DMGetDocInfo(_GetTarArchivePtr(), hwndOwner, *(RemoteId *)&dwId, dwPageSize, dwCurrPage, (int *)&dwTotalPage, &vs, &aList, &nListCount));
+       HR( DMGetDocInfo(_GetTarArchivePtr(), hwndOwner, *(RemoteId *)&dwId, dwPageSize, dwCurrPage, sSortKey.c_str(), iSortDirection, (int *)&dwTotalPage, &vs, &aList, &nListCount));
        if (dwId.id != VdriveId){
            /*HR*/( DMSetTotalPageNumber(_GetTarArchivePtr(), dwId, dwTotalPage));
        }  
    }else{
-       HR( DMGetDocInfo(_GetTarArchivePtr(), hwndOwner, *(RemoteId *)&dwId, MaxPageSize, 1, (int *)&dwTotalPage, &vs, &aList, &nListCount));
+       HR( DMGetDocInfo(_GetTarArchivePtr(), hwndOwner, *(RemoteId *)&dwId, MaxPageSize, 1, sSortKey.c_str(), iSortDirection, (int *)&dwTotalPage, &vs, &aList, &nListCount));
    } 
 
    for( int i = 0; i < nListCount; i++ ) {
@@ -155,7 +164,9 @@ HRESULT CTarFileItem::EnumChildren(HWND hwndOwner, SHCONTF grfFlags, CSimpleValA
       // Cache it to db
       DMAddItemToDB(_GetTarArchivePtr(), aList[i].dwId, aList[i].cFileName, IsBitSet(aList[i].dwFileAttributes, FILE_ATTRIBUTE_DIRECTORY));
    }
+   
    DMFree((LPBYTE)aList);
+
    return S_OK;
 }
 
@@ -603,7 +614,7 @@ HRESULT CTarFileItem::_Search(VFS_MENUCOMMAND & Cmd)
 {
     std::wstring query = _T("Undefined");
     if (Cmd.pUserData){
-        query = (const wchar_t *)CA2WEX<>((const char *)Cmd.pUserData, CP_UTF8);
+        query = (const wchar_t *)CA2WEX<>((const char *)Cmd.pUserData, CP_ACP);
     }
 
     VFS_FIND_DATA searchItem;
@@ -672,11 +683,20 @@ HRESULT CTarFileItem::_ClearRecycleBin(VFS_MENUCOMMAND & Cmd)
     return S_OK;
 }
 
-HRESULT CTarFileItem::Resort(HWND hWndOwner, HWND hShellView, const wchar_t *sortKey, int iDirection)
+HRESULT CTarFileItem::Resort(HWND hWndOwner, HWND hShellView, const wchar_t *sortKey, int iSortDirection)
 {
     // Only directories have sub-items
     if( !IsFolder() ) return E_HANDLE;
    
+    struct WndInfo wi;
+    HR (DMGetWndInfo(_GetTarArchivePtr(), hWndOwner, &wi));
+    if (wi.dwMagic != WndInfoMagic) {
+        memset(&wi, 0, sizeof(wi)); wi.dwMagic = WndInfoMagic;
+    }
+    wcscpy_s(wi.szSortKey, lengthof(wi.szSortKey), sortKey ? sortKey : _T(""));
+    wi.iSortDirection = iSortDirection;
+    HR (DMSetWndInfo(_GetTarArchivePtr(), hWndOwner, &wi));
+
     _RefreshFolderView();
 
     return S_OK;

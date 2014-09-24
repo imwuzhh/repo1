@@ -585,6 +585,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\res\Folder.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\res\Folder_gray.ico"
+				>
+			</File>
+			<File
 				RelativePath=".\res\properties.xslt"
 				>
 			</File>

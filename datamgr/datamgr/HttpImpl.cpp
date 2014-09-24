@@ -305,7 +305,7 @@ BOOL HttpImpl::GetChildFiles(TAR_ARCHIVE * pArchive, const RemoteId & remoteId, 
     return TRUE;
 }
 
-BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, HWND hWndOwner, const RemoteId & remoteId, std::list<std::wstring> & columns, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
+BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, HWND hWndOwner, const RemoteId & remoteId, std::list<std::wstring> & columns, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, const std::wstring & sortKey, int iSortDirection, int* PageCount)
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
@@ -461,7 +461,7 @@ BOOL HttpImpl::GetDocInfo(TAR_ARCHIVE * pArchive, HWND hWndOwner, const RemoteId
     return TRUE;
 }
 
-BOOL HttpImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, HWND hWndOwner, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
+BOOL HttpImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, HWND hWndOwner, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, const std::wstring & sortKey, int iSortDirection, int* PageCount)
 {
     // HarryWu, 2014.2.28
     // Here begin of HttpRequest, directly to remote server
@@ -641,7 +641,7 @@ BOOL HttpImpl::GetPagedRecycleItems(TAR_ARCHIVE * pArchive, HWND hWndOwner, std:
     return TRUE;
 }
 
-BOOL HttpImpl::GetPagedSearchResults(TAR_ARCHIVE * pArchive, HWND hWndOwner, const std::wstring & query, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, int* PageCount)
+BOOL HttpImpl::GetPagedSearchResults(TAR_ARCHIVE * pArchive, HWND hWndOwner, const std::wstring & query, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, const std::wstring & sortKey, int iSortDirection, int* PageCount)
 {
     // http://192.168.253.242/api/api/files/Search?token=9c5323a6-dab1-4704-8703-4dbae644bfa7&pageNum=1&pageSize=50&searchKey=test
     for (int i = 0; i < PageSize; i ++){
@@ -1182,7 +1182,7 @@ BOOL HttpImpl::CheckToken(TAR_ARCHIVE * pArchive, LPCWSTR token)
 BOOL HttpImpl::FindChild(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * childName, VFS_FIND_DATA & childInfo)
 {
 	std::list<std::wstring> lColumns; std::list<VFS_FIND_DATA> vChildren; int totalPage = 0;
-	if (GetDocInfo(pArchive, NULL/*--query data only--*/, parentId, lColumns, vChildren, MaxPageSize, 1, &totalPage)){
+	if (GetDocInfo(pArchive, NULL/*--query data only--*/, parentId, lColumns, vChildren, MaxPageSize, 1, _T(""), 0, &totalPage)){
 		for (std::list<VFS_FIND_DATA>::iterator it = vChildren.begin(); it != vChildren.end(); it++)
 		{
 			const VFS_FIND_DATA & test = *it;

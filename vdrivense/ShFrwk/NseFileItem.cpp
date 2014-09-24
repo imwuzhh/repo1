@@ -45,6 +45,13 @@ BYTE CNseFileItem::GetType()
 HRESULT CNseFileItem::GetSysIcon(UINT uIconFlags, int* pIconIndex)
 {
    // Use our SHGetFileSysIcon() method to get the System Icon index
+	if (0 && ::ILIsEmpty(m_pidlFolder)){
+		if (m_pWfd->dwId.category == RecycleCat) *pIconIndex = 33;
+		if (m_pWfd->dwId.category == SearchCat) *pIconIndex = 23;
+		if (m_pWfd->dwId.category == PublicCat) *pIconIndex = 172;
+		if (m_pWfd->dwId.category == PersonCat) *pIconIndex = 259;
+		return S_OK;
+	}
    return ::SHGetFileSysIcon(m_pWfd->cFileName, m_pWfd->dwFileAttributes, uIconFlags, pIconIndex);
 }
 

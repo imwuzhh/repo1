@@ -135,8 +135,8 @@ HRESULT CShellFolder::FinalConstruct()
    m_hShellDefView = NULL;
    m_hMenu = m_hContextMenu = NULL;
    m_pShellView = NULL;
-   m_pSortKey = PKEY_ParsingName;
-   m_iSortDirection = SORT_ASCENDING;
+   m_pSortKey = PKEY_Null;
+   m_iSortDirection = 0;
    return S_OK;
 }
 
@@ -1262,11 +1262,15 @@ LRESULT CShellFolder::OnBackGroudEnumDone(UINT uMsg, WPARAM wParam, LPARAM lPara
     }
 
 	OUTPUTLOG("%s(), SortColumn=%s, direction=%d", __FUNCTION__, GetPropertyKeyNameA(pKey).c_str(), iDirection);
+	if (m_pSortKey == PKEY_Null){
+		m_pSortKey = pKey;
+		m_iSortDirection = iDirection;
+		return S_OK;
+	}
+
 	m_pSortKey = pKey;
-    m_iSortDirection = iDirection;
-
+	m_iSortDirection = iDirection;
     m_spFolderItem->Resort(m_hwndOwner, m_hShellDefView,  GetPropertyKeyNameW(pKey).c_str(), iDirection);
-
     return S_OK;
 }
 

@@ -1112,7 +1112,7 @@ BOOL Utility::ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime2)
         , &retTime->wSecond
         , &retTime->wMilliseconds);
     TIME_ZONE_INFORMATION tz; GetTimeZoneInformation(&tz);
-    SystemTimeToTzSpecificLocalTime(&tz, retTime, retTime2);
+    TzSpecificLocalTimeToSystemTime(&tz, retTime, retTime2);
     return TRUE;
 }
 

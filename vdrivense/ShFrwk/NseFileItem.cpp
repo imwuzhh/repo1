@@ -90,7 +90,7 @@ HRESULT CNseFileItem::GetColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column)
 	  { PKEY_Size,                        SHCOLSTATE_TYPE_INT  | SHCOLSTATE_ONBYDEFAULT,                    0 },
       { PKEY_DateCreated,                 SHCOLSTATE_TYPE_DATE | SHCOLSTATE_ONBYDEFAULT,                    0 },
       { PKEY_DateModified,                SHCOLSTATE_TYPE_DATE | SHCOLSTATE_ONBYDEFAULT,                    0 },
-      { PKEY_ItemType,                    SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
+      { PKEY_ItemTypeText,                SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
 	  { PKEY_FileVersion,                 SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
 	  { PKEY_Author,                      SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
 	  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

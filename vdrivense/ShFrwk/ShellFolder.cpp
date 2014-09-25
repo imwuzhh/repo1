@@ -372,6 +372,13 @@ STDMETHODIMP CShellFolder::CompareIDs(LPARAM lParam, PCUIDLIST_RELATIVE pidl1, P
       CNseItemPtr spItem1 = spFolder->GenerateChildItem(static_cast<PCUITEMID_CHILD>(pidl1));
       CNseItemPtr spItem2 = spFolder->GenerateChildItem(static_cast<PCUITEMID_CHILD>(pidl2));
       if( spItem1 == NULL || spItem2 == NULL ) return E_FAIL;
+      // HarryWu, 2014.09.25
+      // custom sorting in root space.
+      // always in this order, public->personal->recycle bin->search bin
+      if (::ILIsEmpty(m_pidlFolder)){
+          VFS_FIND_DATA wfd1 = spItem1->GetFindData(); VFS_FIND_DATA wfd2 = spItem2->GetFindData();
+          return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(wfd1.dwId.category - wfd2.dwId.category));
+      }
       // Items may be sorted by DIRECTORY attribute first
       if( !IsBitSet(Column.dwFlags, SHCOLSTATE_NOSORTBYFOLDERNESS) ) {
          CComPropVariant vfd1, vfd2;

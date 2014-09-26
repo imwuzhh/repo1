@@ -375,7 +375,7 @@ STDMETHODIMP CShellFolder::CompareIDs(LPARAM lParam, PCUIDLIST_RELATIVE pidl1, P
       // HarryWu, 2014.09.25
       // custom sorting in root space.
       // always in this order, public->personal->recycle bin->search bin
-      if (::ILIsEmpty(m_pidlFolder)){
+      if (0 && ::ILIsEmpty(m_pidlFolder)){
           VFS_FIND_DATA wfd1 = spItem1->GetFindData(); VFS_FIND_DATA wfd2 = spItem2->GetFindData();
           return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(wfd1.dwId.category - wfd2.dwId.category));
       }

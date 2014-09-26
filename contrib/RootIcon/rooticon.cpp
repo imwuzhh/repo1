@@ -1,3 +1,5 @@
+// remember to build it as x64, if your vdrivense64.dll is registed in system.
+
     std::string sValue = "D:\\workspace\\github\\repo1\\Debug\\VDriveNSE64.dll,-101";
     HKEY hOpenedKey = NULL;
     LONG nResult = RegOpenKeyExA(HKEY_CLASSES_ROOT, "CLSID\\{2C3256E4-49AA-11D3-8229-0050AE509054}\\DefaultIcon", 0, KEY_ALL_ACCESS, &hOpenedKey);

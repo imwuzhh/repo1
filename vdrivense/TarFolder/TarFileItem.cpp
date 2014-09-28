@@ -466,6 +466,8 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
             if (!sIdList.empty())
                 DMMove(_GetTarArchivePtr(), sIdList.c_str(), DestId, IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE) );
 
+            ::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST | SHCNF_FLUSH  , m_pFolder->m_pidlMonitor);
+
 			GlobalUnlock(medium.hGlobal);
 		}
         return S_OK;

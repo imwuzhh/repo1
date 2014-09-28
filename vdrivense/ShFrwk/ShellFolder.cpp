@@ -1078,6 +1078,9 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
       {
          const DFMICS* pDFMICS = reinterpret_cast<DFMICS*>(lParam);
          ATLASSERT(pDFMICS->cbSize==sizeof(DFMICS));
+         if ((UINT)wParam == DFM_CMD_DELETE && pDFMICS->punkSite == NULL){// 1) DMMove with same destination, 2) drag to system recycle bin. 
+             return S_OK;
+         }
          CComPtr<IShellItemArray> spItems;
          ::SHCreateShellItemArrayFromDataObject(pDataObject, IID_PPV_ARGS(&spItems));
          VFS_MENUCOMMAND Cmd = { hwndOwner, (UINT) wParam, HIWORD(pDFMICS->pici->lpVerb) != 0 ? pDFMICS->pici->lpVerb : VFS_MNUCMD_NOVERB, DROPEFFECT_COPY, NULL, spItems, NULL, pDFMICS->punkSite, NULL };

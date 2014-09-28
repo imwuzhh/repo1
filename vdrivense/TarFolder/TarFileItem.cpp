@@ -680,8 +680,11 @@ HRESULT CTarFileItem::_Recover(VFS_MENUCOMMAND & Cmd)
 
 HRESULT CTarFileItem::_ClearRecycleBin(VFS_MENUCOMMAND & Cmd)
 {
-    HR ( DMClearRecycleBin(_GetTarArchivePtr()));
-    _RefreshFolderView();
+    if(DMClearRecycleBin(_GetTarArchivePtr()) == S_OK)	
+	{
+		_RefreshFolderView();
+		DMSetPageNumber(_GetTarArchivePtr(), m_pWfd->dwId, 1);
+	}
     return S_OK;
 }
 

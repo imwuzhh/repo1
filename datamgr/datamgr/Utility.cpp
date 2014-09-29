@@ -1103,6 +1103,7 @@ BOOL Utility::ParseTime(const std::wstring & timestr, SYSTEMTIME * retTime2)
 {
     // "2014-03-26T16:15:38.223"
     SYSTEMTIME sTime, *retTime ; retTime = &sTime;
+    memset(&sTime, 0, sizeof(sTime));
     _stscanf_s(timestr.c_str(), _T("%04hd-%02hd-%02hdT%02hd:%02hd:%02hd.%03hd")
         , &retTime->wYear
         , &retTime->wMonth

@@ -706,7 +706,7 @@ STDMETHODIMP CShellFolder::SetNameOf(HWND hwnd, PCUITEMID_CHILD pidl, LPCWSTR ps
       CPidl pidlNew = m_pidlMonitor + spNewItem->GetITEMID();
       ::SHChangeNotify(spNewItem->IsFolder() ? SHCNE_RENAMEFOLDER : SHCNE_RENAMEITEM, SHCNF_IDLIST | SHCNF_FLUSH, pidlOld, pidlNew);
    }
-   ::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST, m_pidlMonitor);
+   //::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST, m_pidlMonitor);
    return S_OK;
 }
 

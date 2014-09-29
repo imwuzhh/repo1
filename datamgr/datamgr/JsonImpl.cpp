@@ -259,6 +259,28 @@ BOOL JsonImpl::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL 
     return TRUE;
 }
 
+BOOL JsonImpl::BatchDelete(TAR_ARCHIVE * pArchive, const wchar_t * batchIds)
+{
+    Json::StyledWriter writer;
+    Json::Value  root;
+    root ["Server"] = (const char *)CW2A(pArchive->context->service);
+    root ["Port"]   = (int)pArchive->context->JsonPort;
+    root ["Version"]= "1.0.0.1";
+    root ["Token" ] = (const char *)CW2A(pArchive->context->AccessToken);
+    root ["Method"] = "BatchDelete";
+    Json::Value parameters; 
+    parameters["idlist"] = (const char *)CW2A(batchIds);
+
+    root ["Params"] = parameters;
+    std::string jsonString = writer.write(root);
+
+    std::wstring response;
+    if (!Utility::JsonRequest((const wchar_t *)CA2W(jsonString.c_str()), response))
+        return FALSE;
+
+    return TRUE;
+}
+
 BOOL JsonImpl::RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * newName, BOOL isFolder)
 {
     Json::StyledWriter writer;

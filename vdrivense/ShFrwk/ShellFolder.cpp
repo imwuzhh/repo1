@@ -1078,8 +1078,15 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
       {
          const DFMICS* pDFMICS = reinterpret_cast<DFMICS*>(lParam);
          ATLASSERT(pDFMICS->cbSize==sizeof(DFMICS));
-         if ((UINT)wParam == DFM_CMD_DELETE && pDFMICS->punkSite == NULL){// 1) DMMove with same destination, 2) drag to system recycle bin. 
-             return S_OK;
+         if ((UINT)wParam == DFM_CMD_DELETE ){
+             // HarryWu, 2014.09.29
+             // prompt for delete confirmation here
+             if (FALSE /* && ConfirmationForDelete*/){
+                return S_OK;
+             }
+             if ( pDFMICS->punkSite == NULL){// 1) DMMove with same destination, 2) drag to system recycle bin. 
+                 return S_OK;
+             }
          }
          CComPtr<IShellItemArray> spItems;
          ::SHCreateShellItemArrayFromDataObject(pDataObject, IID_PPV_ARGS(&spItems));
@@ -1585,6 +1592,7 @@ HRESULT CShellFolder::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
          if (Cmd.wMenuID == ID_FILE_DISTRIBUTE) break;
          if (Cmd.wMenuID == ID_FILE_INNERLINK) break;
          if (Cmd.wMenuID == ID_FILE_OLDVERSION) break;
+         if (Cmd.wMenuID == DFM_CMD_DELETE) break;
       }
    }
    // Any item can abort if they performed the entire operation alone

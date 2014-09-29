@@ -207,6 +207,14 @@ HRESULT DMRename(TAR_ARCHIVE* pArchive, RemoteId itemId, LPCWSTR pstrNewName, BO
 HRESULT DMDelete(TAR_ARCHIVE* pArchive, RemoteId itemId, BOOL isFolder);
 
 /**
+* Delete items
+* Parameters:
+* [pArchive] the context.
+* [itemId] id list of items, which will be deleted.
+*/
+HRESULT DMBatchDelete(TAR_ARCHIVE* pArchive, const wchar_t * batchIds);
+
+/**
 * Create new folder
 * Parameters:
 * [pArchive] the context.

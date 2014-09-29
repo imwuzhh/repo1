@@ -303,7 +303,7 @@ HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
    case ID_FILE_SEARCH:      return _Search(Cmd);
    case ID_FILE_RECOVER:     return _Recover(Cmd);
    case ID_FILE_CLEAR_ALL:   return _ClearRecycleBin(Cmd);
-   case DFM_CMD_DELETE:      return Delete();
+   case DFM_CMD_DELETE:      return _BatchDelete(Cmd);
    }
    return E_NOTIMPL;
 }
@@ -706,3 +706,15 @@ HRESULT CTarFileItem::Resort(HWND hWndOwner, HWND hShellView, const wchar_t *sor
 
     return S_OK;
 }
+
+HRESULT CTarFileItem::_BatchDelete(VFS_MENUCOMMAND & Cmd)
+{
+    std::wstring sIdList = GetSelectedIdList(Cmd);
+
+    HR (DMBatchDelete(_GetTarArchivePtr(), sIdList.c_str()));
+
+    _RefreshFolderView();
+
+    return S_OK;
+}
+

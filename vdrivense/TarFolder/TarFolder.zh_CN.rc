@@ -1,4 +1,4 @@
-О╩©
+
 #include "resource.h"
 
 
@@ -80,42 +80,42 @@ BEGIN
     POPUP "ContextMenu"
     BEGIN
         MENUITEM SEPARATOR
-        MENUITEM "Д╦▀Х╫╫(&D)",                   ID_FILE_EXTRACT
+        MENUITEM "обть(&D)",                   ID_FILE_EXTRACT
         MENUITEM SEPARATOR
-        MENUITEM "Е┘╠Д╨╚(&S)"                    ID_FILE_SHARE
-        MENUITEM "Е├┘И⌠╬(&I)"                    ID_FILE_INNERLINK
-        MENUITEM "Е╓√Е▐▒(&R)"                    ID_FILE_DISTRIBUTE
+        MENUITEM "╧╡оМ(&S)"                    ID_FILE_SHARE
+        MENUITEM "дза╢(&I)"                    ID_FILE_INNERLINK
+        MENUITEM "мБ╥╒(&R)"                    ID_FILE_DISTRIBUTE
 		MENUITEM SEPARATOR
-		MENUITEM "Ф÷╔Г°▀Ф≈╔Е©≈(&L)"                ID_FILE_VIEWLOG
+		MENUITEM "╡И©╢хуж╬(&L)"                ID_FILE_VIEWLOG
 		MENUITEM SEPARATOR
 ///////////////////////////////////////////////////////////////////////
-		MENUITEM "Х©≤Е▌÷"                       ID_FILE_RECOVER
+		MENUITEM "╩╧т╜"                       ID_FILE_RECOVER
     END
     POPUP "ViewMenu"
     BEGIN
         MENUITEM SEPARATOR
-		MENUITEM "Д╦┼Д╦─И║╣(&P)"                  ID_FILE_PREV
-		MENUITEM "Д╦▀Д╦─И║╣(&N)"                  ID_FILE_NEXT
+		MENUITEM "иор╩рЁ(&P)"                  ID_FILE_PREV
+		MENUITEM "обр╩рЁ(&N)"                  ID_FILE_NEXT
         MENUITEM SEPARATOR
-		MENUITEM "Д╦┼Д╪═(&U)",                   ID_FILE_UPLOAD
-        MENUITEM "Ф√╟Е╩╨Ф√┤Д╩╤Е╓╧(&F)",             ID_FILE_NEWFOLDER
+		MENUITEM "ио╢╚(&U)",                   ID_FILE_UPLOAD
+        MENUITEM "пб╫╗нд╪Ч╪п(&F)",             ID_FILE_NEWFOLDER
 		MENUITEM SEPARATOR
-		MENUITEM "Ф÷╔Г°▀Ф≈╔Е©≈(&L)"                ID_FILE_VIEWLOG
+		MENUITEM "╡И©╢хуж╬(&L)"                ID_FILE_VIEWLOG
 		MENUITEM SEPARATOR
-		MENUITEM "Ф░°Г╢╒(&L)"                    ID_FILE_SEARCH
+		MENUITEM "кякВ(&L)"                    ID_FILE_SEARCH
 		MENUITEM SEPARATOR
 ////////////////////////////////////////////////////////////////////////
-		MENUITEM "Ф╦┘Г╘╨Е⌡·Ф■╤Г╚≥"                  ID_FILE_CLEAR_ALL
+		MENUITEM "гЕ©у╩ьйуу╬"                  ID_FILE_CLEAR_ALL
 		MENUITEM SEPARATOR
     END
     POPUP "CommandMenu"
     BEGIN
-        MENUITEM "Д╦▀Х╫╫(&D)",                   ID_COMMAND_EXTRACT
+        MENUITEM "обть(&D)",                   ID_COMMAND_EXTRACT
     END
     POPUP "ExplorerMenu"
     BEGIN
         MENUITEM SEPARATOR
-        MENUITEM "Д╦▀Х╫╫Е┘╗И┐╗(&D)...",            ID_FILE_EXTRACT
+        MENUITEM "обтьх╚╡©(&D)...",            ID_FILE_EXTRACT
     END
 END
 
@@ -123,26 +123,26 @@ IDM_FILE MENU DISCARDABLE
 BEGIN
     POPUP "ContextMenu"
     BEGIN
-        MENUITEM "И╒└Х╖┬(&P)",                    ID_FILE_PREVIEW
-        MENUITEM "Д╦▀Х╫╫(&D)",                    ID_FILE_EXTRACT
+        MENUITEM "т╓юю(&P)",                    ID_FILE_PREVIEW
+        MENUITEM "обть(&D)",                    ID_FILE_EXTRACT
         MENUITEM SEPARATOR
-        MENUITEM "Е┘╠Д╨╚(&S)"                     ID_FILE_SHARE
-        MENUITEM "Е├┘И⌠╬(&I)"                     ID_FILE_INNERLINK
-        MENUITEM "Е╓√Е▐▒(&R)"                     ID_FILE_DISTRIBUTE
+        MENUITEM "╧╡оМ(&S)"                     ID_FILE_SHARE
+        MENUITEM "дза╢(&I)"                     ID_FILE_INNERLINK
+        MENUITEM "мБ╥╒(&R)"                     ID_FILE_DISTRIBUTE
         MENUITEM SEPARATOR
-        MENUITEM "Ф┴╘Е╠∙Г╪√Х╬▒(&E)"                 ID_FILE_EXTEDIT
-        MENUITEM "И■│Е╝ (&L)"                     ID_FILE_LOCK
-        MENUITEM "Х╖ёИ■│(&U)"                     ID_FILE_UNLOCK
-        MENUITEM "Е▌├Е▐╡Г┴┬Ф°╛(&H)"                 ID_FILE_OLDVERSION
+        MENUITEM "ю╘у╧╠Ю╪╜(&E)"                 ID_FILE_EXTEDIT
+        MENUITEM "кЬ╤╗(&L)"                     ID_FILE_LOCK
+        MENUITEM "╫БкЬ(&U)"                     ID_FILE_UNLOCK
+        MENUITEM "юЗй╥╟Ф╠╬(&H)"                 ID_FILE_OLDVERSION
         MENUITEM SEPARATOR
-		MENUITEM "Ф÷╔Г°▀Ф≈╔Е©≈(&L)"                 ID_FILE_VIEWLOG
+		MENUITEM "╡И©╢хуж╬(&L)"                 ID_FILE_VIEWLOG
 		MENUITEM SEPARATOR
 ///////////////////////////////////////////////////////////////////////
-		MENUITEM "Х©≤Е▌÷"                         ID_FILE_RECOVER
+		MENUITEM "╩╧т╜"                         ID_FILE_RECOVER
     END
     POPUP "CommandMenu"
     BEGIN
-        MENUITEM "Д╦▀Х╫╫(&D)",                    ID_COMMAND_EXTRACT
+        MENUITEM "обть(&D)",                    ID_COMMAND_EXTRACT
     END
 END
 
@@ -165,16 +165,16 @@ END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-   ID_FILE_OPEN            "Ф┴⌠Е╪─Ф√┤Ф║ё\nopen"
-   ID_FILE_NEWFOLDER       "Е┬⌡Е╩╨Д╦─Д╦╙Ф√╟Ф√┤Д╩╤Е╓╧\nNewFolder"
-   ID_FILE_PROPERTIES      "Ф≤╬Г╓╨Ф√┤Ф║ёЕ╠·Ф─╖\nproperties"
-   ID_FILE_EXTRACT         "Д╩▌Х©°Г╗▀Д╦▀Х╫╫Ф√┤Д╩╤Е┬╟Ф°╛Е°╟\nDownload"
+   ID_FILE_OPEN            "╢Р©╙нд╣╣\nopen"
+   ID_FILE_NEWFOLDER       "╢╢╫╗р╩╦Жпбнд╪Ч╪п\nNewFolder"
+   ID_FILE_PROPERTIES      "отй╬нд╣╣йТпт\nproperties"
+   ID_FILE_EXTRACT         "╢ст╤Ёлобтьнд╪Ч╣╫╠╬╣ь\nDownload"
 END
 
 STRINGTABLE DISCARDABLE 
 BEGIN
-   IDS_EXTRACTTITLE        "Д╩▌Х©°Г╗▀Д╦▀Х╫╫Ф√┤Д╩╤Е┬╟Ф°╛Е°╟..."
-   IDS_NEWFOLDER           "Ф√╟Е╩╨Ф√┤Д╩╤Е╓╧"
+   IDS_EXTRACTTITLE        "╢ст╤Ёлобтьнд╪Ч╣╫╠╬╣ь..."
+   IDS_NEWFOLDER           "пб╫╗нд╪Ч╪п"
 END
 
 

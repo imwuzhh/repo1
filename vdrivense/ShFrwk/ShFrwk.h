@@ -59,6 +59,7 @@
 #include <atlcom.h>
 #include <atlcoll.h>
 #include <atlwin.h>
+#include <CommonControls.h>
 
 // Compiling the code requires a recent version of the Microsoft SDK.
 // A version is available for download on the Microsoft MSDN site.

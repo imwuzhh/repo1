@@ -437,6 +437,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 		if (fmtec.cfFormat == CDataObject::s_cfFILEDESCRIPTOR){
 			FILEGROUPDESCRIPTOR * pFgd = (FILEGROUPDESCRIPTOR *)GlobalLock(medium.hGlobal);
             std::wstring sIdList;
+            PIDLIST_ABSOLUTE pidlSource = NULL;
 			for (int i = 0; i < pFgd->cItems; i ++){
 				std::wstring filepath = pFgd->fgd[i].cFileName;
                 OUTPUTLOG("%s(), Action=[%s], Source=[{%d.%d}:{%d.%d}:{%s}], Dest=[%d.%d:{%s}]", __FUNCTION__
@@ -462,11 +463,16 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
                     sIdList += szBuf;
                     sIdList += _T(";");
                 }
+                pidlSource = (PIDLIST_ABSOLUTE)pFgd->fgd[i].ftLastAccessTime.dwHighDateTime;
 			}
             if (!sIdList.empty())
                 DMMove(_GetTarArchivePtr(), sIdList.c_str(), DestId, IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE) );
 
             ::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST | SHCNF_FLUSH  , m_pFolder->m_pidlMonitor);
+
+            if (pidlSource && !::ILIsEmpty(pidlSource)){
+                ::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST | SHCNF_FLUSH  , pidlSource);
+            }
 
 			GlobalUnlock(medium.hGlobal);
 		}

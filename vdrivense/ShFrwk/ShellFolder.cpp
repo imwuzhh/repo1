@@ -1593,6 +1593,7 @@ HRESULT CShellFolder::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
          if (Cmd.wMenuID == ID_FILE_INNERLINK) break;
          if (Cmd.wMenuID == ID_FILE_OLDVERSION) break;
          if (Cmd.wMenuID == DFM_CMD_DELETE) break;
+         if (Cmd.wMenuID == ID_FILE_RECOVER) break;
       }
    }
    // Any item can abort if they performed the entire operation alone

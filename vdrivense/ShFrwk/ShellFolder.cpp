@@ -658,7 +658,7 @@ STDMETHODIMP CShellFolder::GetDisplayNameOf(PCUITEMID_CHILD pidl, SHGDNF uFlags,
          return S_OK;
       }
    }
-   WCHAR wszName[300] = { 0 };
+   std::wstring wszName/*[300] = { 0 }*/;
    const VFS_FIND_DATA wfd = spItem->GetFindData();
    // This is part of the hack to get the SaveAs dialog working.
    // We have redirected the file to a temporary file in the %TEMP% folder.
@@ -672,16 +672,16 @@ STDMETHODIMP CShellFolder::GetDisplayNameOf(PCUITEMID_CHILD pidl, SHGDNF uFlags,
    if( IsBitSet(uFlags, SHGDN_FORPARSING) && !IsBitSet(uFlags, SHGDN_INFOLDER) ) {
       CCoTaskString strFolder;
       HR( ::SHGetNameFromIDList(m_pidlMonitor, bNeedsParsingName ? SIGDN_DESKTOPABSOLUTEPARSING : SIGDN_DESKTOPABSOLUTEEDITING, &strFolder) );
-      wcscat_s(wszName, lengthof(wszName), strFolder);
-      wcscat_s(wszName, lengthof(wszName), L"\\");
+      wszName += (const wchar_t *)strFolder;//wcscat_s(wszName, lengthof(wszName), strFolder);
+      wszName += L"\\";//wcscat_s(wszName, lengthof(wszName), L"\\");
    }
    // Append item's name too
    REFPROPERTYKEY pkey = bNeedsParsingName ? PKEY_ParsingName : PKEY_ItemNameDisplay;
    CComPropVariant v;
    HR( spItem->GetProperty(pkey, v) );
    ATLASSERT(v.vt==VT_LPWSTR);
-   wcscat_s(wszName, lengthof(wszName), v.pwszVal);
-   return StrToSTRRET(wszName, psrName);
+   wszName += v.pwszVal;//wcscat_s(wszName, lengthof(wszName), v.pwszVal);
+   return StrToSTRRET(wszName.c_str(), psrName);
 }
 
 STDMETHODIMP CShellFolder::SetNameOf(HWND hwnd, PCUITEMID_CHILD pidl, LPCWSTR pszName, SHGDNF uFlags, PITEMID_CHILD* ppidlOut)

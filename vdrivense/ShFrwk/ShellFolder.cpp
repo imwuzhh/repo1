@@ -372,6 +372,13 @@ STDMETHODIMP CShellFolder::CompareIDs(LPARAM lParam, PCUIDLIST_RELATIVE pidl1, P
       CNseItemPtr spItem1 = spFolder->GenerateChildItem(static_cast<PCUITEMID_CHILD>(pidl1));
       CNseItemPtr spItem2 = spFolder->GenerateChildItem(static_cast<PCUITEMID_CHILD>(pidl2));
       if( spItem1 == NULL || spItem2 == NULL ) return E_FAIL;
+      // HarryWu, 2014.09.25
+      // custom sorting in root space.
+      // always in this order, public->personal->recycle bin->search bin
+      if (0 && ::ILIsEmpty(m_pidlFolder)){
+          VFS_FIND_DATA wfd1 = spItem1->GetFindData(); VFS_FIND_DATA wfd2 = spItem2->GetFindData();
+          return MAKE_HRESULT(SEVERITY_SUCCESS, 0, USHORT(wfd1.dwId.category - wfd2.dwId.category));
+      }
       // Items may be sorted by DIRECTORY attribute first
       if( !IsBitSet(Column.dwFlags, SHCOLSTATE_NOSORTBYFOLDERNESS) ) {
          CComPropVariant vfd1, vfd2;
@@ -651,7 +658,7 @@ STDMETHODIMP CShellFolder::GetDisplayNameOf(PCUITEMID_CHILD pidl, SHGDNF uFlags,
          return S_OK;
       }
    }
-   WCHAR wszName[300] = { 0 };
+   std::wstring wszName/*[300] = { 0 }*/;
    const VFS_FIND_DATA wfd = spItem->GetFindData();
    // This is part of the hack to get the SaveAs dialog working.
    // We have redirected the file to a temporary file in the %TEMP% folder.
@@ -665,16 +672,16 @@ STDMETHODIMP CShellFolder::GetDisplayNameOf(PCUITEMID_CHILD pidl, SHGDNF uFlags,
    if( IsBitSet(uFlags, SHGDN_FORPARSING) && !IsBitSet(uFlags, SHGDN_INFOLDER) ) {
       CCoTaskString strFolder;
       HR( ::SHGetNameFromIDList(m_pidlMonitor, bNeedsParsingName ? SIGDN_DESKTOPABSOLUTEPARSING : SIGDN_DESKTOPABSOLUTEEDITING, &strFolder) );
-      wcscat_s(wszName, lengthof(wszName), strFolder);
-      wcscat_s(wszName, lengthof(wszName), L"\\");
+      wszName += (const wchar_t *)strFolder;//wcscat_s(wszName, lengthof(wszName), strFolder);
+      wszName += L"\\";//wcscat_s(wszName, lengthof(wszName), L"\\");
    }
    // Append item's name too
    REFPROPERTYKEY pkey = bNeedsParsingName ? PKEY_ParsingName : PKEY_ItemNameDisplay;
    CComPropVariant v;
    HR( spItem->GetProperty(pkey, v) );
    ATLASSERT(v.vt==VT_LPWSTR);
-   wcscat_s(wszName, lengthof(wszName), v.pwszVal);
-   return StrToSTRRET(wszName, psrName);
+   wszName += v.pwszVal;//wcscat_s(wszName, lengthof(wszName), v.pwszVal);
+   return StrToSTRRET(wszName.c_str(), psrName);
 }
 
 STDMETHODIMP CShellFolder::SetNameOf(HWND hwnd, PCUITEMID_CHILD pidl, LPCWSTR pszName, SHGDNF uFlags, PITEMID_CHILD* ppidlOut)
@@ -699,7 +706,7 @@ STDMETHODIMP CShellFolder::SetNameOf(HWND hwnd, PCUITEMID_CHILD pidl, LPCWSTR ps
       CPidl pidlNew = m_pidlMonitor + spNewItem->GetITEMID();
       ::SHChangeNotify(spNewItem->IsFolder() ? SHCNE_RENAMEFOLDER : SHCNE_RENAMEITEM, SHCNF_IDLIST | SHCNF_FLUSH, pidlOld, pidlNew);
    }
-   ::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST, m_pidlMonitor);
+   //::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST, m_pidlMonitor);
    return S_OK;
 }
 
@@ -1071,6 +1078,16 @@ STDMETHODIMP CShellFolder::CallBack(IShellFolder* psf, HWND hwndOwner, IDataObje
       {
          const DFMICS* pDFMICS = reinterpret_cast<DFMICS*>(lParam);
          ATLASSERT(pDFMICS->cbSize==sizeof(DFMICS));
+         if ((UINT)wParam == DFM_CMD_DELETE ){
+             // HarryWu, 2014.09.29
+             // prompt for delete confirmation here
+             if (FALSE /* && ConfirmationForDelete*/){
+                return S_OK;
+             }
+             if ( pDFMICS->punkSite == NULL){// 1) DMMove with same destination, 2) drag to system recycle bin. 
+                 return S_OK;
+             }
+         }
          CComPtr<IShellItemArray> spItems;
          ::SHCreateShellItemArrayFromDataObject(pDataObject, IID_PPV_ARGS(&spItems));
          VFS_MENUCOMMAND Cmd = { hwndOwner, (UINT) wParam, HIWORD(pDFMICS->pici->lpVerb) != 0 ? pDFMICS->pici->lpVerb : VFS_MNUCMD_NOVERB, DROPEFFECT_COPY, NULL, spItems, NULL, pDFMICS->punkSite, NULL };
@@ -1575,6 +1592,8 @@ HRESULT CShellFolder::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
          if (Cmd.wMenuID == ID_FILE_DISTRIBUTE) break;
          if (Cmd.wMenuID == ID_FILE_INNERLINK) break;
          if (Cmd.wMenuID == ID_FILE_OLDVERSION) break;
+         if (Cmd.wMenuID == DFM_CMD_DELETE) break;
+         if (Cmd.wMenuID == ID_FILE_RECOVER) break;
       }
    }
    // Any item can abort if they performed the entire operation alone

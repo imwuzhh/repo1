@@ -19,7 +19,8 @@ void CExplorerCommandProvider::FinalRelease()
 
 HRESULT CExplorerCommandProvider::Init(CShellFolder* pFolder, HWND hWnd, HMENU hMenu)
 {
-   ATLTRACE(L"CExplorerCommandProvider::Init\n");
+    ATLTRACE(L"CExplorerCommandProvider::Init\n");
+    ATLTRACENOTIMPL(L"CExplorerCommandProvider::Init\n");
    m_spFolder = pFolder;
    m_hMenu = hMenu;
    m_hWnd = hWnd;

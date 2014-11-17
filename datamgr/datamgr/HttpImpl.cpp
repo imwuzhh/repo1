@@ -718,6 +718,12 @@ BOOL HttpImpl::DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL 
     return FALSE;
 }
 
+BOOL HttpImpl::BatchDelete(TAR_ARCHIVE * pArchive, const wchar_t * batchIds)
+{
+    // Not implemented.
+    return TRUE;
+}
+
 BOOL HttpImpl::RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * newName, BOOL isFolder)
 {
     // HarryWu, 2014.2.28

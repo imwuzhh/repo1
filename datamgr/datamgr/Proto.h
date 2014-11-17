@@ -20,7 +20,9 @@ public:
      virtual BOOL GetPagedSearchResults(TAR_ARCHIVE * pArchive, HWND hWndOwner, const std::wstring & query, std::list<VFS_FIND_DATA> & children, int PageSize, int PageNo, const std::wstring & sortKey, int iSortDirection, int* PageCount) = 0;
      
      virtual BOOL DeleteItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, BOOL isFolder) = 0;
-     
+
+     virtual BOOL BatchDelete(TAR_ARCHIVE * pArchive, const wchar_t * batchIds) = 0;
+
      virtual BOOL RenameItem(TAR_ARCHIVE * pArchive, const RemoteId & itemId, const wchar_t * newName, BOOL isFolder) = 0;
      
      virtual BOOL CreateFolder(TAR_ARCHIVE * pArchive, const RemoteId & parentId, const wchar_t * folderName, RemoteId * retId) = 0;

@@ -5,9 +5,9 @@
 #include "ShellFolder.h"
 #include "PropSheetExt.h"
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // NSE File Item - Default virtual folder/file implementation
+
 
 CNseFileItem::CNseFileItem(CShellFolder* pFolder, PCIDLIST_RELATIVE pidlFolder, PCITEMID_CHILD pidlItem, BOOL bReleaseItem) :
    CNseBaseItem(pFolder, pidlFolder, pidlItem, bReleaseItem)
@@ -45,11 +45,44 @@ BYTE CNseFileItem::GetType()
 HRESULT CNseFileItem::GetSysIcon(UINT uIconFlags, int* pIconIndex)
 {
    // Use our SHGetFileSysIcon() method to get the System Icon index
-	if (0 && ::ILIsEmpty(m_pidlFolder)){
-		if (m_pWfd->dwId.category == RecycleCat) *pIconIndex = 33;
-		if (m_pWfd->dwId.category == SearchCat) *pIconIndex = 23;
-		if (m_pWfd->dwId.category == PublicCat) *pIconIndex = 172;
-		if (m_pWfd->dwId.category == PersonCat) *pIconIndex = 259;
+    // Note, to use ILEmpty to check pidl `is' null.
+    // ==> http://msdn.microsoft.com/en-us/library/windows/desktop/bb776454(v=vs.85).aspx
+    if (::ILIsEmpty(m_pidlFolder) && m_pidlItem && !::ILIsEmpty(m_pidlItem) && ::ILIsEmpty(::ILNext(m_pidlItem)) ){
+        static int siRootBeginIndex = 0;
+        static std::map<int, std::string> imageMap;
+        if (imageMap.size() == 0){
+            // Initialize a table for imagelist of different size.
+            imageMap.insert(std::make_pair(SHIL_LARGE,       "Images\\RootIcons_32x32.bmp"));
+            imageMap.insert(std::make_pair(SHIL_SMALL,       "Images\\RootIcons_16x16.bmp"));
+            imageMap.insert(std::make_pair(SHIL_SYSSMALL,    "Images\\RootIcons_SysSmall.bmp"));
+            imageMap.insert(std::make_pair(SHIL_EXTRALARGE,  "Images\\RootIcons_48x48.bmp"));
+            //TODO: but jumbo will fail, :(
+            imageMap.insert(std::make_pair(SHIL_JUMBO,       "Images\\RootIcons_256x256.bmp"));
+
+            // Load the imagelist and setup [RootBeginIndex_Large] with index of newly append image.
+            for (std::map<int, std::string>::iterator it = imageMap.begin(); it != imageMap.end(); it ++){
+                HIMAGELIST hImageList = NULL;
+                SHGetImageList(it->first, IID_IImageList, (void **)&hImageList);
+                if (!hImageList) continue ;
+                char szFullResPath [MAX_PATH] = "";
+                GetModuleFileNameA(_pModule->get_m_hInst(), szFullResPath, lengthof(szFullResPath));
+                strrchr(szFullResPath, _T('\\'))[1] = 0; strcat_s(szFullResPath, lengthof(szFullResPath), it->second.c_str());
+                HBITMAP hBmp = (HBITMAP )LoadImageA(_pModule->m_hInstResource, szFullResPath, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+                if (hBmp) {
+                    int iRootBeginIndex = ImageList_Add(hImageList, hBmp, NULL);
+                    OUTPUTLOG("Load [%s] at Index=%u, error=%d", szFullResPath, iRootBeginIndex, GetLastError());
+                    if (iRootBeginIndex != -1)
+                        siRootBeginIndex = iRootBeginIndex;
+                    DeleteObject(hBmp); hBmp = NULL;
+                }
+            }
+        }
+
+        OUTPUTLOG("%s(Flags=0x%08x)", __FUNCTION__, uIconFlags);
+        if (m_pWfd->dwId.category == PublicCat ) *pIconIndex = siRootBeginIndex + 0;
+        if (m_pWfd->dwId.category == PersonCat ) *pIconIndex = siRootBeginIndex + 1;
+        if (m_pWfd->dwId.category == SearchCat ) *pIconIndex = siRootBeginIndex + 2;
+        if (m_pWfd->dwId.category == RecycleCat) *pIconIndex = siRootBeginIndex + 3;
 		return S_OK;
 	}
    return ::SHGetFileSysIcon(m_pWfd->cFileName, m_pWfd->dwFileAttributes, uIconFlags, pIconIndex);
@@ -90,7 +123,7 @@ HRESULT CNseFileItem::GetColumnInfo(UINT iColumn, VFS_COLUMNINFO& Column)
 	  { PKEY_Size,                        SHCOLSTATE_TYPE_INT  | SHCOLSTATE_ONBYDEFAULT,                    0 },
       { PKEY_DateCreated,                 SHCOLSTATE_TYPE_DATE | SHCOLSTATE_ONBYDEFAULT,                    0 },
       { PKEY_DateModified,                SHCOLSTATE_TYPE_DATE | SHCOLSTATE_ONBYDEFAULT,                    0 },
-      { PKEY_ItemType,                    SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
+      { PKEY_ItemTypeText,                SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
 	  { PKEY_FileVersion,                 SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
 	  { PKEY_Author,                      SHCOLSTATE_TYPE_STR  | SHCOLSTATE_ONBYDEFAULT,                    0 },
 	  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

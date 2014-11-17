@@ -303,7 +303,7 @@ HRESULT CTarFileItem::ExecuteMenuCommand(VFS_MENUCOMMAND& Cmd)
    case ID_FILE_SEARCH:      return _Search(Cmd);
    case ID_FILE_RECOVER:     return _Recover(Cmd);
    case ID_FILE_CLEAR_ALL:   return _ClearRecycleBin(Cmd);
-   case DFM_CMD_DELETE:      return Delete();
+   case DFM_CMD_DELETE:      return _BatchDelete(Cmd);
    }
    return E_NOTIMPL;
 }
@@ -437,6 +437,7 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
 		if (fmtec.cfFormat == CDataObject::s_cfFILEDESCRIPTOR){
 			FILEGROUPDESCRIPTOR * pFgd = (FILEGROUPDESCRIPTOR *)GlobalLock(medium.hGlobal);
             std::wstring sIdList;
+            PIDLIST_ABSOLUTE pidlSource = NULL;
 			for (int i = 0; i < pFgd->cItems; i ++){
 				std::wstring filepath = pFgd->fgd[i].cFileName;
                 OUTPUTLOG("%s(), Action=[%s], Source=[{%d.%d}:{%d.%d}:{%s}], Dest=[%d.%d:{%s}]", __FUNCTION__
@@ -462,9 +463,16 @@ HRESULT CTarFileItem::_DoPasteFiles(VFS_MENUCOMMAND& Cmd)
                     sIdList += szBuf;
                     sIdList += _T(";");
                 }
+                pidlSource = (PIDLIST_ABSOLUTE)pFgd->fgd[i].ftLastAccessTime.dwHighDateTime;
 			}
             if (!sIdList.empty())
                 DMMove(_GetTarArchivePtr(), sIdList.c_str(), DestId, IsBitSet(Cmd.dwDropEffect, DROPEFFECT_MOVE) );
+
+            ::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST | SHCNF_FLUSH  , m_pFolder->m_pidlMonitor);
+
+            if (pidlSource && !::ILIsEmpty(pidlSource)){
+                ::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST | SHCNF_FLUSH  , pidlSource);
+            }
 
 			GlobalUnlock(medium.hGlobal);
 		}
@@ -678,8 +686,11 @@ HRESULT CTarFileItem::_Recover(VFS_MENUCOMMAND & Cmd)
 
 HRESULT CTarFileItem::_ClearRecycleBin(VFS_MENUCOMMAND & Cmd)
 {
-    HR ( DMClearRecycleBin(_GetTarArchivePtr()));
-    _RefreshFolderView();
+    if(DMClearRecycleBin(_GetTarArchivePtr()) == S_OK)	
+	{
+		_RefreshFolderView();
+		DMSetPageNumber(_GetTarArchivePtr(), m_pWfd->dwId, 1);
+	}
     return S_OK;
 }
 
@@ -716,3 +727,15 @@ HRESULT CTarFileItem::Resort(HWND hWndOwner, HWND hShellView, const wchar_t *sor
 
     return S_OK;
 }
+
+HRESULT CTarFileItem::_BatchDelete(VFS_MENUCOMMAND & Cmd)
+{
+    std::wstring sIdList = GetSelectedIdList(Cmd);
+
+    HR (DMBatchDelete(_GetTarArchivePtr(), sIdList.c_str()));
+
+    _RefreshFolderView();
+
+    return S_OK;
+}
+

@@ -453,6 +453,23 @@ HRESULT DMDelete(TAR_ARCHIVE* pArchive, RemoteId itemId, BOOL isFolder)
 }
 
 /**
+* Delete files or folders.
+*/
+HRESULT DMBatchDelete(TAR_ARCHIVE* pArchive, const wchar_t * batchIds)
+{
+    CComCritSecLock<CComCriticalSection> lock(pArchive->csLock);
+
+    OUTPUTLOG("%s(), RemoteId={%s}", __FUNCTION__, (const char *)CW2A(batchIds));
+
+    if (!GetProto(pArchive)->BatchDelete(pArchive, batchIds))
+    {
+        return E_FAIL;
+    }
+
+    return S_OK;
+}
+
+/**
  * Create a new sub-folder in the archive.
  */
 HRESULT DMCreateFolder(TAR_ARCHIVE* pArchive, RemoteId parentId, LPCWSTR pwstrFilename, VFS_FIND_DATA * pWfd)

@@ -694,6 +694,21 @@ HRESULT CTarFileItem::_ClearRecycleBin(VFS_MENUCOMMAND & Cmd)
     return S_OK;
 }
 
+HRESULT CTarFileItem::_DoNewFolder(VFS_MENUCOMMAND& Cmd, UINT uLabelRes)
+{
+	//HarryWu, 2014.11.17
+	//Check existence first.
+	CComBSTR bstrLabel;
+	bstrLabel.LoadString(uLabelRes);
+
+	CNseItemPtr spPrevItem;
+	this->GetChild(bstrLabel.m_str, SHGDN_FORPARSING, &spPrevItem);
+	if( spPrevItem != NULL ) {
+		return AtlHresultFromWin32(ERROR_FILE_EXISTS);
+	}
+	return CNseBaseItem::_DoNewFolder(Cmd, uLabelRes);
+}
+
 HRESULT CTarFileItem::Resort(HWND hWndOwner, HWND hShellView, const wchar_t *sortKey, int iSortDirection)
 {
     // Only directories have sub-items

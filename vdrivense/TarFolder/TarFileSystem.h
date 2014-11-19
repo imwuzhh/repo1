@@ -139,6 +139,7 @@ public:
    HRESULT _Recover(VFS_MENUCOMMAND & Cmd);
    HRESULT _ClearRecycleBin(VFS_MENUCOMMAND & Cmd);
    HRESULT _BatchDelete(VFS_MENUCOMMAND & Cmd);
+   HRESULT _DoNewFolder(VFS_MENUCOMMAND& Cmd, UINT uLabelRes);
    
    // Utility
    std::wstring GetSelectedIdList(VFS_MENUCOMMAND & Cmd);

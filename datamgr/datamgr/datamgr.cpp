@@ -345,7 +345,7 @@ HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DAT
 HRESULT DMGetDocInfo(TAR_ARCHIVE* pArchive, HWND hWndOwner, RemoteId dwId, int PageSize, int PageNo, const wchar_t * sortKey, int iSortDirection, int * totalPage, ViewSettings * pVS, VFS_FIND_DATA ** retList, int * nListCount)
 {
     OUTPUTLOG("%s(), RemoteId={%d, %d}, PageSize=%u, PageNo=%u, sortKey=%s, sortDirection=%d", __FUNCTION__, dwId.category, dwId.id, PageSize, PageNo, (const char *)CW2A(sortKey), iSortDirection);
-    *retList = NULL; *nListCount = 0;
+    *retList = NULL; *nListCount = 0; sortKey = sortKey ? sortKey : L"";
     // not implemented for root, use default NON-PAGED version.
     if (dwId.category == VdriveCat){
         HR(DMGetRootChildren(pArchive, dwId, retList, nListCount));

@@ -85,6 +85,8 @@ BOOL HttpImpl::Login(TAR_ARCHIVE * pArchive)
         position = response.find(_T("\""), position + 1 );
     }
 
+    if (response.length() >= maxTokenLength) return FALSE;
+
     wcscpy_s(accessToken, maxTokenLength, response.c_str());
     return TRUE;
 }

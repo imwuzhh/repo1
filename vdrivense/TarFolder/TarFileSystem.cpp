@@ -1,6 +1,7 @@
 
 #include "stdafx.h"
-
+#include <DbgHelp.h>
+#pragma comment(lib, "DbgHelp.lib")
 #include "TarFileSystem.h"
 
 
@@ -129,6 +130,7 @@ BOOL CTarShellModule::DllMain(DWORD dwReason, LPVOID lpReserved)
 	if (dwReason == DLL_PROCESS_ATTACH){
         if (FAILED(CheckCallingProcess())) return FALSE;
 		LoadLangResource();
+        InstallExceptionHandler();
 	}
     return TRUE;
 }
@@ -184,6 +186,28 @@ HRESULT CTarShellModule::CheckCallingProcess()
     if (!stricmp(szExeName, "Explorer") || !stricmp(szExeName, "Regsvr32"))
         return S_OK;
     return E_FAIL;
+}
+
+HRESULT CTarShellModule::InstallExceptionHandler()
+{
+    SetUnhandledExceptionFilter(ExceptionHandler);
+    return S_OK;
+}
+
+LONG WINAPI CTarShellModule::ExceptionHandler(struct _EXCEPTION_POINTERS* ExceptionInfo)
+{
+    wchar_t * pwszDumpPath = NULL; SHGetKnownFolderPath(FOLDERID_Documents, 0, NULL, &pwszDumpPath);
+    SYSTEMTIME stNow; GetLocalTime(&stNow);
+    wchar_t wszTimestamp[MAX_PATH] = L""; wsprintf(wszTimestamp, L"%s\\VDriveNSE-%04hu%02hu%02hu-%02hu%02hu%02hu-%x-%x.dmp", pwszDumpPath, stNow.wYear, stNow.wMonth, stNow.wDay, stNow.wHour, stNow.wMinute, stNow.wSecond, GetCurrentProcessId(), GetCurrentThreadId());
+    LocalFree(pwszDumpPath); pwszDumpPath = NULL;
+    HANDLE lhDumpFile = CreateFileW(wszTimestamp, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,FILE_ATTRIBUTE_NORMAL ,NULL);
+    MINIDUMP_EXCEPTION_INFORMATION loExceptionInfo;
+    loExceptionInfo.ExceptionPointers = ExceptionInfo;
+    loExceptionInfo.ThreadId = GetCurrentThreadId();
+    loExceptionInfo.ClientPointers = TRUE;
+    MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(),lhDumpFile, MiniDumpNormal, &loExceptionInfo, NULL, NULL);
+    CloseHandle(lhDumpFile);
+    return EXCEPTION_EXECUTE_HANDLER;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

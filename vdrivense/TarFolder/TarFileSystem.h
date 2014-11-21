@@ -51,6 +51,8 @@ public:
    HRESULT CreateFileSystem(PCIDLIST_ABSOLUTE pidlRoot, CNseFileSystem** ppFS);
    HRESULT LoadLangResource();
    HRESULT CheckCallingProcess();
+   HRESULT InstallExceptionHandler(); 
+   static LONG WINAPI ExceptionHandler(struct _EXCEPTION_POINTERS* ExceptionInfo);
 };
 
 

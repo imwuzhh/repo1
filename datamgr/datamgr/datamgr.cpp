@@ -332,6 +332,8 @@ HRESULT DMSetupQuery(TAR_ARCHIVE * pArchive, const wchar_t * query, VFS_FIND_DAT
 
     ServerItemInfo & refItem = gspGlobalDB->find(SearchId)->second;
 
+    if (wcslen(query) >= lengthof(refItem.szQuery)) return E_FAIL;
+
     wcscpy_s(refItem.szQuery, lengthof(refItem.szQuery), query);
 
     memset(pWfd, 0, sizeof(*pWfd));

@@ -180,12 +180,25 @@ static HRESULT DMCleanup()
 	return S_OK;
 }
 
+static 
+HRESULT CheckCallingProcess()
+{
+    char szExePath [MAX_PATH] = "";
+    char szExeName [MAX_PATH] = "";
+    GetModuleFileNameA(NULL, szExePath, MAX_PATH);
+    ::_splitpath(szExePath, NULL, NULL, szExeName, NULL);
+    if (!stricmp(szExeName, "Explorer") || !stricmp(szExeName, "Regsvr32"))
+        return S_OK;
+    return E_FAIL;
+}
+
 BOOL WINAPI DllMain(_In_  HINSTANCE hinstDLL,
                     _In_  DWORD fdwReason,
                     _In_  LPVOID lpvReserved
                     )
 {
     if (DLL_PROCESS_ATTACH){
+        if (FAILED(CheckCallingProcess())) return FALSE;
         DMInit(hinstDLL);
     }
     if (DLL_PROCESS_DETACH){

@@ -697,14 +697,21 @@ STDMETHODIMP CShellFolder::SetNameOf(HWND hwnd, PCUITEMID_CHILD pidl, LPCWSTR ps
    HR( spItem->Rename(pszName, wszOutputName) );
    // Lookup the new item and return it as the result
    if( ppidlOut != NULL ) {
-      CNseItemPtr spNewItem;
-      HRESULT hr = ( m_spFolderItem->GetChild(wszOutputName, SHGDN_FORPARSING, &spNewItem) );
-      if (hr != S_OK) return hr;
-      *ppidlOut = ::ILCloneChild( spNewItem->GetITEMID() );
-      // Notify Shell directly about the rename operation...
-      CPidl pidlOld = m_pidlMonitor + pidl;
-      CPidl pidlNew = m_pidlMonitor + spNewItem->GetITEMID();
-      ::SHChangeNotify(spNewItem->IsFolder() ? SHCNE_RENAMEFOLDER : SHCNE_RENAMEITEM, SHCNF_IDLIST | SHCNF_FLUSH, pidlOld, pidlNew);
+		HRESULT hr = S_FALSE;
+		CNseItemPtr spNewItem;
+		if (true){
+			VFS_FIND_DATA wfd = spItem->GetFindData(); wcscpy_s(wfd.cFileName, lengthof(wfd.cFileName), pszName);
+			spNewItem = m_spFolderItem->GenerateChild(this, m_pidlFolder, wfd);
+			hr = ((CNseItem *)spNewItem == NULL) ? S_FALSE : S_OK;
+		}else{
+			hr = ( m_spFolderItem->GetChild(wszOutputName, SHGDN_FORPARSING, &spNewItem) );
+		}
+		if (hr != S_OK) return hr;
+		*ppidlOut = ::ILCloneChild( spNewItem->GetITEMID() );
+		// Notify Shell directly about the rename operation...
+		CPidl pidlOld = m_pidlMonitor + pidl;
+		CPidl pidlNew = m_pidlMonitor + spNewItem->GetITEMID();
+		::SHChangeNotify(spNewItem->IsFolder() ? SHCNE_RENAMEFOLDER : SHCNE_RENAMEITEM, SHCNF_IDLIST | SHCNF_FLUSH, pidlOld, pidlNew);
    }
    //::SHChangeNotify(SHCNE_UPDATEDIR, SHCNF_IDLIST, m_pidlMonitor);
    return S_OK;

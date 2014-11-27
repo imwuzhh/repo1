@@ -698,7 +698,7 @@ STDMETHODIMP CShellFolder::SetNameOf(HWND hwnd, PCUITEMID_CHILD pidl, LPCWSTR ps
    // Lookup the new item and return it as the result
    if( ppidlOut != NULL ) {
       CNseItemPtr spNewItem;
-      HRESULT hr = S_OK;//( m_spFolderItem->GetChild(wszOutputName, SHGDN_FORPARSING, &spNewItem) );
+      HRESULT hr = ( m_spFolderItem->GetChild(wszOutputName, SHGDN_FORPARSING, &spNewItem) );
       if (hr != S_OK) return hr;
       *ppidlOut = ::ILCloneChild( spNewItem->GetITEMID() );
       // Notify Shell directly about the rename operation...
